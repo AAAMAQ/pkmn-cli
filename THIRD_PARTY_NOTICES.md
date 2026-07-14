@@ -12,3 +12,7 @@ Both source projects are licensed under the MIT License. The complete MIT terms 
 The initial internal save reader and checksum validator adapt the verified Gen I layout and checksum rules from Save Genie's `SaveStructure` module. Later imports will be recorded here as they are incorporated.
 
 No ROMs, private saves, screenshots, emulator artifacts, personal resources, or proof evidence from the source projects are incorporated.
+
+## JSON for Modern C++
+
+This repository vendors JSON for Modern C++ 3.12.0 by Niels Lohmann under the MIT License. Its license is stored at `third_party/nlohmann/LICENSE.MIT`.

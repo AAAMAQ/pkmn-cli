@@ -46,13 +46,14 @@ cmake --install build --prefix /your/install/prefix
 pkmn --help
 pkmn --version
 pkmn doctor
+pkmn red decode input.sav
 pkmn red inspect input.sav
 pkmn red validate input.sav
 ```
 
 `pkmn doctor` reports the modules compiled into the standalone executable. It does not search for or invoke Save Genie or Save Generator. No save, ROM, or evidence file is read by the doctor.
 
-`pkmn red inspect` and `pkmn red validate` use the internal reader and validator and require no Save Genie executable. `pkmn red decode` remains reserved until the canonical internal `.red.json` export slice is complete.
+`pkmn red decode`, `pkmn red inspect`, and `pkmn red validate` use the internal reader and require no Save Genie executable. Decode includes the archival `physicalImage` by default; use `--no-physical-image` for a semantic-only export. Existing output files are never overwritten.
 
 ## Planned command shape
 

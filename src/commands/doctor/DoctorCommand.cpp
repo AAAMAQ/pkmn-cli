@@ -36,7 +36,8 @@ int Run(const std::vector<std::string>& arguments,
            << "[ok] command router\n"
            << "[ok] internal Red save loader\n"
            << "[ok] internal Red checksum validator\n"
-           << "[info] canonical Red JSON and generation modules: planned milestones\n"
+           << "[ok] canonical Red JSON decoder\n"
+           << "[info] internal RJSON validation and generation: planned milestones\n"
            << "\nStandalone readiness: ready\n";
     return ToInt(ExitCode::Success);
 }

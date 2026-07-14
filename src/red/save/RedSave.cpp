@@ -27,4 +27,12 @@ RedSave::Byte RedSave::At(std::size_t offset) const {
     return bytes_[offset];
 }
 
+RedSave::Bytes RedSave::Slice(std::size_t offset, std::size_t length) const {
+    if (offset > bytes_.size() || length > bytes_.size() - offset) {
+        throw std::out_of_range("Red save byte range is out of bounds");
+    }
+    return Bytes(bytes_.begin() + static_cast<std::ptrdiff_t>(offset),
+                 bytes_.begin() + static_cast<std::ptrdiff_t>(offset + length));
+}
+
 }  // namespace pkmn::cli::red::save

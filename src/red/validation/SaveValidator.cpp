@@ -33,7 +33,7 @@ std::size_t SaveValidator::BoxOffset(std::size_t indexZeroBased) {
 ValidationReport SaveValidator::Validate(const save::RedSave& input) {
     ValidationReport report;
     report.actualSize = input.Size();
-    report.expectedSize = input.Size() == save::RedSave::ExpectedSize;
+    report.expectedSize = input.Size() >= save::RedSave::ExpectedSize;
     if (!report.expectedSize) return report;
 
     report.main = {ComputeInvertedSum(input, MainStart, MainEnd), input.At(MainStored)};

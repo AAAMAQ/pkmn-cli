@@ -74,9 +74,9 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  doctor               Check standalone internal-engine readiness\n"
         << "  red inspect          Inspect save integrity using the internal Red engine\n"
         << "  red validate         Validate all known Red save checksums internally\n"
+        << "  red decode           Export canonical .red.json internally\n"
         << "\n"
         << "Reserved/planned command domains:\n"
-        << "  red decode           Pending internal canonical JSON export\n"
         << "  rjson                Pending internal Red JSON workflows\n"
         << "  proof                End-to-end proof workflows\n"
         << "  compare              Physical and semantic comparisons\n"
@@ -88,6 +88,7 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  reconstruct          Archival reconstruction; physicalImage is required\n"
         << "  edit                 Writes a validated copy; never overwrites input by default\n\n"
         << "Examples:\n"
+        << "  pkmn red decode savefile.sav\n"
         << "  pkmn red inspect savefile.sav\n"
         << "  pkmn red validate savefile.sav\n"
         << "  pkmn doctor\n";

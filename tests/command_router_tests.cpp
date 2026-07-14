@@ -6,10 +6,14 @@
 #include <utility>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include "app/CommandRouter.hpp"
 #include "app/ExitCode.hpp"
+#include "red/json/RedDecoder.hpp"
 #include "red/save/RedSave.hpp"
 #include "red/validation/SaveValidator.hpp"
+#include "util/Sha256.hpp"
 
 namespace {
 
@@ -81,11 +85,9 @@ int main() {
     Expect(unknown.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidArguments),
            "unknown command should use invalid-arguments exit code");
 
-    const auto planned = Run({"red", "decode", "sample.sav"});
-    Expect(planned.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::UnsupportedOperation),
-           "planned domain should fail honestly as unsupported");
-    Expect(planned.error.find("internal canonical .red.json export") != std::string::npos,
-           "Red decode placeholder should explain the internal JSON-export migration gate");
+    const auto missingDecodeArgument = Run({"red", "decode"});
+    Expect(missingDecodeArgument.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidArguments),
+           "red decode should require an input");
 
     const auto pendingRjson = Run({"rjson", "generate"});
     Expect(pendingRjson.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::UnsupportedOperation),
@@ -120,6 +122,53 @@ int main() {
     const auto validation = pkmn::cli::red::validation::SaveValidator::Validate(loaded);
     Expect(validation.Valid(), "internal Red validator should accept a synthetic valid save");
     Expect(validation.boxes.size() == 12, "internal Red validator should check all 12 boxes");
+    Expect(pkmn::cli::util::Sha256Hex({}) ==
+               "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+           "portable SHA-256 should match the empty-message standard vector");
+
+    const fs::path includedJson = temp / "included.red.json";
+    const auto includedDecode = Run({"red", "decode", validSavePath.string(),
+                                     "--output", includedJson.string(),
+                                     "--include-physical-image"});
+    Expect(includedDecode.code == 0 && fs::exists(includedJson),
+           "red decode should export a requested canonical JSON path");
+    nlohmann::ordered_json includedDocument;
+    {
+        std::ifstream input(includedJson);
+        input >> includedDocument;
+    }
+    Expect(includedDocument.at("schema").at("format") == "pkmn-red-master-save" &&
+               includedDocument.at("schema").at("schemaVersion") == "0.1.0",
+           "decode should emit canonical schema identity");
+    Expect(includedDocument.contains("physicalImage") &&
+               includedDocument.at("physicalImage").at("standardSramHex").get<std::string>().size() == 0x10000,
+           "include-physical-image should preserve the complete 32 KiB SRAM image");
+    Expect(includedDocument.at("decoded").contains("party") &&
+               includedDocument.at("decoded").at("pcStorage").at("boxes").size() == 12 &&
+               includedDocument.at("decoded").contains("hallOfFame"),
+           "decode should contain the required party, storage, and Hall of Fame sections");
+
+    const fs::path excludedJson = temp / "excluded.red.json";
+    const auto excludedDecode = Run({"red", "decode", validSavePath.string(),
+                                     "--output", excludedJson.string(), "--no-physical-image"});
+    Expect(excludedDecode.code == 0, "red decode should support semantic-only export");
+    nlohmann::ordered_json excludedDocument;
+    {
+        std::ifstream input(excludedJson);
+        input >> excludedDocument;
+    }
+    Expect(!excludedDocument.contains("physicalImage") &&
+               !excludedDocument.at("reconstruction").at("available").get<bool>(),
+           "no-physical-image should omit archival bytes and mark reconstruction unavailable");
+    const auto deterministicA = pkmn::cli::red::json::Serialize(
+        pkmn::cli::red::json::Decode(loaded, "logical.sav", validation, {true}));
+    const auto deterministicB = pkmn::cli::red::json::Serialize(
+        pkmn::cli::red::json::Decode(loaded, "logical.sav", validation, {true}));
+    Expect(deterministicA == deterministicB, "canonical decode serialization should be deterministic");
+    const auto collision = Run({"red", "decode", validSavePath.string(),
+                                "--output", includedJson.string()});
+    Expect(collision.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
+           "red decode should refuse an existing output");
 
     for (std::size_t bank = 0; bank < 2; ++bank) {
         auto corrupted = ValidSyntheticSave();
@@ -160,6 +209,10 @@ int main() {
            "red validate should map checksum corruption to checksum failure");
     Expect(corruptValidate.output.find("Main checksum: invalid") != std::string::npos,
            "red validate should identify the corrupted checksum");
+    const auto corruptDecode = Run({"red", "decode", corruptSavePath.string(),
+                                    "--output", (temp / "corrupt.red.json").string()});
+    Expect(corruptDecode.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::ChecksumFailure),
+           "red decode should reject a checksum-invalid save");
 
     const auto missingSave = Run({"red", "validate", (temp / "missing.sav").string()});
     Expect(missingSave.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidInput),

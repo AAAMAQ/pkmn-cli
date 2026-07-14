@@ -21,6 +21,7 @@ public:
 
     [[nodiscard]] std::size_t Size() const noexcept { return bytes_.size(); }
     [[nodiscard]] Byte At(std::size_t offset) const;
+    [[nodiscard]] Bytes Slice(std::size_t offset, std::size_t length) const;
     [[nodiscard]] const Bytes& BytesView() const noexcept { return bytes_; }
 
 private:

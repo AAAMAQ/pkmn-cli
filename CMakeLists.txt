@@ -13,11 +13,17 @@ add_library(pkmn_cli_core
     src/app/CommandRouter.cpp
     src/commands/doctor/DoctorCommand.cpp
     src/commands/red/RedCommand.cpp
+    src/red/codec/Gen1Codec.cpp
+    src/red/json/RedDecoder.cpp
     src/red/save/RedSave.cpp
     src/red/validation/SaveValidator.cpp
+    src/util/Sha256.cpp
 )
 
-target_include_directories(pkmn_cli_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(pkmn_cli_core PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    "${CMAKE_CURRENT_SOURCE_DIR}/third_party"
+)
 target_compile_features(pkmn_cli_core PUBLIC cxx_std_20)
 
 if(MSVC)

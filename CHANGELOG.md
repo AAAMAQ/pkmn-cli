@@ -8,6 +8,7 @@
 - Added migration planning, acceptance gates, licensing attribution, and standalone tests.
 - Removed the initial helper-executable discovery scaffold so the product boundary cannot regress into a sidecar dependency.
 - Updated `doctor` to report compiled-in module readiness only.
+- Implemented deterministic internal `red decode` with canonical `.red.json`, optional archival physical image, SHA-256 identities, collision refusal, and broad Red semantic sections.
 
 All notable changes to `pkmn-cli` will be documented here.
 
