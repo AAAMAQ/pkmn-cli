@@ -52,7 +52,10 @@ add_executable(pkmn src/main.cpp)
 target_link_libraries(pkmn PRIVATE pkmn_cli_core)
 
 install(TARGETS pkmn RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
-install(FILES LICENSE DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+install(FILES LICENSE README.md CHANGELOG.md THIRD_PARTY_NOTICES.md
+        DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+install(DIRECTORY docs/ DESTINATION "${CMAKE_INSTALL_DOCDIR}/docs"
+        FILES_MATCHING PATTERN "*.md")
 install(FILES resources/pokemon-red-usa-europe-v1.template.bin
         DESTINATION "${CMAKE_INSTALL_DATADIR}/pkmn/resources")
 

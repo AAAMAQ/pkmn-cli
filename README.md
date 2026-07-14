@@ -40,6 +40,8 @@ Install to a chosen prefix:
 cmake --install build --prefix /your/install/prefix
 ```
 
+For a user-local shell installation, use `--prefix "$HOME/.local"`, add `$HOME/.local/bin` to `PATH`, and run `pkmn doctor`. See [installation and Homebrew readiness](docs/INSTALL.md).
+
 ## Implemented commands
 
 ```text
@@ -75,20 +77,9 @@ pkmn red end-edit input.edit-session.json
 
 Red editing is copy-first. `begin-edit` creates a semantic-only session, `edit-session` accumulates named or JSON-pointer edits, `validate-edit` performs an in-memory generation/checksum gate, and `end-edit` writes a new save plus JSON/Markdown reports. The source hash is rechecked at every validation. Arbitrary locations are rejected; generated edits use the verified Red's-house preset. Complex supported structures—including inventory, party, boxes, current-box cache, Daycare, Hall of Fame, and raw supported event state—are scriptable through `--set /decoded/... <JSON-value>`.
 
-## Planned command shape
+## Command documentation
 
-```sh
-pkmn red decode savefile.sav
-pkmn red inspect savefile.sav
-pkmn red validate savefile.sav
-pkmn red edit savefile.sav
-pkmn rjson generate savefile.red.json
-pkmn rjson reconstruct savefile.red.json
-pkmn proof red savefile.sav
-pkmn compare physical original.sav generated.sav
-```
-
-Internal `red inspect` and `red validate` are implemented. `red decode` and all `rjson` commands are pending internal modules.
+See the [complete command reference](docs/COMMAND_REFERENCE.md) for options, policies, exit codes, and the explicit FireRed placeholders. Public-data-only examples are in [examples/README.md](examples/README.md).
 
 ## Generation is not reconstruction
 
@@ -112,6 +103,8 @@ Semantic generation must never read `physicalImage` as authority. Reconstruction
 - Manual emulator load, interaction, save-again, and reparse remain release gates for generated-save claims.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/PRIVACY_AND_PUBLICATION.md](docs/PRIVACY_AND_PUBLICATION.md), and the preserved planning material in [Pkmn Unified CLI Plan](Pkmn%20Unified%20CLI%20Plan/).
+
+Release maintainers should also follow [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md). CI builds, tests, installs, and smoke-tests the standalone executable on macOS and Linux.
 
 ## License
 
