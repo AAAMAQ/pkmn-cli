@@ -9,6 +9,7 @@
 #include "app/Version.hpp"
 #include "commands/doctor/DoctorCommand.hpp"
 #include "commands/red/RedCommand.hpp"
+#include "commands/rjson/RjsonCommand.hpp"
 
 namespace pkmn::cli {
 namespace {
@@ -47,6 +48,9 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
     if (arguments.front() == "red") {
         return commands::red::Run({arguments.begin() + 1, arguments.end()}, output, error);
     }
+    if (arguments.front() == "rjson") {
+        return commands::rjson::Run({arguments.begin() + 1, arguments.end()}, output, error);
+    }
 
     if (std::find(kPlannedDomains.begin(), kPlannedDomains.end(), arguments.front()) !=
         kPlannedDomains.end()) {
@@ -75,9 +79,11 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  red inspect          Inspect save integrity using the internal Red engine\n"
         << "  red validate         Validate all known Red save checksums internally\n"
         << "  red decode           Export canonical .red.json internally\n"
+        << "  rjson inspect        Inspect canonical Red JSON internally\n"
+        << "  rjson validate       Validate canonical Red JSON internally\n"
+        << "  rjson reconstruct    Restore an archival physical image\n"
         << "\n"
         << "Reserved/planned command domains:\n"
-        << "  rjson                Pending internal Red JSON workflows\n"
         << "  proof                End-to-end proof workflows\n"
         << "  compare              Physical and semantic comparisons\n"
         << "  config               Local helper-tool configuration\n"

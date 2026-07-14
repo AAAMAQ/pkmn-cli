@@ -49,11 +49,16 @@ pkmn doctor
 pkmn red decode input.sav
 pkmn red inspect input.sav
 pkmn red validate input.sav
+pkmn rjson inspect input.red.json
+pkmn rjson validate input.red.json
+pkmn rjson reconstruct input.red.json
 ```
 
 `pkmn doctor` reports the modules compiled into the standalone executable. It does not search for or invoke Save Genie or Save Generator. No save, ROM, or evidence file is read by the doctor.
 
 `pkmn red decode`, `pkmn red inspect`, and `pkmn red validate` use the internal reader and require no Save Genie executable. Decode includes the archival `physicalImage` by default; use `--no-physical-image` for a semantic-only export. Existing output files are never overwritten.
+
+`pkmn rjson inspect` and `validate` verify schema `0.1.0`, required semantics, and—when present—the physical image SHA-256 and Red checksums. `pkmn rjson reconstruct` is a separate archival mode that requires `physicalImage`; it is never semantic generation.
 
 ## Planned command shape
 

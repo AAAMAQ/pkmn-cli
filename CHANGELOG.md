@@ -9,6 +9,8 @@
 - Removed the initial helper-executable discovery scaffold so the product boundary cannot regress into a sidecar dependency.
 - Updated `doctor` to report compiled-in module readiness only.
 - Implemented deterministic internal `red decode` with canonical `.red.json`, optional archival physical image, SHA-256 identities, collision refusal, and broad Red semantic sections.
+- Added internal `rjson inspect` and `rjson validate` with schema, required-field, semantic, physical-image, checksum, and SHA-256 validation.
+- Added explicit collision-safe `rjson reconstruct` archival reconstruction with mandatory `physicalImage` authority.
 
 All notable changes to `pkmn-cli` will be documented here.
 

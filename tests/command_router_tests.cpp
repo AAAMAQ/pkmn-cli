@@ -90,8 +90,8 @@ int main() {
            "red decode should require an input");
 
     const auto pendingRjson = Run({"rjson", "generate"});
-    Expect(pendingRjson.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::UnsupportedOperation),
-           "rjson should remain an honest internal-workflow placeholder");
+    Expect(pendingRjson.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidArguments),
+           "rjson should reject an unimplemented or incomplete command form");
 
     const auto future = Run({"fred", "decode", "sample.sav"});
     Expect(future.error.find("emulator-proven") != std::string::npos,
@@ -160,6 +160,51 @@ int main() {
     Expect(!excludedDocument.contains("physicalImage") &&
                !excludedDocument.at("reconstruction").at("available").get<bool>(),
            "no-physical-image should omit archival bytes and mark reconstruction unavailable");
+    const auto inspectRjson = Run({"rjson", "inspect", includedJson.string()});
+    Expect(inspectRjson.code == 0 && inspectRjson.output.find("Physical image: present and valid") !=
+               std::string::npos,
+           "rjson inspect should validate and summarize canonical JSON internally");
+    const auto validateRjson = Run({"rjson", "validate", excludedJson.string()});
+    Expect(validateRjson.code == 0 && validateRjson.output.find("Physical image: absent") !=
+               std::string::npos,
+           "rjson validate should accept semantic-only JSON and report reconstruction unavailable");
+
+    const fs::path reconstructed = temp / "reconstructed.sav";
+    const auto reconstruct = Run({"rjson", "reconstruct", includedJson.string(),
+                                  "--output", reconstructed.string()});
+    Expect(reconstruct.code == 0 && fs::exists(reconstructed),
+           "rjson reconstruct should write an archival physical image");
+    const auto reconstructedSave = pkmn::cli::red::save::RedSave::Read(reconstructed);
+    Expect(reconstructedSave.BytesView() == loaded.BytesView(),
+           "archival reconstruction should reproduce the source bytes exactly");
+    const auto missingPhysicalReconstruct = Run({"rjson", "reconstruct", excludedJson.string(),
+                                                 "--output", (temp / "missing-physical.sav").string()});
+    Expect(missingPhysicalReconstruct.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidInput),
+           "reconstruction should fail safely when physicalImage is absent");
+    const auto reconstructionCollision = Run({"rjson", "reconstruct", includedJson.string(),
+                                              "--output", reconstructed.string()});
+    Expect(reconstructionCollision.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
+           "reconstruction should refuse to overwrite an existing output");
+
+    auto missingFieldDocument = excludedDocument;
+    missingFieldDocument["decoded"].erase("party");
+    const fs::path missingFieldJson = temp / "missing-field.json";
+    std::ofstream(missingFieldJson) << missingFieldDocument.dump(2);
+    Expect(Run({"rjson", "validate", missingFieldJson.string()}).code ==
+               pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidInput),
+           "rjson validate should reject a missing required semantic field");
+    auto unsupportedSchema = excludedDocument;
+    unsupportedSchema["schema"]["schemaVersion"] = "9.0.0";
+    const fs::path unsupportedJson = temp / "unsupported-schema.json";
+    std::ofstream(unsupportedJson) << unsupportedSchema.dump(2);
+    Expect(Run({"rjson", "validate", unsupportedJson.string()}).code ==
+               pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidInput),
+           "rjson validate should reject an unsupported schema version");
+    const fs::path invalidJson = temp / "invalid.json";
+    std::ofstream(invalidJson) << "{not-json";
+    Expect(Run({"rjson", "validate", invalidJson.string()}).code ==
+               pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidInput),
+           "rjson validate should reject malformed JSON");
     const auto deterministicA = pkmn::cli::red::json::Serialize(
         pkmn::cli::red::json::Decode(loaded, "logical.sav", validation, {true}));
     const auto deterministicB = pkmn::cli::red::json::Serialize(

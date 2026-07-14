@@ -13,8 +13,10 @@ add_library(pkmn_cli_core
     src/app/CommandRouter.cpp
     src/commands/doctor/DoctorCommand.cpp
     src/commands/red/RedCommand.cpp
+    src/commands/rjson/RjsonCommand.cpp
     src/red/codec/Gen1Codec.cpp
     src/red/json/RedDecoder.cpp
+    src/red/json/RedJsonDocument.cpp
     src/red/save/RedSave.cpp
     src/red/validation/SaveValidator.cpp
     src/util/Sha256.cpp
