@@ -8,6 +8,8 @@
 #include "app/ExitCode.hpp"
 #include "app/Version.hpp"
 #include "commands/doctor/DoctorCommand.hpp"
+#include "commands/compare/CompareCommand.hpp"
+#include "commands/proof/ProofCommand.hpp"
 #include "commands/red/RedCommand.hpp"
 #include "commands/rjson/RjsonCommand.hpp"
 
@@ -43,6 +45,12 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
     if (arguments.front() == "doctor") {
         const std::vector<std::string> doctorArguments(arguments.begin() + 1, arguments.end());
         return commands::doctor::Run(doctorArguments, output, error);
+    }
+    if (arguments.front() == "compare") {
+        return commands::compare::Run({arguments.begin() + 1, arguments.end()}, output, error);
+    }
+    if (arguments.front() == "proof") {
+        return commands::proof::Run({arguments.begin() + 1, arguments.end()}, output, error);
     }
 
     if (arguments.front() == "red") {
@@ -84,10 +92,11 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  rjson generate       Generate a Red save from semantic fields\n"
         << "  rjson reconstruct    Restore an archival physical image\n"
         << "\n"
-        << "Reserved/planned command domains:\n"
-        << "  proof                End-to-end proof workflows\n"
-        << "  compare              Physical and semantic comparisons\n"
-        << "  config               Local helper-tool configuration\n"
+        << "  compare physical     Compare save bytes and difference ranges\n"
+        << "  compare semantic     Compare canonical Red semantic JSON\n"
+        << "  proof red            Run the internal Red proof pipeline\n"
+        << "\nReserved/planned command domains:\n"
+        << "  config               Future local CLI configuration\n"
         << "  fred, frjson         Future FireRed workflows (not implemented)\n"
         << "  convert              Future Red-to-FireRed conversion (not implemented)\n\n"
         << "Core safety model:\n"

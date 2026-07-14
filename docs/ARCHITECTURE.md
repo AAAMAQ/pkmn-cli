@@ -19,12 +19,12 @@ pkmn command router
 - `src/red/generation`: physical-image-isolated semantic generation, safe-location policy, subsystem serializers, checksum repair, and write-range validation.
 - `src/red/editing`: copy-first validated editing (migration pending).
 - `src/red/validation`: structural, checksum, semantic, and policy checks.
-- `src/red/comparison`: physical and semantic comparison (migration pending).
+- `src/red/comparison`: physical range/hash comparison and field-aware semantic policy comparison.
 - `src/red/reporting`: portable human/machine reports (migration pending).
 
 ## Current internal coverage
 
-`red inspect`, `red validate`, and `red decode` internally load and decode Red SRAM. `rjson inspect`, `validate`, `reconstruct`, and `generate` are internal. Generation uses a hash-validated bundled Red's-house template, ignores target physical bytes, rewrites supported semantics, and repairs all checksums. Comparison/proof and editing migrate next.
+`red inspect`, `red validate`, and `red decode` internally load and decode Red SRAM. All `rjson` workflows are internal. Generation uses a hash-validated bundled Red's-house template, ignores target physical bytes, rewrites supported semantics, and repairs all checksums. Physical/semantic comparison and proof orchestration are internal; editing migrates next.
 
 ## Non-negotiable boundaries
 

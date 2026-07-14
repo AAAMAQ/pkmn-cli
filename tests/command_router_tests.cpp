@@ -51,6 +51,8 @@ std::vector<std::uint8_t> ValidSyntheticSave() {
   using Validator = pkmn::cli::red::validation::SaveValidator;
   std::vector<std::uint8_t> bytes(pkmn::cli::red::save::RedSave::ExpectedSize,
                                   0);
+  bytes[0x2598] = 0x50;
+  bytes[0x25F6] = 0x50;
   bytes[Validator::MainStored] =
       InvertedSum(bytes, Validator::MainStart, Validator::MainEnd);
   for (std::size_t bank = 0; bank < 2; ++bank) {
@@ -271,6 +273,57 @@ int main() {
                  .code ==
              pkmn::cli::ToInt(pkmn::cli::ExitCode::GenerationFailure),
          "semantic generation should fail closed on unsupported state");
+
+  const auto physicalSame =
+      Run({"compare", "physical", generatedA.string(), generatedA.string()});
+  Expect(physicalSame.code == 0 &&
+             physicalSame.output.find("Identical: yes") != std::string::npos,
+         "physical comparison should report identical save bytes");
+  const auto physicalDifferent =
+      Run({"compare", "physical", validSavePath.string(), generatedA.string()});
+  Expect(physicalDifferent.code == 0 &&
+             physicalDifferent.output.find("Differing bytes:") !=
+                 std::string::npos,
+         "physical comparison should report byte differences");
+  const auto semanticSame = Run(
+      {"compare", "semantic", includedJson.string(), excludedJson.string()});
+  Expect(semanticSame.code == 0,
+         "semantic comparison should ignore archival physical-image presence");
+  auto semanticDifference = excludedDocument;
+  semanticDifference["decoded"]["moneyAndCoins"]["money"] = 123456;
+  const fs::path semanticDifferenceJson = temp / "semantic-difference.json";
+  std::ofstream(semanticDifferenceJson) << semanticDifference.dump(2);
+  Expect(Run({"compare", "semantic", excludedJson.string(),
+              semanticDifferenceJson.string()})
+                 .code ==
+             pkmn::cli::ToInt(pkmn::cli::ExitCode::SemanticMismatch),
+         "semantic comparison should return the mismatch exit code");
+
+  const fs::path proofDirectory = temp / "synthetic-proof";
+  const auto proof = Run({"proof", "red", validSavePath.string(),
+                          "--output-dir", proofDirectory.string()});
+  Expect(proof.code == 0 && fs::exists(proofDirectory / "comparison.md") &&
+             fs::exists(proofDirectory / "comparison.json") &&
+             fs::exists(proofDirectory / "physical-comparison.md") &&
+             fs::exists(proofDirectory / "physical-comparison.json") &&
+             fs::exists(proofDirectory / "semantic-comparison.md") &&
+             fs::exists(proofDirectory / "semantic-comparison.json") &&
+             fs::exists(proofDirectory / "proof-manifest.json") &&
+             fs::exists(proofDirectory / "emulator-checklist.md"),
+         "proof red should create the complete report and emulator-checklist "
+         "package");
+  nlohmann::ordered_json proofManifest;
+  std::ifstream(proofDirectory / "proof-manifest.json") >> proofManifest;
+  Expect(proofManifest.at("deterministic").get<bool>() &&
+             proofManifest.at("physicalImageIsolation").get<bool>() &&
+             proofManifest.at("generatedIntegrityValid").get<bool>() &&
+             proofManifest.at("emulatorValidation") == "required-manual-gate",
+         "proof manifest should record automated gates without claiming "
+         "emulator proof");
+  Expect(Run({"proof", "red", validSavePath.string(), "--output-dir",
+              proofDirectory.string()})
+                 .code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
+         "proof workflow should refuse an existing proof directory");
 
   auto missingFieldDocument = excludedDocument;
   missingFieldDocument["decoded"].erase("party");

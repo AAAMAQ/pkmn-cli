@@ -12,6 +12,7 @@
 - Added internal `rjson inspect` and `rjson validate` with schema, required-field, semantic, physical-image, checksum, and SHA-256 validation.
 - Added explicit collision-safe `rjson reconstruct` archival reconstruction with mandatory `physicalImage` authority.
 - Added internal deterministic `rjson generate`, the validated bundled Red's-house template, full supported semantic serialization, physical-image isolation, checksum regeneration, write-range overlap validation, and JSON/Markdown generation reports.
+- Added physical and field-aware semantic comparison plus the complete internal `proof red` decode/generate/redecode/determinism/isolation/report/checklist workflow.
 
 All notable changes to `pkmn-cli` will be documented here.
 
