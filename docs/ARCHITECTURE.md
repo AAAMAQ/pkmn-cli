@@ -16,7 +16,7 @@ pkmn command router
 - `src/commands`: stable public command contracts.
 - `src/red/save`: bounded Gen I SRAM representation and file I/O.
 - `src/red/json`: deterministic canonical JSON decode model, import validation, physical-image verification, and archival reconstruction source handling.
-- `src/red/generation`: semantic generation (migration pending).
+- `src/red/generation`: physical-image-isolated semantic generation, safe-location policy, subsystem serializers, checksum repair, and write-range validation.
 - `src/red/editing`: copy-first validated editing (migration pending).
 - `src/red/validation`: structural, checksum, semantic, and policy checks.
 - `src/red/comparison`: physical and semantic comparison (migration pending).
@@ -24,7 +24,7 @@ pkmn command router
 
 ## Current internal coverage
 
-`red inspect`, `red validate`, and `red decode` internally load a standard 32 KiB SRAM image (preserving optional trailing bytes), validate all Red checksums, then optionally export deterministic archival bytes and supported semantics. `rjson inspect`, `rjson validate`, and explicit physical-image reconstruction are internal. Semantic generation, comparison/proof, and editing migrate next in the order defined by [SELF_CONTAINED_RED_ENGINE_PLAN.md](SELF_CONTAINED_RED_ENGINE_PLAN.md).
+`red inspect`, `red validate`, and `red decode` internally load and decode Red SRAM. `rjson inspect`, `validate`, `reconstruct`, and `generate` are internal. Generation uses a hash-validated bundled Red's-house template, ignores target physical bytes, rewrites supported semantics, and repairs all checksums. Comparison/proof and editing migrate next.
 
 ## Non-negotiable boundaries
 

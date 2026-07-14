@@ -52,6 +52,7 @@ pkmn red validate input.sav
 pkmn rjson inspect input.red.json
 pkmn rjson validate input.red.json
 pkmn rjson reconstruct input.red.json
+pkmn rjson generate input.red.json [output.sav]
 ```
 
 `pkmn doctor` reports the modules compiled into the standalone executable. It does not search for or invoke Save Genie or Save Generator. No save, ROM, or evidence file is read by the doctor.
@@ -59,6 +60,8 @@ pkmn rjson reconstruct input.red.json
 `pkmn red decode`, `pkmn red inspect`, and `pkmn red validate` use the internal reader and require no Save Genie executable. Decode includes the archival `physicalImage` by default; use `--no-physical-image` for a semantic-only export. Existing output files are never overwritten.
 
 `pkmn rjson inspect` and `validate` verify schema `0.1.0`, required semantics, and—when present—the physical image SHA-256 and Red checksums. `pkmn rjson reconstruct` is a separate archival mode that requires `physicalImage`; it is never semantic generation.
+
+`pkmn rjson generate` uses only decoded semantic fields. It ignores target `physicalImage`, rewrites supported trainer/core, inventory, Pokédex, party, permanent/current storage, Daycare, Hall of Fame, events/scripts/missables/hidden-state fields, canonicalizes unsafe locations to the verified Red's-house baseline, regenerates all checksums, and writes JSON/Markdown reports. The bundled public template is identity-checked before use.
 
 ## Planned command shape
 

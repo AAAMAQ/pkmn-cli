@@ -15,11 +15,20 @@ add_library(pkmn_cli_core
     src/commands/red/RedCommand.cpp
     src/commands/rjson/RjsonCommand.cpp
     src/red/codec/Gen1Codec.cpp
+    src/red/generation/SemanticGenerator.cpp
     src/red/json/RedDecoder.cpp
     src/red/json/RedJsonDocument.cpp
     src/red/save/RedSave.cpp
     src/red/validation/SaveValidator.cpp
     src/util/Sha256.cpp
+    src/util/ResourceLocator.cpp
+)
+
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/resources")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/pokemon-red-usa-europe-v1.template.bin"
+    "${CMAKE_CURRENT_BINARY_DIR}/resources/pokemon-red-usa-europe-v1.template.bin"
+    COPYONLY
 )
 
 target_include_directories(pkmn_cli_core PUBLIC
@@ -39,6 +48,8 @@ target_link_libraries(pkmn PRIVATE pkmn_cli_core)
 
 install(TARGETS pkmn RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 install(FILES LICENSE DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+install(FILES resources/pokemon-red-usa-europe-v1.template.bin
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/pkmn/resources")
 
 if(BUILD_TESTING)
     add_executable(pkmn_cli_tests tests/command_router_tests.cpp)

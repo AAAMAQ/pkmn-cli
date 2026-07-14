@@ -9,7 +9,9 @@ Portions of the Pokemon Red save-format knowledge and implementation in this rep
 
 Both source projects are licensed under the MIT License. The complete MIT terms are reproduced in this repository's `LICENSE` file. Both projects and `pkmn-cli` share the same owner; this notice preserves the technical provenance of the incorporated work.
 
-The initial internal save reader and checksum validator adapt the verified Gen I layout and checksum rules from Save Genie's `SaveStructure` module. Later imports will be recorded here as they are incorporated.
+The internal reader, codecs, decoder, validators, semantic serializers, checksum repair, safe-location policy, storage/current-box distinction, and generation template policy adapt the verified Gen I implementation and findings from those projects.
+
+The public synthetic canonical initialization resource is incorporated as `resources/pokemon-red-usa-europe-v1.template.bin`; its identity and purpose are documented in `resources/README.md`.
 
 No ROMs, private saves, screenshots, emulator artifacts, personal resources, or proof evidence from the source projects are incorporated.
 

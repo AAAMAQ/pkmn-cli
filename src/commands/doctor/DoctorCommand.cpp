@@ -38,7 +38,7 @@ int Run(const std::vector<std::string>& arguments,
            << "[ok] internal Red checksum validator\n"
            << "[ok] canonical Red JSON decoder\n"
            << "[ok] internal Red JSON validator and reconstructor\n"
-           << "[info] semantic generation: planned milestone\n"
+           << "[ok] internal semantic generator and bundled Red template\n"
            << "\nStandalone readiness: ready\n";
     return ToInt(ExitCode::Success);
 }

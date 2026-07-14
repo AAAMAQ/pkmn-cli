@@ -81,6 +81,7 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  red decode           Export canonical .red.json internally\n"
         << "  rjson inspect        Inspect canonical Red JSON internally\n"
         << "  rjson validate       Validate canonical Red JSON internally\n"
+        << "  rjson generate       Generate a Red save from semantic fields\n"
         << "  rjson reconstruct    Restore an archival physical image\n"
         << "\n"
         << "Reserved/planned command domains:\n"
