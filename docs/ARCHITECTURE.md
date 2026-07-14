@@ -17,14 +17,14 @@ pkmn command router
 - `src/red/save`: bounded Gen I SRAM representation and file I/O.
 - `src/red/json`: deterministic canonical JSON decode model, import validation, physical-image verification, and archival reconstruction source handling.
 - `src/red/generation`: physical-image-isolated semantic generation, safe-location policy, subsystem serializers, checksum repair, and write-range validation.
-- `src/red/editing`: copy-first validated editing (migration pending).
+- `src/red/editing`: semantic-only sessions, source identity checks, supported-field policy, and copy-first validated editing.
 - `src/red/validation`: structural, checksum, semantic, and policy checks.
 - `src/red/comparison`: physical range/hash comparison and field-aware semantic policy comparison.
 - `src/red/reporting`: portable human/machine reports (migration pending).
 
 ## Current internal coverage
 
-`red inspect`, `red validate`, and `red decode` internally load and decode Red SRAM. All `rjson` workflows are internal. Generation uses a hash-validated bundled Red's-house template, ignores target physical bytes, rewrites supported semantics, and repairs all checksums. Physical/semantic comparison and proof orchestration are internal; editing migrates next.
+`red inspect`, `red validate`, and `red decode` internally load and decode Red SRAM. All `rjson` workflows are internal. Generation uses a hash-validated bundled Red's-house template, ignores target physical bytes, rewrites supported semantics, and repairs all checksums. Physical/semantic comparison, proof orchestration, and copy-first interactive/scriptable editing are internal.
 
 ## Non-negotiable boundaries
 

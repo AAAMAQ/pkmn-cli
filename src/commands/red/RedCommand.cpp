@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "app/ExitCode.hpp"
+#include "commands/red/EditCommand.hpp"
 #include "red/json/RedDecoder.hpp"
 #include "red/save/RedSave.hpp"
 #include "red/validation/SaveValidator.hpp"
@@ -17,7 +18,9 @@ void PrintHelp(std::ostream& output) {
            << "  pkmn red decode <input.sav> [--output <file.red.json>]\n"
            << "                       [--include-physical-image|--no-physical-image]\n"
            << "  pkmn red inspect <input.sav>\n"
-           << "  pkmn red validate <input.sav>\n";
+           << "  pkmn red validate <input.sav>\n"
+           << "  pkmn red edit <input.sav>\n"
+           << "  pkmn red begin-edit|edit-session|pending-edits|validate-edit|end-edit ...\n";
 }
 
 void PrintReport(const pkmn::cli::red::validation::ValidationReport& report, std::ostream& output) {
@@ -104,6 +107,10 @@ int Run(const std::vector<std::string>& arguments, std::ostream& output, std::os
         return ToInt(ExitCode::Success);
     }
     if (arguments.front() == "decode") return RunDecode(arguments, output, error);
+    if (arguments.front() == "edit" || arguments.front() == "begin-edit" ||
+        arguments.front() == "edit-session" || arguments.front() == "pending-edits" ||
+        arguments.front() == "validate-edit" || arguments.front() == "end-edit")
+        return edit::Run(arguments, output, error);
     if ((arguments.front() == "inspect" || arguments.front() == "validate") &&
         arguments.size() == 2) {
         try {

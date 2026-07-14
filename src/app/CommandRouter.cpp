@@ -87,6 +87,8 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  red inspect          Inspect save integrity using the internal Red engine\n"
         << "  red validate         Validate all known Red save checksums internally\n"
         << "  red decode           Export canonical .red.json internally\n"
+        << "  red edit             Interactive validated copy editing\n"
+        << "  red begin-edit       Start a scriptable multi-edit session\n"
         << "  rjson inspect        Inspect canonical Red JSON internally\n"
         << "  rjson validate       Validate canonical Red JSON internally\n"
         << "  rjson generate       Generate a Red save from semantic fields\n"

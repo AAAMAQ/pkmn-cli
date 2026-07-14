@@ -1,0 +1,173 @@
+#include "red/editing/EditSession.hpp"
+
+#include <fstream>
+#include <set>
+#include <stdexcept>
+
+#include "red/save/RedSave.hpp"
+#include "red/validation/SaveValidator.hpp"
+#include "util/Sha256.hpp"
+
+namespace pkmn::cli::red::editing {
+namespace {
+
+void RequireSession(const Json &session) {
+  if (session.value("format", "") != "pkmn-red-edit-session" ||
+      session.value("sessionVersion", "") != "0.1.0" ||
+      !session.contains("source") || !session.contains("document") ||
+      !session.contains("pendingEdits") ||
+      !session.at("pendingEdits").is_array())
+    throw std::runtime_error("invalid or unsupported edit session");
+}
+
+void RequireEditablePointer(const std::string &pointer) {
+  if (!pointer.starts_with("/decoded/"))
+    throw std::runtime_error("edits must target a /decoded field");
+  if (pointer.starts_with("/decoded/location"))
+    throw std::runtime_error(
+        "arbitrary location editing is disabled; generation uses the verified "
+        "Red's-house preset");
+  const std::set<std::string> roots = {
+      "trainer",         "rival",      "moneyAndCoins", "badges",
+      "options",         "pokedex",    "inventory",     "party",
+      "pcStorage",       "currentBoxCache", "daycare",  "hallOfFame",
+      "worldStateRaw",   "playtime"};
+  const auto begin = std::string("/decoded/").size();
+  const auto end = pointer.find('/', begin);
+  const auto root = pointer.substr(begin, end - begin);
+  if (!roots.contains(root))
+    throw std::runtime_error("field is not in the supported Red edit surface");
+}
+
+} // namespace
+
+Json Begin(const std::filesystem::path &source) {
+  const auto save = save::RedSave::Read(source);
+  const auto integrity = validation::SaveValidator::Validate(save);
+  if (!integrity.Valid())
+    throw std::runtime_error("source save failed checksum validation");
+  auto document = json::Decode(save, source.filename().string(), integrity,
+                               {.includePhysicalImage = false});
+  return {{"format", "pkmn-red-edit-session"},
+          {"sessionVersion", "0.1.0"},
+          {"source",
+           {{"path", std::filesystem::absolute(source).lexically_normal().string()},
+            {"logicalName", source.filename().string()},
+            {"sha256", util::Sha256Hex(save.BytesView())}}},
+          {"document", std::move(document)},
+          {"pendingEdits", Json::array()},
+          {"policy",
+           {{"sourceOverwriteAllowed", false},
+            {"physicalImageGenerationAuthority", false},
+            {"locationEditing", "verified-safe-presets-only"}}}};
+}
+
+Json Load(const std::filesystem::path &sessionPath) {
+  std::ifstream input(sessionPath);
+  if (!input)
+    throw std::runtime_error("could not open edit session");
+  Json session;
+  input >> session;
+  RequireSession(session);
+  return session;
+}
+
+void Save(const std::filesystem::path &sessionPath, const Json &session,
+          bool refuseCollision) {
+  RequireSession(session);
+  if (refuseCollision && std::filesystem::exists(sessionPath))
+    throw std::runtime_error("refusing to overwrite existing edit session");
+  std::ofstream output(sessionPath, std::ios::binary | std::ios::trunc);
+  output << session.dump(2) << '\n';
+  if (!output)
+    throw std::runtime_error("could not write complete edit session");
+}
+
+void AddEdit(Json &session, const std::string &pointer, const Json &value) {
+  RequireSession(session);
+  RequireEditablePointer(pointer);
+  const Json::json_pointer path(pointer);
+  auto &document = session.at("document");
+  if (!document.contains(path))
+    throw std::runtime_error("edit pointer does not identify an existing field");
+  const auto previous = document.at(path);
+  document[path] = value;
+  if ((pointer.ends_with("/name/value") ||
+       pointer.ends_with("/nickname/value") ||
+       pointer.ends_with("/otName/value"))) {
+    const auto losslessPointer = Json::json_pointer(
+        pointer.substr(0, pointer.size() - 5) + "losslessValue");
+    if (document.contains(losslessPointer))
+      document[losslessPointer] = value;
+  }
+  auto &decoded = document.at("decoded");
+  auto syncCollection = [](Json &collection) {
+    const auto count = collection.at("pokemon").size();
+    collection["count"] = count;
+    if (collection.contains("declaredCount"))
+      collection["declaredCount"] = count;
+  };
+  syncCollection(decoded.at("party"));
+  for (auto &box : decoded.at("pcStorage").at("boxes"))
+    syncCollection(box);
+  syncCollection(decoded.at("currentBoxCache").at("cache"));
+  for (auto *key : {"bag", "pcItems"}) {
+    auto &inventory = decoded.at("inventory").at(key);
+    inventory["count"] = inventory.at("items").size();
+    inventory["declaredCount"] = inventory.at("items").size();
+  }
+  decoded.at("hallOfFame")["recordCount"] =
+      decoded.at("hallOfFame").at("entries").size();
+  if (pointer == "/decoded/badges/raw") {
+    const auto raw = value.get<std::uint8_t>();
+    decoded.at("badges")["mirrorRaw"] = raw;
+    auto &entries = decoded.at("badges").at("entries");
+    for (std::size_t index = 0; index < entries.size(); ++index)
+      entries.at(index)["owned"] = (raw & (1U << index)) != 0;
+  }
+  session.at("pendingEdits").push_back(
+      {{"path", pointer}, {"previous", previous}, {"value", value}});
+}
+
+generation::Result Validate(const Json &session) {
+  RequireSession(session);
+  const auto &source = session.at("source");
+  const auto current = save::RedSave::Read(source.at("path").get<std::string>());
+  if (util::Sha256Hex(current.BytesView()) !=
+      source.at("sha256").get<std::string>())
+    throw std::runtime_error(
+        "source save changed after this edit session was created");
+  auto result = generation::Generate(session.at("document"));
+  const auto integrity = validation::SaveValidator::Validate(
+      save::RedSave(result.bytes));
+  if (!integrity.Valid())
+    throw std::runtime_error("edited output failed checksum validation");
+  return result;
+}
+
+std::filesystem::path DefaultSessionPath(const std::filesystem::path &source) {
+  auto path = source;
+  if (path.extension() == ".sav" || path.extension() == ".srm")
+    path.replace_extension();
+  path += ".edit-session.json";
+  return path;
+}
+
+std::filesystem::path DefaultOutputPath(const Json &session) {
+  RequireSession(session);
+  const std::filesystem::path source =
+      session.at("source").at("path").get<std::string>();
+  std::string category = "manual-edit";
+  const auto &edits = session.at("pendingEdits");
+  if (edits.size() == 1) {
+    const auto pointer = edits.at(0).at("path").get<std::string>();
+    if (pointer.starts_with("/decoded/moneyAndCoins/money"))
+      category = "money";
+    else if (pointer.starts_with("/decoded/party"))
+      category = "party";
+  }
+  return source.parent_path() /
+         (source.stem().string() + "_generated_" + category + ".sav");
+}
+
+} // namespace pkmn::cli::red::editing

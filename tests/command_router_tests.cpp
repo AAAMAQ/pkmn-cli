@@ -325,6 +325,92 @@ int main() {
                  .code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
          "proof workflow should refuse an existing proof directory");
 
+  const auto sourceBeforeEdit =
+      pkmn::cli::red::save::RedSave::Read(validSavePath).BytesView();
+  const fs::path editSession = temp / "multi.edit-session.json";
+  const auto beginEdit =
+      Run({"red", "begin-edit", validSavePath.string(), "--output",
+           editSession.string()});
+  Expect(beginEdit.code == 0 && fs::exists(editSession),
+         "begin-edit should create a semantic-only copy-first session");
+  Expect(Run({"red", "begin-edit", validSavePath.string(), "--output",
+              editSession.string()})
+                 .code ==
+             pkmn::cli::ToInt(pkmn::cli::ExitCode::EditValidationFailure),
+         "begin-edit should refuse an existing session path");
+  const auto addEdits =
+      Run({"red", "edit-session", editSession.string(), "--trainer-name",
+           "RED", "--money", "123456", "--set",
+           "/decoded/party/pokemon", "[]"});
+  Expect(addEdits.code == 0 &&
+             addEdits.output.find("Pending edits updated and validated: 3") !=
+                 std::string::npos,
+         "edit-session should preserve and validate multiple pending edits");
+  const auto pendingEdits =
+      Run({"red", "pending-edits", editSession.string()});
+  Expect(pendingEdits.code == 0 &&
+             pendingEdits.output.find("Pending edits: 3") != std::string::npos,
+         "pending-edits should report every staged edit");
+  Expect(Run({"red", "validate-edit", editSession.string()}).code == 0,
+         "validate-edit should generate and checksum-check without writing a "
+         "save");
+  Expect(Run({"red", "edit-session", editSession.string(), "--set",
+              "/decoded/location/mapId", "1"})
+                 .code ==
+             pkmn::cli::ToInt(pkmn::cli::ExitCode::EditValidationFailure),
+         "edit sessions should reject arbitrary location changes");
+  const fs::path editedSave = temp / "explicit-manual-edit.sav";
+  const auto endEdit = Run({"red", "end-edit", editSession.string(),
+                            "--output", editedSave.string()});
+  Expect(endEdit.code == 0 && fs::exists(editedSave) &&
+             fs::exists(editedSave.string() + ".edit-report.json") &&
+             fs::exists(editedSave.string() + ".edit-report.md"),
+         "end-edit should write a validated save copy and edit reports");
+  Expect(pkmn::cli::red::validation::SaveValidator::Validate(
+             pkmn::cli::red::save::RedSave::Read(editedSave))
+             .Valid(),
+         "end-edit should regenerate and validate every checksum");
+  const auto editedLoaded =
+      pkmn::cli::red::save::RedSave::Read(editedSave);
+  const auto editedDecoded = pkmn::cli::red::json::Decode(
+      editedLoaded, "edited.sav",
+      pkmn::cli::red::validation::SaveValidator::Validate(editedLoaded),
+      {false});
+  Expect(editedDecoded.at("decoded").at("trainer").at("name").at("value") ==
+                 "RED" &&
+             editedDecoded.at("decoded").at("moneyAndCoins").at("money") ==
+                 123456,
+         "end-edit should apply staged semantic values to the output save");
+  Expect(pkmn::cli::red::save::RedSave::Read(validSavePath).BytesView() ==
+             sourceBeforeEdit,
+         "editing must never overwrite the source save");
+  Expect(Run({"red", "end-edit", editSession.string(), "--output",
+              editedSave.string()})
+                 .code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
+         "end-edit should refuse output and report collisions");
+
+  const fs::path invalidEditSession = temp / "invalid.edit-session.json";
+  Expect(Run({"red", "begin-edit", validSavePath.string(), "--output",
+              invalidEditSession.string()})
+                 .code == 0,
+         "a second edit session should be independent");
+  Expect(Run({"red", "edit-session", invalidEditSession.string(), "--set",
+              "/decoded/currentBoxCache/selectedBoxNumber", "99"})
+                 .code ==
+             pkmn::cli::ToInt(pkmn::cli::ExitCode::EditValidationFailure),
+         "invalid pending state should fail validation before session write");
+
+  const fs::path moneySession = temp / "money.edit-session.json";
+  Expect(Run({"red", "begin-edit", validSavePath.string(), "--output",
+              moneySession.string()})
+                 .code == 0 &&
+             Run({"red", "edit-session", moneySession.string(), "--money",
+                  "42"})
+                     .code == 0 &&
+             Run({"red", "end-edit", moneySession.string()}).code == 0 &&
+             fs::exists(temp / "synthetic-valid_generated_money.sav"),
+         "a single money edit should use the documented output name");
+
   auto missingFieldDocument = excludedDocument;
   missingFieldDocument["decoded"].erase("party");
   const fs::path missingFieldJson = temp / "missing-field.json";

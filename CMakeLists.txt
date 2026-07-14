@@ -14,10 +14,12 @@ add_library(pkmn_cli_core
     src/commands/doctor/DoctorCommand.cpp
     src/commands/compare/CompareCommand.cpp
     src/commands/proof/ProofCommand.cpp
+    src/commands/red/EditCommand.cpp
     src/commands/red/RedCommand.cpp
     src/commands/rjson/RjsonCommand.cpp
     src/red/codec/Gen1Codec.cpp
     src/red/comparison/Comparison.cpp
+    src/red/editing/EditSession.cpp
     src/red/generation/SemanticGenerator.cpp
     src/red/json/RedDecoder.cpp
     src/red/json/RedJsonDocument.cpp
