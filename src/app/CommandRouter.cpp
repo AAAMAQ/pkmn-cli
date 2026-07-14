@@ -8,6 +8,7 @@
 #include "app/ExitCode.hpp"
 #include "app/Version.hpp"
 #include "commands/doctor/DoctorCommand.hpp"
+#include "commands/red/RedCommand.hpp"
 
 namespace pkmn::cli {
 namespace {
@@ -43,6 +44,10 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
         return commands::doctor::Run(doctorArguments, output, error);
     }
 
+    if (arguments.front() == "red") {
+        return commands::red::Run({arguments.begin() + 1, arguments.end()}, output, error);
+    }
+
     if (std::find(kPlannedDomains.begin(), kPlannedDomains.end(), arguments.front()) !=
         kPlannedDomains.end()) {
         return RunPlannedDomain(arguments, output, error);
@@ -66,10 +71,13 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  pkmn --help\n"
         << "  pkmn --version\n\n"
         << "Available now:\n"
-        << "  doctor               Check the CLI and Red helper-tool environment\n\n"
-        << "Planned command domains:\n"
-        << "  red                  Pokemon Red .sav workflows\n"
-        << "  rjson                Pokemon Red .red.json workflows\n"
+        << "  doctor               Check standalone internal-engine readiness\n"
+        << "  red inspect          Inspect save integrity using the internal Red engine\n"
+        << "  red validate         Validate all known Red save checksums internally\n"
+        << "\n"
+        << "Reserved/planned command domains:\n"
+        << "  red decode           Pending internal canonical JSON export\n"
+        << "  rjson                Pending internal Red JSON workflows\n"
         << "  proof                End-to-end proof workflows\n"
         << "  compare              Physical and semantic comparisons\n"
         << "  config               Local helper-tool configuration\n"
@@ -79,12 +87,10 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  generate             Semantic generation; physicalImage is never authority\n"
         << "  reconstruct          Archival reconstruction; physicalImage is required\n"
         << "  edit                 Writes a validated copy; never overwrites input by default\n\n"
-        << "Examples planned for the Red integration milestones:\n"
-        << "  pkmn red decode savefile.sav\n"
+        << "Examples:\n"
+        << "  pkmn red inspect savefile.sav\n"
         << "  pkmn red validate savefile.sav\n"
-        << "  pkmn rjson generate savefile.red.json\n"
-        << "  pkmn rjson reconstruct savefile.red.json\n"
-        << "  pkmn proof red savefile.sav\n";
+        << "  pkmn doctor\n";
 }
 
 int CommandRouter::RunPlannedDomain(const std::vector<std::string>& arguments,
@@ -107,4 +113,3 @@ int CommandRouter::RunPlannedDomain(const std::vector<std::string>& arguments,
 }
 
 }  // namespace pkmn::cli
-

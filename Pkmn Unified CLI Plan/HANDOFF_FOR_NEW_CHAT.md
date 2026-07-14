@@ -19,15 +19,15 @@ pkmn
 
 This new tool should act as the public-facing command line for the full ecosystem.
 
-The unified CLI should start by wrapping and orchestrating the completed Pokemon Red Save Genie and Save Generator. Later, it can grow to support FireRed and Red-to-FireRed conversion.
+The unified CLI incorporates the verified research and MIT-licensed implementation knowledge from Pokemon Red Save Genie and Save Generator into clean internal modules. It must not locate or invoke those project executables at runtime. Later, it can grow to support FireRed and Red-to-FireRed conversion through the same self-contained architecture.
 
 ## 2. Existing Repository Locations
 
 Local paths:
 
 ```text
-/Users/abdulqadir/Documents/Pkmn Red Save Genie
-/Users/abdulqadir/Documents/Pkmn Red Save Generator
+~/Documents/Pkmn Red Save Genie
+~/Documents/Pkmn Red Save Generator
 ```
 
 Remote repositories:
@@ -181,13 +181,13 @@ MAQ / BiG MAQ Studios
 A detailed plan was created here:
 
 ```text
-/Users/abdulqadir/Documents/Pkmn Unified CLI Plan/UNIFIED_PKMN_CLI_PROJECT_PLAN.md
+~/Documents/Pkmn Unified CLI Plan/UNIFIED_PKMN_CLI_PROJECT_PLAN.md
 ```
 
 The new project should likely be:
 
 ```text
-/Users/abdulqadir/Documents/pkmn-cli
+~/Documents/pkmn-cli
 ```
 
 Recommended GitHub repository:
@@ -544,15 +544,15 @@ If starting implementation, ask or infer:
 
 1. Should the new repo be named `pkmn-cli`?
 2. Should the first implementation be C++20 for consistency with Red repos?
-3. Should Phase 1 wrap existing binaries rather than link libraries?
+3. Which verified source subsystem should be adapted into an internal module next?
 4. Should the first milestone be only `pkmn --help`, `--version`, and `doctor`?
 
 Recommended default:
 
 ```text
-Create /Users/abdulqadir/Documents/pkmn-cli as a new Git repo.
+Create `~/Documents/pkmn-cli` as a new Git repo.
 Use C++20.
-Start with wrapper orchestration.
+Start with a self-contained internal Red engine.
 Implement help/version/doctor first.
 ```
 
@@ -561,22 +561,21 @@ Implement help/version/doctor first.
 Planning folder:
 
 ```text
-/Users/abdulqadir/Documents/Pkmn Unified CLI Plan
+~/Documents/Pkmn Unified CLI Plan
 ```
 
 Main plan:
 
 ```text
-/Users/abdulqadir/Documents/Pkmn Unified CLI Plan/UNIFIED_PKMN_CLI_PROJECT_PLAN.md
+~/Documents/Pkmn Unified CLI Plan/UNIFIED_PKMN_CLI_PROJECT_PLAN.md
 ```
 
 This handoff:
 
 ```text
-/Users/abdulqadir/Documents/Pkmn Unified CLI Plan/HANDOFF_FOR_NEW_CHAT.md
+~/Documents/Pkmn Unified CLI Plan/HANDOFF_FOR_NEW_CHAT.md
 ```
 
 ## 20. Short Project Summary
 
-The Pokemon Red parser/generator work is complete. The next step is to build `pkmn`, a unified command-line tool that wraps the completed Red engines, adds interactive editing and proof workflows, prepares for Homebrew installation, and establishes the command framework for future FireRed and Red-to-FireRed conversion work.
-
+The Pokemon Red parser/generator research work is complete. The next step is to build `pkmn`, a self-contained unified command-line tool that adapts the verified logic into internal modules, adds editing and proof workflows, prepares for Homebrew installation, and establishes the command framework for future FireRed and Red-to-FireRed conversion work.

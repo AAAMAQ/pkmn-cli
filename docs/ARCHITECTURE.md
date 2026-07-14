@@ -1,31 +1,40 @@
 # Architecture
 
-`pkmn` is the public orchestration layer for independently verified save engines. It does not duplicate their parsing and generation logic during the first integration phase.
+`pkmn` is a self-contained unified command-line application. Installed Red workflows use internal libraries adapted from the verified Pokemon Red Save Genie and Save Generator projects; users do not install or locate those executables.
 
 ```text
 pkmn command router
-  -> workflow command
-  -> helper discovery/configuration
-  -> Pokemon Red Save Genie or Save Generator process
-  -> output validation, reporting, and packaging
+  -> domain command (red, rjson, future fred/frjson)
+  -> internal game engine module
+  -> validation and safety policy
+  -> output/reporting
 ```
 
-## Current foundation
+## Modules
 
-- `src/app`: stable process entry, version, exit codes, and command routing.
-- `src/commands`: domain command implementations; currently `doctor`.
-- `src/integration`: external helper discovery. Process execution will be added with the first Red wrapper commands.
-- `tests`: synthetic command parsing tests with no private saves or ROM dependencies.
+- `src/app`: process entry, version, exit codes, and command routing.
+- `src/commands`: stable public command contracts.
+- `src/red/save`: bounded Gen I SRAM representation and file I/O.
+- `src/red/json`: canonical JSON model and serialization (migration pending).
+- `src/red/generation`: semantic generation (migration pending).
+- `src/red/editing`: copy-first validated editing (migration pending).
+- `src/red/validation`: structural, checksum, semantic, and policy checks.
+- `src/red/comparison`: physical and semantic comparison (migration pending).
+- `src/red/reporting`: portable human/machine reports (migration pending).
 
-## Non-negotiable workflow boundaries
+## Current internal coverage
+
+`red inspect` and `red validate` internally load exact 32 KiB SRAM images and validate the main checksum, both bank all-checksums, and all 12 per-box checksums. Canonical JSON export, internal JSON workflows, generation, reconstruction, comparison/proof, and editing migrate in the order defined by [SELF_CONTAINED_RED_ENGINE_PLAN.md](SELF_CONTAINED_RED_ENGINE_PLAN.md).
+
+## Non-negotiable boundaries
 
 - Decode reads source `.sav` bytes and produces semantic/archival outputs.
-- Generate uses semantic `.red.json` data and must never use its `physicalImage` as authority.
-- Reconstruct requires `physicalImage` and is explicitly archival, not semantic generation.
-- Edit works on a copy, validates before final output, and does not overwrite the source by default.
-- FireRed and Red-to-FireRed commands remain unavailable until separate engines are verified and emulator-tested.
+- Generate uses semantic `.red.json` data and never uses `physicalImage` as authority.
+- Reconstruct requires `physicalImage` and is explicitly archival.
+- Edit writes a collision-safe copy, validates it, and never overwrites the source by default.
+- Unsupported runtime locations fail closed or use only the verified canonical safe-location policy.
+- FireRed will use internal modules under the same executable, after its separate research engines are verified.
 
-## Integration status
+## Reference projects
 
-The Save Generator already provides a scriptable `pkmn-red-save-generator` executable. Save Genie currently has a verified interactive executable but needs a stable automation-facing CLI contract before decode/inspect/validate wrapper commands can be completed safely.
-
+Pokemon Red Save Genie and Pokemon Red Save Generator remain read-only research/reference projects. Proven code is adapted into this repository's module boundaries with MIT attribution recorded in `THIRD_PARTY_NOTICES.md`; their executables, project structures, UI/CLI entry points, private resources, and build assumptions are not imported or used at runtime.

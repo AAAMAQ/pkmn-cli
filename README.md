@@ -2,16 +2,16 @@
 
 `pkmn-cli` is the standalone home of `pkmn`, a unified command-line interface for Pokemon save research, preservation, validation, editing, generation, reconstruction, comparison, and proof workflows.
 
-The project currently provides its C++20/CMake foundation, command router, and environment doctor. Pokemon Red workflow wrappers are the next integration milestone. FireRed and Red-to-FireRed features are future work and will not be advertised as supported until their separate engines are verified and emulator-tested.
+The project provides its C++20/CMake foundation, command router, and the first internal Pokemon Red save reader/validator. FireRed and Red-to-FireRed features are future work and will not be advertised as supported until their research engines are verified and emulator-tested.
 
 ## Relationship to the verified Red projects
 
-`pkmn` begins as a wrapper/orchestration layer around two completed engines:
+`pkmn` incorporates proven logic from two completed research engines:
 
 - **Pokemon Red Save Genie** decodes, inspects, validates, safely edits, and exports canonical `.red.json` data.
 - **Pokemon Red Save Generator** creates deterministic gameplay-semantic `.sav` files without using target `physicalImage` as generation authority.
 
-The engines remain independent source-of-truth projects. This repository will coordinate them, enforce shared safety policies, and produce consistent output layouts and reports.
+The completed engines remain independent research/source-reference projects. `pkmn-cli` adapts the necessary MIT-licensed logic into clean internal modules and will not require their executables after installation. See [the self-contained Red engine plan](docs/SELF_CONTAINED_RED_ENGINE_PLAN.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
 
 ## Build
 
@@ -40,21 +40,19 @@ Install to a chosen prefix:
 cmake --install build --prefix /your/install/prefix
 ```
 
-## Foundation commands
+## Implemented commands
 
 ```text
 pkmn --help
 pkmn --version
 pkmn doctor
+pkmn red inspect input.sav
+pkmn red validate input.sav
 ```
 
-`pkmn doctor` searches for the two Red helper executables in this order:
+`pkmn doctor` reports the modules compiled into the standalone executable. It does not search for or invoke Save Genie or Save Generator. No save, ROM, or evidence file is read by the doctor.
 
-1. `PKMN_RED_SAVE_GENIE` or `PKMN_RED_SAVE_GENERATOR`;
-2. the current `PATH`;
-3. nearby sibling development builds.
-
-Missing tools are reported with setup guidance. No save, ROM, or evidence file is read by the doctor.
+`pkmn red inspect` and `pkmn red validate` use the internal reader and validator and require no Save Genie executable. `pkmn red decode` remains reserved until the canonical internal `.red.json` export slice is complete.
 
 ## Planned command shape
 
@@ -69,7 +67,7 @@ pkmn proof red savefile.sav
 pkmn compare physical original.sav generated.sav
 ```
 
-These workflow commands are reserved by the router but intentionally return an unsupported-operation exit code until implemented.
+Internal `red inspect` and `red validate` are implemented. `red decode` and all `rjson` commands are pending internal modules.
 
 ## Generation is not reconstruction
 
@@ -97,4 +95,3 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/PRIVACY_AND_PUBLICATION.
 ## License
 
 MIT License, copyright MAQ / BiG MAQ Studios, with a non-binding stewardship note. This is an independent research project and is not affiliated with Nintendo, Game Freak, Creatures, or The Pokemon Company.
-

@@ -12,7 +12,9 @@ include(CTest)
 add_library(pkmn_cli_core
     src/app/CommandRouter.cpp
     src/commands/doctor/DoctorCommand.cpp
-    src/integration/ToolDiscovery.cpp
+    src/commands/red/RedCommand.cpp
+    src/red/save/RedSave.cpp
+    src/red/validation/SaveValidator.cpp
 )
 
 target_include_directories(pkmn_cli_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -35,4 +37,3 @@ if(BUILD_TESTING)
     target_link_libraries(pkmn_cli_tests PRIVATE pkmn_cli_core)
     add_test(NAME pkmn-cli-command-router COMMAND pkmn_cli_tests)
 endif()
-
