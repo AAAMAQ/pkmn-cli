@@ -1,0 +1,49 @@
+# Build products
+/build/
+/build-*/
+/out/
+/dist/
+/.cache/
+/.cmake/
+CMakeUserPresets.json
+compile_commands.json
+
+# IDE and operating-system files
+.DS_Store
+.idea/
+.vscode/
+*.xcuserstate
+xcuserdata/
+
+# Local configuration and dependency paths
+.env
+.env.*
+!.env.example
+/config.local.json
+
+# Private Pokemon/emulator material and generated evidence
+*.sav
+*.srm
+*.gb
+*.gbc
+*.gba
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.pdf
+*.red.json
+*.fred.json
+*.edit-session.json
+*.pkmn-proof/
+*.pkmn-output/
+evidence/
+private/
+personal resources/
+personal rescources/
+
