@@ -7,6 +7,12 @@ All currently implemented workflows are internal to `pkmn`. Save Genie and Save 
 - `pkmn --help` prints the supported and reserved command domains.
 - `pkmn --version` prints the stable tool version.
 - `pkmn doctor` checks that the internal modules and installed Red generation resource are ready without reading user files.
+- `pkmn completion <bash|zsh|fish>` prints shell completion source.
+- `pkmn config show [--format text|json]` prints immutable compiled safety and default policy; no external engine paths are configured.
+
+Doctor, raw Red inspect/validate, canonical JSON inspect/validate, and compare commands support machine-readable JSON output.
+
+Existing outputs are refused by default. Decode, generation, reconstruction, editing, and proof commands support explicit `--auto-suffix` where output paths may collide, producing `_2`, `_3`, and later names while preserving the no-overwrite rule.
 
 ## Pokemon Red saves
 

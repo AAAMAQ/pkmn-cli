@@ -86,6 +86,19 @@ int main() {
   const auto version = Run({"--version"});
   Expect(version.code == 0, "--version should succeed");
   Expect(version.output == "pkmn 0.1.0\n", "version output should be stable");
+  Expect(Run({"completion", "bash"}).output.find("complete -F") !=
+                 std::string::npos &&
+             Run({"completion", "zsh"}).output.find("#compdef pkmn") !=
+                 std::string::npos &&
+             Run({"completion", "fish"}).output.find("complete -c pkmn") !=
+                 std::string::npos,
+         "completion should generate bash, zsh, and fish scripts");
+  const auto configJson = Run({"config", "show", "--format", "json"});
+  Expect(configJson.code == 0 &&
+             !nlohmann::ordered_json::parse(configJson.output)
+                  .at("externalEngineExecutables")
+                  .get<bool>(),
+         "config show should expose the compiled standalone safety policy");
 
   const auto unknown = Run({"wat"});
   Expect(unknown.code ==
@@ -122,6 +135,12 @@ int main() {
              doctor.output.find("Standalone readiness: ready") !=
                  std::string::npos,
          "doctor should report standalone readiness without external tools");
+  const auto doctorJson = Run({"doctor", "--format", "json"});
+  Expect(doctorJson.code == 0 &&
+             nlohmann::ordered_json::parse(doctorJson.output)
+                     .at("standaloneReadiness") ==
+                 "ready",
+         "doctor should support machine-readable JSON output");
 
   namespace fs = std::filesystem;
   const fs::path temp =
@@ -204,6 +223,13 @@ int main() {
                  std::string::npos,
          "rjson validate should accept semantic-only JSON and report "
          "reconstruction unavailable");
+  const auto validateRjsonJson =
+      Run({"rjson", "validate", excludedJson.string(), "--format", "json"});
+  Expect(validateRjsonJson.code == 0 &&
+             nlohmann::ordered_json::parse(validateRjsonJson.output)
+                 .at("valid")
+                 .get<bool>(),
+         "rjson validation should support machine-readable JSON output");
 
   const fs::path reconstructed = temp / "reconstructed.sav";
   const auto reconstruct = Run({"rjson", "reconstruct", includedJson.string(),
@@ -226,6 +252,11 @@ int main() {
   Expect(reconstructionCollision.code ==
              pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
          "reconstruction should refuse to overwrite an existing output");
+  Expect(Run({"rjson", "reconstruct", includedJson.string(), "--output",
+              reconstructed.string(), "--auto-suffix"})
+                 .code == 0 &&
+             fs::exists(temp / "reconstructed_2.sav"),
+         "reconstruction should support explicit collision-safe suffixing");
 
   const fs::path generatedA = temp / "generated-a.sav";
   const auto generationA =
@@ -270,6 +301,12 @@ int main() {
   Expect(Run({"rjson", "generate", includedJson.string(), generatedA.string()})
                  .code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
          "semantic generation should refuse output/report collisions");
+  Expect(Run({"rjson", "generate", includedJson.string(), generatedA.string(),
+              "--auto-suffix"})
+                 .code == 0 &&
+             fs::exists(temp / "generated-a_2.sav"),
+         "semantic generation should suffix all output/report collisions when "
+         "explicitly requested");
   auto unsupportedSemantic = excludedDocument;
   unsupportedSemantic["decoded"]["currentBoxCache"]["selectedBoxNumber"] = 99;
   const fs::path unsupportedSemanticJson = temp / "unsupported-semantic.json";
@@ -373,6 +410,13 @@ int main() {
               proofDirectory.string()})
                  .code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
          "proof workflow should refuse an existing proof directory");
+  Expect(Run({"proof", "red", validSavePath.string(), "--output-dir",
+              proofDirectory.string(), "--zip", "--auto-suffix"})
+                 .code == 0 &&
+             fs::exists(temp / "synthetic-proof_2") &&
+             fs::exists(temp / "synthetic-proof_2.zip"),
+         "proof workflows should support explicit collision-safe directory "
+         "and archive suffixing");
 
   auto postEmulatorBytes =
       pkmn::cli::red::save::RedSave::Read(generatedA).BytesView();
@@ -524,6 +568,11 @@ int main() {
               editedSave.string()})
                  .code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
          "end-edit should refuse output and report collisions");
+  Expect(Run({"red", "end-edit", editSession.string(), "--output",
+              editedSave.string(), "--auto-suffix"})
+                 .code == 0 &&
+             fs::exists(temp / "explicit-manual-edit_2.sav"),
+         "end-edit should support explicit collision-safe output suffixing");
 
   const fs::path invalidEditSession = temp / "invalid.edit-session.json";
   Expect(Run({"red", "begin-edit", validSavePath.string(), "--output",
@@ -622,6 +671,11 @@ int main() {
                               "--output", includedJson.string()});
   Expect(collision.code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
          "red decode should refuse an existing output");
+  Expect(Run({"red", "decode", validSavePath.string(), "--output",
+              includedJson.string(), "--auto-suffix"})
+                 .code == 0 &&
+             fs::exists(temp / "included_2.red.json"),
+         "red decode should support explicit collision-safe output suffixing");
 
   for (std::size_t bank = 0; bank < 2; ++bank) {
     auto corrupted = ValidSyntheticSave();
@@ -659,6 +713,13 @@ int main() {
                  std::string::npos,
          "red validate should use the internal engine when helper executables "
          "are absent");
+  const auto standaloneValidateJson =
+      Run({"red", "validate", validSavePath.string(), "--format", "json"});
+  Expect(standaloneValidateJson.code == 0 &&
+             nlohmann::ordered_json::parse(standaloneValidateJson.output)
+                 .at("valid")
+                 .get<bool>(),
+         "red validation should support machine-readable JSON output");
 
   validSave[pkmn::cli::red::validation::SaveValidator::MainStored] ^= 0x01U;
   const fs::path corruptSavePath = temp / "synthetic-corrupt.sav";

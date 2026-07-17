@@ -12,6 +12,7 @@ class PkmnCli < Formula
     system "cmake", "--build", "build", "--parallel"
     system "ctest", "--test-dir", "build", "--output-on-failure"
     system "cmake", "--install", "build"
+    generate_completions_from_executable(bin/"pkmn", "completion")
   end
 
   test do

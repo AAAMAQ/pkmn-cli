@@ -48,6 +48,8 @@ For a user-local shell installation, use `--prefix "$HOME/.local"`, add `$HOME/.
 pkmn --help
 pkmn --version
 pkmn doctor
+pkmn completion zsh
+pkmn config show
 pkmn red decode input.sav
 pkmn red inspect input.sav
 pkmn red validate input.sav
@@ -70,6 +72,8 @@ pkmn red end-edit input.edit-session.json
 
 `pkmn doctor` reports the modules compiled into the standalone executable. It does not search for or invoke Save Genie or Save Generator. No save, ROM, or evidence file is read by the doctor.
 
+`pkmn config show` reports immutable compiled safety defaults. Output-producing workflows refuse collisions unless `--auto-suffix` is explicitly requested, in which case numbered alternatives are selected without overwriting data.
+
 `pkmn red decode`, `pkmn red inspect`, and `pkmn red validate` use the internal reader and require no Save Genie executable. Decode includes the archival `physicalImage` by default; use `--no-physical-image` for a semantic-only export. Existing output files are never overwritten.
 
 `pkmn rjson inspect` and `validate` verify schema `0.1.0`, required semantics, and—when present—the physical image SHA-256 and Red checksums. `pkmn rjson reconstruct` is a separate archival mode that requires `physicalImage`; it is never semantic generation.
@@ -82,7 +86,7 @@ Red editing is copy-first. `red edit` provides a looped interactive editor; `beg
 
 ## Command documentation
 
-See the [complete command reference](docs/COMMAND_REFERENCE.md) for options, policies, exit codes, and the explicit FireRed placeholders. Public-data-only examples are in [examples/README.md](examples/README.md).
+See the [complete command reference](docs/COMMAND_REFERENCE.md), [Red JSON schema](docs/RED_JSON_SCHEMA.md), and focused editing, reconstruction, proof, installation, and future-FireRed documents under `docs/`. Public-data-only examples are in [examples/README.md](examples/README.md).
 
 ## Generation is not reconstruction
 

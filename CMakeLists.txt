@@ -11,6 +11,8 @@ include(CTest)
 
 add_library(pkmn_cli_core
     src/app/CommandRouter.cpp
+    src/commands/completion/CompletionCommand.cpp
+    src/commands/config/ConfigCommand.cpp
     src/commands/doctor/DoctorCommand.cpp
     src/commands/compare/CompareCommand.cpp
     src/commands/proof/ProofCommand.cpp
@@ -27,6 +29,7 @@ add_library(pkmn_cli_core
     src/red/save/RedSave.cpp
     src/red/validation/SaveValidator.cpp
     src/util/Sha256.cpp
+    src/util/OutputPath.cpp
     src/util/ZipWriter.cpp
     src/util/ResourceLocator.cpp
 )
@@ -58,6 +61,7 @@ install(FILES LICENSE README.md CHANGELOG.md THIRD_PARTY_NOTICES.md
         DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 install(DIRECTORY docs/ DESTINATION "${CMAKE_INSTALL_DOCDIR}/docs"
         FILES_MATCHING PATTERN "*.md")
+install(FILES docs/pkmn.1 DESTINATION "${CMAKE_INSTALL_MANDIR}/man1")
 install(FILES resources/pokemon-red-usa-europe-v1.template.bin
         DESTINATION "${CMAKE_INSTALL_DATADIR}/pkmn/resources")
 

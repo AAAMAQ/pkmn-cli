@@ -11,15 +11,17 @@
 #include "red/json/RedDecoder.hpp"
 #include "red/save/RedSave.hpp"
 #include "red/validation/SaveValidator.hpp"
+#include "util/OutputPath.hpp"
 
 namespace pkmn::cli::commands::red {
 namespace {
 void PrintHelp(std::ostream& output) {
     output << "Usage:\n"
            << "  pkmn red decode <input.sav> [--output <file.red.json>]\n"
-           << "                       [--include-physical-image|--no-physical-image]\n"
-           << "  pkmn red inspect <input.sav>\n"
-           << "  pkmn red validate <input.sav>\n"
+           << "                       [--include-physical-image|--no-physical-image] "
+              "[--auto-suffix]\n"
+           << "  pkmn red inspect <input.sav> [--format json]\n"
+           << "  pkmn red validate <input.sav> [--format json]\n"
            << "  pkmn red validate-post-emulator <before.sav> <after.sav> "
               "[--output-dir <directory>]\n"
            << "  pkmn red edit <input.sav>\n"
@@ -40,6 +42,25 @@ void PrintReport(const pkmn::cli::red::validation::ValidationReport& report, std
     output << '\n';
 }
 
+pkmn::cli::red::json::OrderedJson ReportJson(
+    const pkmn::cli::red::validation::ValidationReport& report,
+    const std::string& logicalName) {
+    auto boxes = pkmn::cli::red::json::OrderedJson::array();
+    for (std::size_t index = 0; index < report.boxes.size(); ++index)
+        boxes.push_back({{"box", index + 1},
+                         {"valid", report.boxes[index].Valid()},
+                         {"stored", report.boxes[index].stored},
+                         {"calculated", report.boxes[index].expected}});
+    return {{"logicalName", logicalName},
+            {"size", report.actualSize},
+            {"expectedSize", report.expectedSize},
+            {"valid", report.Valid()},
+            {"mainChecksumValid", report.expectedSize && report.main.Valid()},
+            {"bank2ChecksumValid", report.expectedSize && report.banks[0].Valid()},
+            {"bank3ChecksumValid", report.expectedSize && report.banks[1].Valid()},
+            {"boxChecksums", boxes}};
+}
+
 std::filesystem::path DefaultJsonPath(const std::filesystem::path& input) {
     auto output = input;
     if (output.extension() == ".sav" || output.extension() == ".srm") output.replace_extension();
@@ -54,6 +75,7 @@ int RunDecode(const std::vector<std::string>& arguments,
     auto outputPath = DefaultJsonPath(inputPath);
     bool includePhysical = true;
     bool physicalChoiceSeen = false;
+    bool autoSuffix = false;
     for (std::size_t index = 2; index < arguments.size(); ++index) {
         if (arguments[index] == "--output" && index + 1 < arguments.size()) {
             outputPath = arguments[++index];
@@ -63,10 +85,20 @@ int RunDecode(const std::vector<std::string>& arguments,
         } else if (arguments[index] == "--no-physical-image" && !physicalChoiceSeen) {
             includePhysical = false;
             physicalChoiceSeen = true;
+        } else if (arguments[index] == "--auto-suffix") {
+            autoSuffix = true;
         } else {
             error << "pkmn red decode: invalid or conflicting option '" << arguments[index] << "'\n";
             return ToInt(ExitCode::InvalidArguments);
         }
+    }
+    const auto preferredOutputPath = outputPath;
+    if (autoSuffix && std::filesystem::exists(outputPath)) {
+        std::size_t number = 2;
+        do {
+            outputPath = util::NumberedOutputPath(preferredOutputPath,
+                                                  number++, ".red.json");
+        } while (std::filesystem::exists(outputPath));
     }
     if (std::filesystem::exists(outputPath)) {
         error << "pkmn red decode: refusing to overwrite existing output: "
@@ -126,15 +158,25 @@ int Run(const std::vector<std::string>& arguments, std::ostream& output, std::os
         arguments.front() == "validate-edit" || arguments.front() == "end-edit")
         return edit::Run(arguments, output, error);
     if ((arguments.front() == "inspect" || arguments.front() == "validate") &&
-        arguments.size() == 2) {
+        (arguments.size() == 2 ||
+         (arguments.size() == 4 && arguments[2] == "--format" &&
+          arguments[3] == "json"))) {
         try {
             const auto input = pkmn::cli::red::save::RedSave::Read(arguments[1]);
             const auto report = pkmn::cli::red::validation::SaveValidator::Validate(input);
-            output << "Red save: " << std::filesystem::path(arguments[1]).filename().string() << '\n';
-            PrintReport(report, output);
+            const auto logicalName =
+                std::filesystem::path(arguments[1]).filename().string();
+            const bool json = arguments.size() == 4;
+            if (json)
+                output << ReportJson(report, logicalName).dump(2) << '\n';
+            else {
+                output << "Red save: " << logicalName << '\n';
+                PrintReport(report, output);
+            }
             if (arguments.front() == "inspect")
                 return report.expectedSize ? ToInt(ExitCode::Success) : ToInt(ExitCode::InvalidInput);
-            output << "Validation: " << (report.Valid() ? "passed" : "failed") << '\n';
+            if (!json)
+                output << "Validation: " << (report.Valid() ? "passed" : "failed") << '\n';
             if (!report.expectedSize) return ToInt(ExitCode::InvalidInput);
             return report.Valid() ? ToInt(ExitCode::Success) : ToInt(ExitCode::ChecksumFailure);
         } catch (const std::exception& exception) {

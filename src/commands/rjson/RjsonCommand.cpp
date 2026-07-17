@@ -8,6 +8,7 @@
 #include "red/generation/SemanticGenerator.hpp"
 #include "red/json/RedJsonDocument.hpp"
 #include "util/Sha256.hpp"
+#include "util/OutputPath.hpp"
 
 namespace pkmn::cli::commands::rjson {
 namespace {
@@ -15,10 +16,11 @@ namespace {
 void Help(std::ostream &output) {
   output
       << "Usage:\n"
-      << "  pkmn rjson inspect <file.red.json>\n"
-      << "  pkmn rjson validate <file.red.json>\n"
-      << "  pkmn rjson generate <file.red.json> [output.sav]\n"
-      << "  pkmn rjson reconstruct <file.red.json> [--output <output.sav>]\n";
+      << "  pkmn rjson inspect <file.red.json> [--format json]\n"
+      << "  pkmn rjson validate <file.red.json> [--format json]\n"
+      << "  pkmn rjson generate <file.red.json> [output.sav] [--auto-suffix]\n"
+      << "  pkmn rjson reconstruct <file.red.json> [--output <output.sav>] "
+         "[--auto-suffix]\n";
 }
 
 std::filesystem::path DefaultGeneration(const std::filesystem::path &input) {
@@ -67,6 +69,34 @@ void PrintValidation(const red::json::LoadedDocument &document,
     output << "Error: " << error << '\n';
 }
 
+red::json::OrderedJson
+ValidationJson(const red::json::LoadedDocument &document) {
+  const auto &status = document.validation;
+  red::json::OrderedJson result = {
+      {"valid", status.Valid()},
+      {"syntaxValid", status.syntaxValid},
+      {"schemaValid", status.schemaValid},
+      {"semanticsValid", status.semanticsValid},
+      {"physicalImagePresent", status.hasPhysicalImage},
+      {"physicalImageValid",
+       status.hasPhysicalImage ? red::json::OrderedJson(status.physicalImageValid)
+                               : red::json::OrderedJson(nullptr)},
+      {"semanticGenerationUsesPhysicalImage", false},
+      {"warnings", status.warnings},
+      {"errors", status.errors}};
+  if (document.root.contains("schema"))
+    result["schemaVersion"] =
+        document.root.at("schema").value("schemaVersion", "");
+  if (document.root.contains("decoded") && status.semanticsValid) {
+    const auto &decoded = document.root.at("decoded");
+    result["summary"] = {
+        {"trainer", decoded.at("trainer").at("name").at("value")},
+        {"partyCount", decoded.at("party").at("count")},
+        {"pcBoxCount", decoded.at("pcStorage").at("boxes").size()}};
+  }
+  return result;
+}
+
 } // namespace
 
 int Run(const std::vector<std::string> &arguments, std::ostream &output,
@@ -77,10 +107,17 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
     return ToInt(ExitCode::Success);
   }
   if ((arguments.front() == "inspect" || arguments.front() == "validate") &&
-      arguments.size() == 2) {
+      (arguments.size() == 2 ||
+       (arguments.size() == 4 && arguments[2] == "--format" &&
+        arguments[3] == "json"))) {
     const auto document = red::json::LoadAndValidate(arguments[1]);
-    PrintValidation(document, output);
-    if (arguments.front() == "inspect" && document.validation.semanticsValid) {
+    const bool json = arguments.size() == 4;
+    if (json)
+      output << ValidationJson(document).dump(2) << '\n';
+    else
+      PrintValidation(document, output);
+    if (!json && arguments.front() == "inspect" &&
+        document.validation.semanticsValid) {
       if (document.root.contains("decoded")) {
         const auto &decoded = document.root.at("decoded");
         output
@@ -95,11 +132,36 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
     return document.validation.Valid() ? ToInt(ExitCode::Success)
                                        : ToInt(ExitCode::InvalidInput);
   }
-  if (arguments.front() == "generate" &&
-      (arguments.size() == 2 || arguments.size() == 3)) {
-    const auto outputPath = arguments.size() == 3
-                                ? std::filesystem::path(arguments[2])
-                                : DefaultGeneration(arguments[1]);
+  if (arguments.front() == "generate" && arguments.size() >= 2) {
+    auto outputPath = DefaultGeneration(arguments[1]);
+    bool outputSeen = false;
+    bool autoSuffix = false;
+    for (std::size_t index = 2; index < arguments.size(); ++index) {
+      if (arguments[index] == "--auto-suffix")
+        autoSuffix = true;
+      else if (!outputSeen && !arguments[index].starts_with("--")) {
+        outputPath = arguments[index];
+        outputSeen = true;
+      } else {
+        error << "pkmn rjson generate: invalid arguments\n";
+        return ToInt(ExitCode::InvalidArguments);
+      }
+    }
+    const auto preferredOutputPath = outputPath;
+    auto available = [](const std::filesystem::path &path) {
+      return !std::filesystem::exists(path) &&
+             !std::filesystem::exists(path.string() +
+                                      ".generation-report.json") &&
+             !std::filesystem::exists(path.string() +
+                                      ".generation-report.md");
+    };
+    if (autoSuffix && !available(outputPath)) {
+      for (std::size_t number = 2;; ++number) {
+        outputPath = util::NumberedOutputPath(preferredOutputPath, number);
+        if (available(outputPath))
+          break;
+      }
+    }
     auto jsonReport = outputPath;
     jsonReport += ".generation-report.json";
     auto markdownReport = outputPath;
@@ -136,11 +198,24 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
   }
   if (arguments.front() == "reconstruct" && arguments.size() >= 2) {
     auto outputPath = DefaultReconstruction(arguments[1]);
-    if (arguments.size() == 4 && arguments[2] == "--output")
-      outputPath = arguments[3];
-    else if (arguments.size() != 2) {
-      error << "pkmn rjson reconstruct: invalid arguments\n";
-      return ToInt(ExitCode::InvalidArguments);
+    bool autoSuffix = false;
+    for (std::size_t index = 2; index < arguments.size(); ++index) {
+      if (arguments[index] == "--output" && index + 1 < arguments.size())
+        outputPath = arguments[++index];
+      else if (arguments[index] == "--auto-suffix")
+        autoSuffix = true;
+      else {
+        error << "pkmn rjson reconstruct: invalid arguments\n";
+        return ToInt(ExitCode::InvalidArguments);
+      }
+    }
+    const auto preferredOutputPath = outputPath;
+    if (autoSuffix && std::filesystem::exists(outputPath)) {
+      for (std::size_t number = 2;; ++number) {
+        outputPath = util::NumberedOutputPath(preferredOutputPath, number);
+        if (!std::filesystem::exists(outputPath))
+          break;
+      }
     }
     if (std::filesystem::exists(outputPath)) {
       error << "pkmn rjson reconstruct: refusing to overwrite existing output: "

@@ -8,6 +8,7 @@
 
 #include "app/ExitCode.hpp"
 #include "red/editing/EditSession.hpp"
+#include "util/OutputPath.hpp"
 
 namespace pkmn::cli::commands::red::edit {
 namespace {
@@ -20,7 +21,8 @@ void Help(std::ostream &out) {
       << "  pkmn red edit-session <session.json> [edits...]\n"
       << "  pkmn red pending-edits <session.json>\n"
       << "  pkmn red validate-edit <session.json>\n"
-      << "  pkmn red end-edit <session.json> [--output <output.sav>]\n\n"
+      << "  pkmn red end-edit <session.json> [--output <output.sav>] "
+         "[--auto-suffix]\n\n"
       << "Named edits: --trainer-name <text>, --rival-name <text>, "
          "--trainer-id <n>, --money <n>, --coins <n>, --badges <0..255|all>, "
          "--selected-box <1..12>\n"
@@ -153,6 +155,23 @@ void WriteResult(const std::filesystem::path &outputPath,
       << session.at("pendingEdits").size()
       << "\n- Checksums regenerated and validated: yes\n\n"
       << result.markdownReport;
+}
+
+bool EditOutputAvailable(const std::filesystem::path &outputPath) {
+  return !std::filesystem::exists(outputPath) &&
+         !std::filesystem::exists(outputPath.string() + ".edit-report.json") &&
+         !std::filesystem::exists(outputPath.string() + ".edit-report.md");
+}
+
+std::filesystem::path AutoSuffixEditOutput(
+    const std::filesystem::path &preferred) {
+  if (EditOutputAvailable(preferred))
+    return preferred;
+  for (std::size_t number = 2;; ++number) {
+    const auto candidate = util::NumberedOutputPath(preferred, number);
+    if (EditOutputAvailable(candidate))
+      return candidate;
+  }
 }
 
 int End(Json &session, const std::filesystem::path &outputPath,
@@ -331,13 +350,20 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
              << "\nSource unchanged: yes\nGenerated checksums: valid\n";
       return 0;
     }
-    if (command == "end-edit" &&
-        (arguments.size() == 2 ||
-         (arguments.size() == 4 && arguments[2] == "--output"))) {
+    if (command == "end-edit" && arguments.size() >= 2) {
       auto session = pkmn::cli::red::editing::Load(arguments[1]);
-      const auto path = arguments.size() == 4
-                            ? std::filesystem::path(arguments[3])
-                            : pkmn::cli::red::editing::DefaultOutputPath(session);
+      auto path = pkmn::cli::red::editing::DefaultOutputPath(session);
+      bool autoSuffix = false;
+      for (std::size_t index = 2; index < arguments.size(); ++index) {
+        if (arguments[index] == "--output" && index + 1 < arguments.size())
+          path = arguments[++index];
+        else if (arguments[index] == "--auto-suffix")
+          autoSuffix = true;
+        else
+          throw std::runtime_error("invalid end-edit option");
+      }
+      if (autoSuffix)
+        path = AutoSuffixEditOutput(path);
       return End(session, path, output);
     }
     if (command == "edit" && arguments.size() == 2) {

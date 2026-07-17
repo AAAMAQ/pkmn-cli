@@ -22,6 +22,8 @@ pkmn red validate-edit savefile.edit-session.json
 pkmn red end-edit savefile.edit-session.json
 ```
 
+`end-edit --auto-suffix` selects `_2`, `_3`, and later output/report names when the preferred name exists. Without it, collisions fail closed.
+
 Named scalar options are:
 
 - `--trainer-name`, `--rival-name`, `--trainer-id`;

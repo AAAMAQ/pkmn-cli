@@ -4,6 +4,8 @@
 
 Use `--output-dir <directory>` to select the proof directory. Use `--zip` for the adjacent default archive or `--zip-output <archive.zip>` for an explicit path. ZIP files are deterministic ZIP32 archives containing logical artifact names only. They contain save data and require publication review; they are not safe to publish merely because they contain no ROM.
 
+Use `--auto-suffix` to select a collision-safe numbered proof directory/archive. The default remains strict refusal.
+
 The package includes:
 
 - original and generated canonical JSON;

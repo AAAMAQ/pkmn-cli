@@ -13,6 +13,7 @@
 #include "red/save/RedSave.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
+#include "util/OutputPath.hpp"
 #include "util/ZipWriter.hpp"
 
 namespace pkmn::cli::commands::proof {
@@ -122,7 +123,7 @@ int Run(const std::vector<std::string> &args, std::ostream &output,
   if (args.empty() || args[0] == "help" || args[0] == "--help") {
     output << "Usage:\n"
               "  pkmn proof red <source.sav> [--output-dir <directory>] "
-              "[--zip|--zip-output <archive.zip>]\n"
+              "[--zip|--zip-output <archive.zip>] [--auto-suffix]\n"
               "  pkmn proof post-emulator --before <save.sav> --after "
               "<save.sav> [--output-dir <directory>|--proof-dir <directory>]\n";
     return 0;
@@ -137,6 +138,8 @@ int Run(const std::vector<std::string> &args, std::ostream &output,
   auto directory = DefaultDirectory(source);
   std::filesystem::path zipPath;
   bool createZip = false;
+  bool autoSuffix = false;
+  bool explicitZipPath = false;
   for (std::size_t index = 2; index < args.size(); ++index) {
     if (args[index] == "--output-dir" && index + 1 < args.size())
       directory = args[++index];
@@ -144,15 +147,49 @@ int Run(const std::vector<std::string> &args, std::ostream &output,
       createZip = true;
     else if (args[index] == "--zip-output" && index + 1 < args.size()) {
       createZip = true;
+      explicitZipPath = true;
       zipPath = args[++index];
+    } else if (args[index] == "--auto-suffix") {
+      autoSuffix = true;
     } else {
       error << "pkmn proof red: invalid arguments\n";
       return ToInt(ExitCode::InvalidArguments);
     }
   }
+  const auto preferredDirectory = directory;
+  if (autoSuffix && std::filesystem::exists(directory)) {
+    for (std::size_t number = 2;; ++number) {
+      directory = util::NumberedOutputPath(preferredDirectory, number);
+      if (!std::filesystem::exists(directory))
+        break;
+    }
+  }
   if (zipPath.empty()) {
     zipPath = directory;
     zipPath += ".zip";
+  }
+  if (autoSuffix && createZip && !explicitZipPath &&
+      std::filesystem::exists(zipPath)) {
+    for (std::size_t number = 2;; ++number) {
+      const auto candidate = util::NumberedOutputPath(preferredDirectory, number);
+      auto candidateZip = candidate;
+      candidateZip += ".zip";
+      if (!std::filesystem::exists(candidate) &&
+          !std::filesystem::exists(candidateZip)) {
+        directory = candidate;
+        zipPath = candidateZip;
+        break;
+      }
+    }
+  }
+  if (autoSuffix && createZip && explicitZipPath &&
+      std::filesystem::exists(zipPath)) {
+    const auto preferredZipPath = zipPath;
+    for (std::size_t number = 2;; ++number) {
+      zipPath = util::NumberedOutputPath(preferredZipPath, number);
+      if (!std::filesystem::exists(zipPath))
+        break;
+    }
   }
   if (std::filesystem::exists(directory)) {
     error << "pkmn proof red: refusing existing proof directory\n";

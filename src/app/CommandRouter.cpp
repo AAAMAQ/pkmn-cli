@@ -7,6 +7,8 @@
 
 #include "app/ExitCode.hpp"
 #include "app/Version.hpp"
+#include "commands/completion/CompletionCommand.hpp"
+#include "commands/config/ConfigCommand.hpp"
 #include "commands/doctor/DoctorCommand.hpp"
 #include "commands/compare/CompareCommand.hpp"
 #include "commands/proof/ProofCommand.hpp"
@@ -16,8 +18,8 @@
 namespace pkmn::cli {
 namespace {
 
-constexpr std::array<std::string_view, 8> kPlannedDomains = {
-    "red", "rjson", "proof", "compare", "config", "fred", "frjson", "convert"};
+constexpr std::array<std::string_view, 7> kPlannedDomains = {
+    "red", "rjson", "proof", "compare", "fred", "frjson", "convert"};
 
 bool IsHelp(std::string_view argument) {
     return argument == "help" || argument == "--help" || argument == "-h";
@@ -45,6 +47,14 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
     if (arguments.front() == "doctor") {
         const std::vector<std::string> doctorArguments(arguments.begin() + 1, arguments.end());
         return commands::doctor::Run(doctorArguments, output, error);
+    }
+    if (arguments.front() == "completion") {
+        return commands::completion::Run(
+            {arguments.begin() + 1, arguments.end()}, output, error);
+    }
+    if (arguments.front() == "config") {
+        return commands::config::Run(
+            {arguments.begin() + 1, arguments.end()}, output, error);
     }
     if (arguments.front() == "compare") {
         return commands::compare::Run({arguments.begin() + 1, arguments.end()}, output, error);
@@ -84,6 +94,8 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  pkmn --version\n\n"
         << "Available now:\n"
         << "  doctor               Check standalone internal-engine readiness\n"
+        << "  completion           Generate bash, zsh, or fish completions\n"
+        << "  config show          Show compiled safety/default policy\n"
         << "  red inspect          Inspect save integrity using the internal Red engine\n"
         << "  red validate         Validate all known Red save checksums internally\n"
         << "  red validate-post-emulator  Validate emulator round-trip drift\n"
@@ -100,7 +112,6 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  proof red            Run the internal Red proof pipeline\n"
         << "  proof post-emulator  Continue proof after manual emulator testing\n"
         << "\nReserved/planned command domains:\n"
-        << "  config               Future local CLI configuration\n"
         << "  fred, frjson         Future FireRed workflows (not implemented)\n"
         << "  convert              Future Red-to-FireRed conversion (not implemented)\n\n"
         << "Core safety model:\n"

@@ -2,6 +2,8 @@
 
 #include <ostream>
 
+#include <nlohmann/json.hpp>
+
 #include "app/ExitCode.hpp"
 #include "app/Version.hpp"
 
@@ -10,7 +12,7 @@ namespace {
 
 void PrintHelp(std::ostream& output) {
     output
-        << "Usage: pkmn doctor\n\n"
+        << "Usage: pkmn doctor [--format text|json]\n\n"
         << "Checks that this standalone executable contains the internal Red foundation.\n"
         << "No Save Genie or Save Generator executable is searched for or required.\n";
 }
@@ -20,6 +22,7 @@ void PrintHelp(std::ostream& output) {
 int Run(const std::vector<std::string>& arguments,
         std::ostream& output,
         std::ostream& error) {
+    bool json = false;
     if (!arguments.empty()) {
         if (arguments.size() == 1 &&
             (arguments.front() == "--help" || arguments.front() == "-h" ||
@@ -27,8 +30,29 @@ int Run(const std::vector<std::string>& arguments,
             PrintHelp(output);
             return ToInt(ExitCode::Success);
         }
+        if ((arguments.size() == 1 && arguments.front() == "--json") ||
+            (arguments.size() == 2 && arguments.front() == "--format" &&
+             arguments[1] == "json")) {
+            json = true;
+        } else {
         error << "pkmn doctor: unexpected argument '" << arguments.front() << "'\n";
         return ToInt(ExitCode::InvalidArguments);
+        }
+    }
+
+    if (json) {
+        nlohmann::ordered_json report = {
+            {"tool", "pkmn"},
+            {"version", std::string(kVersion)},
+            {"standaloneReadiness", "ready"},
+            {"externalExecutablesRequired", false},
+            {"modules", nlohmann::ordered_json::array({
+                "command-router", "red-save-loader", "red-checksum-validator",
+                "red-json-decoder-validator-reconstructor", "red-semantic-generator",
+                "physical-semantic-comparison", "red-proof",
+                "post-emulator-validation", "red-editing"})}};
+        output << report.dump(2) << '\n';
+        return ToInt(ExitCode::Success);
     }
 
     output << "pkmn doctor\n"

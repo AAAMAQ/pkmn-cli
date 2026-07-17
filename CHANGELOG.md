@@ -17,6 +17,8 @@
 - Added macOS/Linux CI, installed documentation, a clean release verification script, Homebrew formula draft, command/install/release documentation, and public-data-only examples.
 - Added complete semantic-difference classifications, machine-readable comparison output, post-emulator validation/proof continuation, expanded proof reports, and deterministic privacy-marked ZIP proof packages.
 - Expanded editing into a validated looped terminal application with broad file-backed named fields, advanced value-file support, derived-field synchronization, and detailed in-memory semantic validation.
+- Added JSON output for diagnostic commands, generated bash/zsh/fish completion, an installed `pkmn(1)` manual, and dedicated schema, reconstruction, editing, proof, and future-FireRed documentation.
+- Added immutable `config show` policy reporting and explicit collision-safe `_2`/`_3` output suffixing across decode, generation, reconstruction, editing, and proof workflows.
 
 All notable changes to `pkmn-cli` will be documented here.
 

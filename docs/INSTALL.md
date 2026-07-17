@@ -20,6 +20,16 @@ pkmn --version
 pkmn doctor
 ```
 
+Enable completion in the current shell or install it through the shell's normal completion directory:
+
+```sh
+source <(pkmn completion zsh)  # zsh
+source <(pkmn completion bash) # bash
+pkmn completion fish | source  # fish
+```
+
+The manual page is installed as `pkmn(1)`.
+
 The install step places the executable in `bin` and the identity-checked public Red template in `share/pkmn/resources`. Moving only the executable without its installed resource directory will disable semantic generation and editing.
 
 ## Homebrew readiness

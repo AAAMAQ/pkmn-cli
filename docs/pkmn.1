@@ -1,0 +1,77 @@
+.TH PKMN 1 "July 2026" "pkmn 0.1.0" "User Commands"
+.SH NAME
+pkmn \- standalone Pokemon Red save workflow command line
+.SH SYNOPSIS
+.B pkmn
+.I domain command
+[arguments] [options]
+.SH DESCRIPTION
+.B pkmn
+provides internal Pokemon Red decoding, inspection, validation, canonical JSON, archival reconstruction, semantic generation, comparison, proof, post-emulator validation, and copy-first editing. It does not require Save Genie or Save Generator executables or a ROM.
+.SH GENERAL COMMANDS
+.TP
+.B pkmn --help
+Show available and reserved commands.
+.TP
+.B pkmn --version
+Show the CLI version.
+.TP
+.B pkmn doctor [--format text|json]
+Report standalone internal-engine readiness.
+.TP
+.B pkmn completion bash|zsh|fish
+Generate shell completion source.
+.TP
+.B pkmn config show [--format text|json]
+Show immutable compiled safety and default policy.
+.SH RED COMMANDS
+.TP
+.B pkmn red inspect|validate SAVE [--format json]
+Inspect or validate Red SRAM and all known checksums.
+.TP
+.B pkmn red decode SAVE [--output FILE] [--include-physical-image|--no-physical-image]
+Write deterministic canonical Red JSON without overwriting existing output.
+.TP
+.B pkmn red edit SAVE
+Run the interactive copy-first editor.
+.TP
+.B pkmn red begin-edit|edit-session|pending-edits|validate-edit|end-edit ...
+Run durable scriptable edit sessions.
+.TP
+.B pkmn red validate-post-emulator BEFORE AFTER
+Validate and classify a manual emulator round trip.
+.SH RED JSON COMMANDS
+.TP
+.B pkmn rjson inspect|validate FILE [--format json]
+Validate canonical schema, semantics, and optional physical image.
+.TP
+.B pkmn rjson generate FILE [OUTPUT]
+Generate a deterministic semantic save without using physicalImage authority.
+.TP
+.B pkmn rjson reconstruct FILE [--output OUTPUT]
+Perform exact archival reconstruction requiring physicalImage.
+.SH COMPARISON AND PROOF
+.TP
+.B pkmn compare physical A B
+Compare save bytes, hashes, percentages, and regions.
+.TP
+.B pkmn compare semantic A B
+Classify field-aware canonical semantic differences.
+.TP
+.B pkmn proof red SAVE [--output-dir DIR] [--zip|--zip-output ZIP]
+Run decode, generation, re-decode, comparison, determinism, isolation, report, and emulator-checklist workflows.
+.TP
+.B pkmn proof post-emulator --before SAVE --after SAVE [--proof-dir DIR]
+Complete the manual emulator proof gate after validating expected drift.
+.SH SAFETY
+Inputs and existing outputs are not overwritten. Semantic generation never uses physicalImage as authority. Reconstruction is explicitly archival. Arbitrary runtime location editing is disabled. Proof packages contain save data and require publication review.
+.PP
+Commands that create outputs accept explicit --auto-suffix where documented, producing numbered alternatives without weakening the no-overwrite default.
+.SH FUTURE DOMAINS
+fred, frjson, and convert are disabled placeholders until separately verified and emulator-proven FireRed engines exist.
+.SH FILES
+Installed Red template: share/pkmn/resources/pokemon-red-usa-europe-v1.template.bin
+.SH LICENSE
+MIT License, MAQ / BiG MAQ Studios stewardship note. Independent and not affiliated with Nintendo, Game Freak, Creatures, or The Pokemon Company.
+.SH SEE ALSO
+README.md, docs/COMMAND_REFERENCE.md, docs/EDIT_MODE.md, docs/PROOF_WORKFLOW.md
