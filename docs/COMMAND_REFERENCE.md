@@ -13,14 +13,16 @@ All currently implemented workflows are internal to `pkmn`. Save Genie and Save 
 - `pkmn red inspect <save.sav>` prints size and checksum status.
 - `pkmn red validate <save.sav>` validates the main, bank, and all 12 box checksums.
 - `pkmn red decode <save.sav> [--output <file.red.json>] [--include-physical-image|--no-physical-image]` writes deterministic canonical JSON. Physical image inclusion is the default. Existing outputs are refused.
-- `pkmn red edit <save.sav>` starts the interactive copy-first scalar editor.
+- `pkmn red edit <save.sav>` starts the looped interactive copy-first editor, including complex file-backed fields, pending preview, validation, save, and discard actions.
 - `pkmn red begin-edit <save.sav> [--output <session.json>]` creates a semantic-only edit session.
-- `pkmn red edit-session <session.json> <edits...>` accumulates edits. Named options are `--trainer-name`, `--rival-name`, `--trainer-id`, `--money`, `--coins`, and `--badges`. `--set </decoded/pointer> <JSON-value>` exposes supported complex semantic structures.
+- `pkmn red edit-session <session.json> <edits...>` accumulates edits. Named scalar options are `--trainer-name`, `--rival-name`, `--trainer-id`, `--money`, `--coins`, `--badges <0..255|all>`, and `--selected-box`. Complex `--*-file` options cover inventory, party, boxes/cache, Daycare, Hall of Fame, Pokédex, options, playtime, and verified world state. `--set` and `--set-file` expose supported existing semantic fields.
 - `pkmn red pending-edits <session.json>` lists staged changes.
 - `pkmn red validate-edit <session.json>` verifies source identity, generation policy, and output checksums without writing a save.
 - `pkmn red end-edit <session.json> [--output <output.sav>]` writes a new save and JSON/Markdown reports. It never overwrites an existing artifact.
 
 Arbitrary location edits are rejected. Generated and edited semantic saves use the verified Red's-house second-floor preset.
+
+See `docs/EDIT_MODE.md` for the complete editor and validation contract.
 
 ## Canonical Red JSON
 

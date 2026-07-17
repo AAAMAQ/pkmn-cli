@@ -96,6 +96,11 @@ int main() {
   Expect(missingDecodeArgument.code ==
              pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidArguments),
          "red decode should require an input");
+  const auto editHelp = Run({"red", "edit", "--help"});
+  Expect(editHelp.code == 0 &&
+             editHelp.output.find("--party-file") != std::string::npos &&
+             editHelp.output.find("--set-file") != std::string::npos,
+         "edit subcommand help should describe broad and advanced editing");
 
   const auto pendingRjson = Run({"rjson", "generate"});
   Expect(pendingRjson.code ==
@@ -530,6 +535,52 @@ int main() {
                  .code ==
              pkmn::cli::ToInt(pkmn::cli::ExitCode::EditValidationFailure),
          "invalid pending state should fail validation before session write");
+  Expect(Run({"red", "edit-session", invalidEditSession.string(), "--set",
+              "/decoded/moneyAndCoins/money", "1000000"})
+                 .code ==
+             pkmn::cli::ToInt(pkmn::cli::ExitCode::EditValidationFailure),
+         "advanced edit pointers should not bypass semantic range validation");
+
+  const fs::path broadEditSession = temp / "broad.edit-session.json";
+  const fs::path partyValueFile = temp / "party-value.json";
+  const fs::path bagValueFile = temp / "bag-value.json";
+  std::ofstream(partyValueFile)
+      << excludedDocument.at("decoded").at("party").dump(2);
+  std::ofstream(bagValueFile)
+      << excludedDocument.at("decoded").at("inventory").at("bag").dump(2);
+  Expect(Run({"red", "begin-edit", validSavePath.string(), "--output",
+              broadEditSession.string()})
+                 .code == 0 &&
+             Run({"red", "edit-session", broadEditSession.string(),
+                  "--badges", "all", "--selected-box", "1", "--party-file",
+                  partyValueFile.string(), "--bag-file",
+                  bagValueFile.string()})
+                     .code == 0 &&
+             Run({"red", "validate-edit", broadEditSession.string()}).code ==
+                 0,
+         "named broad-edit options should support badges, storage selection, "
+         "party, and inventory JSON values");
+  {
+    nlohmann::ordered_json broadSessionDocument;
+    std::ifstream(broadEditSession) >> broadSessionDocument;
+    Expect(broadSessionDocument.at("document")
+                   .at("decoded")
+                   .at("badges")
+                   .at("raw") == 255,
+           "--badges all should stage all eight badges");
+  }
+
+  const fs::path interactiveOutput =
+      temp / "synthetic-valid_generated_trainer.sav";
+  std::istringstream interactiveInput("1\nRED\n22\n");
+  auto *originalInputBuffer = std::cin.rdbuf(interactiveInput.rdbuf());
+  const auto interactiveEdit =
+      Run({"red", "edit", validSavePath.string()});
+  std::cin.rdbuf(originalInputBuffer);
+  Expect(interactiveEdit.code == 0 && fs::exists(interactiveOutput) &&
+             interactiveEdit.output.find("Pokemon Red copy-first editor") !=
+                 std::string::npos,
+         "interactive edit should stage, validate, and save from its menu");
 
   const fs::path moneySession = temp / "money.edit-session.json";
   Expect(Run({"red", "begin-edit", validSavePath.string(), "--output",

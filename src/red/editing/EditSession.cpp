@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include "red/save/RedSave.hpp"
+#include "red/json/RedJsonDocument.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
 
@@ -137,6 +138,14 @@ generation::Result Validate(const Json &session) {
       source.at("sha256").get<std::string>())
     throw std::runtime_error(
         "source save changed after this edit session was created");
+  const auto semanticValidation =
+      json::ValidateDocument(session.at("document"));
+  if (!semanticValidation.Valid()) {
+    const auto message = semanticValidation.errors.empty()
+                             ? "edited semantic document is invalid"
+                             : semanticValidation.errors.front();
+    throw std::runtime_error("edit validation failed: " + message);
+  }
   auto result = generation::Generate(session.at("document"));
   const auto integrity = validation::SaveValidator::Validate(
       save::RedSave(result.bytes));
@@ -165,6 +174,22 @@ std::filesystem::path DefaultOutputPath(const Json &session) {
       category = "money";
     else if (pointer.starts_with("/decoded/party"))
       category = "party";
+    else if (pointer.starts_with("/decoded/pcStorage") ||
+             pointer.starts_with("/decoded/currentBoxCache"))
+      category = "box-edit";
+    else if (pointer.starts_with("/decoded/inventory"))
+      category = "inventory";
+    else if (pointer.starts_with("/decoded/trainer") ||
+             pointer.starts_with("/decoded/rival"))
+      category = "trainer";
+    else if (pointer.starts_with("/decoded/badges"))
+      category = "badges";
+    else if (pointer.starts_with("/decoded/daycare"))
+      category = "daycare";
+    else if (pointer.starts_with("/decoded/hallOfFame"))
+      category = "hall-of-fame";
+    else if (pointer.starts_with("/decoded/worldStateRaw"))
+      category = "events";
   }
   return source.parent_path() /
          (source.stem().string() + "_generated_" + category + ".sav");

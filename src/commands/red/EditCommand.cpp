@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <stdexcept>
 
 #include "app/ExitCode.hpp"
@@ -21,8 +22,14 @@ void Help(std::ostream &out) {
       << "  pkmn red validate-edit <session.json>\n"
       << "  pkmn red end-edit <session.json> [--output <output.sav>]\n\n"
       << "Named edits: --trainer-name <text>, --rival-name <text>, "
-         "--trainer-id <n>, --money <n>, --coins <n>, --badges <0..255>\n"
-      << "Advanced edit: --set </decoded/json/pointer> <JSON-value>\n"
+         "--trainer-id <n>, --money <n>, --coins <n>, --badges <0..255|all>, "
+         "--selected-box <1..12>\n"
+      << "Complex value files: --bag-file, --pc-items-file, --party-file, "
+         "--boxes-file, --current-box-file, --daycare-file, "
+         "--hall-of-fame-file, --pokedex-file, --options-file, "
+         "--playtime-file, --world-state-file\n"
+      << "Advanced edits: --set </decoded/json/pointer> <JSON-value> or "
+         "--set-file </decoded/json/pointer> <value.json>\n"
       << "Arbitrary location editing is disabled. Source saves are never "
          "overwritten.\n";
 }
@@ -36,21 +43,35 @@ Json ParseUnsigned(const std::string &value, std::uint64_t maximum,
   return parsed;
 }
 
+Json LoadJsonValue(const std::filesystem::path &path) {
+  std::ifstream input(path);
+  if (!input)
+    throw std::runtime_error("could not open edit JSON value file");
+  Json value;
+  input >> value;
+  return value;
+}
+
 void ApplyArguments(Json &session, const std::vector<std::string> &args,
                     std::size_t begin) {
   for (std::size_t i = begin; i < args.size(); ++i) {
     if (i + 1 >= args.size())
       throw std::runtime_error("edit option requires a value");
     const auto &option = args[i];
-    if (option == "--set") {
+    if (option == "--set" || option == "--set-file") {
       if (i + 2 >= args.size())
-        throw std::runtime_error("--set requires a JSON pointer and value");
+        throw std::runtime_error(option +
+                                 " requires a JSON pointer and value");
       Json value;
-      try {
-        value = Json::parse(args[i + 2]);
-      } catch (const std::exception &) {
-        throw std::runtime_error(
-            "--set value must be valid JSON (quote JSON strings)");
+      if (option == "--set-file") {
+        value = LoadJsonValue(args[i + 2]);
+      } else {
+        try {
+          value = Json::parse(args[i + 2]);
+        } catch (const std::exception &) {
+          throw std::runtime_error(
+              "--set value must be valid JSON (quote JSON strings)");
+        }
       }
       pkmn::cli::red::editing::AddEdit(session, args[i + 1], value);
       i += 2;
@@ -78,9 +99,31 @@ void ApplyArguments(Json &session, const std::vector<std::string> &args,
     else if (option == "--badges")
       pkmn::cli::red::editing::AddEdit(
           session, "/decoded/badges/raw",
-          ParseUnsigned(value, 255, "badges"));
-    else
-      throw std::runtime_error("unsupported edit option: " + option);
+          value == "all" ? Json(255)
+                         : ParseUnsigned(value, 255, "badges"));
+    else if (option == "--selected-box")
+      pkmn::cli::red::editing::AddEdit(
+          session, "/decoded/currentBoxCache/selectedBoxNumber",
+          ParseUnsigned(value, 12, "selected box"));
+    else {
+      const std::map<std::string, std::string> fileOptions = {
+          {"--bag-file", "/decoded/inventory/bag"},
+          {"--pc-items-file", "/decoded/inventory/pcItems"},
+          {"--party-file", "/decoded/party"},
+          {"--boxes-file", "/decoded/pcStorage/boxes"},
+          {"--current-box-file", "/decoded/currentBoxCache"},
+          {"--daycare-file", "/decoded/daycare"},
+          {"--hall-of-fame-file", "/decoded/hallOfFame"},
+          {"--pokedex-file", "/decoded/pokedex"},
+          {"--options-file", "/decoded/options"},
+          {"--playtime-file", "/decoded/playtime"},
+          {"--world-state-file", "/decoded/worldStateRaw"}};
+      const auto found = fileOptions.find(option);
+      if (found == fileOptions.end())
+        throw std::runtime_error("unsupported edit option: " + option);
+      pkmn::cli::red::editing::AddEdit(session, found->second,
+                                       LoadJsonValue(value));
+    }
   }
 }
 
@@ -124,12 +167,129 @@ int End(Json &session, const std::filesystem::path &outputPath,
   return ToInt(ExitCode::Success);
 }
 
+void PrintPending(const Json &session, std::ostream &output) {
+  output << "Pending edits: " << session.at("pendingEdits").size() << '\n';
+  for (const auto &edit : session.at("pendingEdits"))
+    output << "- " << edit.at("path").get<std::string>() << ": "
+           << edit.at("previous").dump() << " -> "
+           << edit.at("value").dump() << '\n';
+}
+
+int Interactive(const std::filesystem::path &source, std::ostream &output) {
+  auto session = pkmn::cli::red::editing::Begin(source);
+  const std::vector<std::pair<std::string, std::string>> actions = {
+      {"Trainer name", "--trainer-name"},
+      {"Rival name", "--rival-name"},
+      {"Trainer ID", "--trainer-id"},
+      {"Money", "--money"},
+      {"Coins", "--coins"},
+      {"Badges (0..255 or all)", "--badges"},
+      {"Bag object from JSON file", "--bag-file"},
+      {"PC-item object from JSON file", "--pc-items-file"},
+      {"Party object from JSON file", "--party-file"},
+      {"All 12 boxes array from JSON file", "--boxes-file"},
+      {"Current-box/cache object from JSON file", "--current-box-file"},
+      {"Daycare object from JSON file", "--daycare-file"},
+      {"Hall of Fame object from JSON file", "--hall-of-fame-file"},
+      {"Pokedex object from JSON file", "--pokedex-file"},
+      {"Options object from JSON file", "--options-file"},
+      {"Playtime object from JSON file", "--playtime-file"},
+      {"Supported world-state object from JSON file", "--world-state-file"},
+      {"Selected box (1..12)", "--selected-box"}};
+  while (true) {
+    output << "\nPokemon Red copy-first editor\nSource: "
+           << source.filename().string() << "\nPending edits: "
+           << session.at("pendingEdits").size() << "\n";
+    for (std::size_t index = 0; index < actions.size(); ++index)
+      output << index + 1 << ". " << actions[index].first << '\n';
+    output << "19. Advanced JSON-pointer edit\n"
+              "20. View pending edits\n"
+              "21. Validate pending edits\n"
+              "22. Save validated edited copy\n"
+              "23. Discard edits and exit\nChoice: "
+           << std::flush;
+    std::string choiceText;
+    if (!std::getline(std::cin, choiceText)) {
+      output << "\nInput closed; edits discarded.\n";
+      return 0;
+    }
+    std::size_t choice = 0;
+    try {
+      choice = static_cast<std::size_t>(std::stoul(choiceText));
+    } catch (const std::exception &) {
+      output << "Invalid menu choice.\n";
+      continue;
+    }
+    if (choice >= 1 && choice <= actions.size()) {
+      output << (choice <= 6 || choice == 18 ? "Value: " : "JSON file: ")
+             << std::flush;
+      std::string value;
+      if (!std::getline(std::cin, value) || value.empty()) {
+        output << "No edit applied.\n";
+        continue;
+      }
+      auto candidate = session;
+      try {
+        ApplyArguments(candidate,
+                       {"edit", actions[choice - 1].second, value}, 1);
+        pkmn::cli::red::editing::Validate(candidate);
+        session = std::move(candidate);
+        output << "Edit staged and validated.\n";
+      } catch (const std::exception &exception) {
+        output << "Edit rejected: " << exception.what() << '\n';
+      }
+      continue;
+    }
+    if (choice == 19) {
+      output << "JSON pointer: " << std::flush;
+      std::string pointer;
+      std::getline(std::cin, pointer);
+      output << "JSON value: " << std::flush;
+      std::string value;
+      std::getline(std::cin, value);
+      auto candidate = session;
+      try {
+        ApplyArguments(candidate, {"edit", "--set", pointer, value}, 1);
+        pkmn::cli::red::editing::Validate(candidate);
+        session = std::move(candidate);
+        output << "Edit staged and validated.\n";
+      } catch (const std::exception &exception) {
+        output << "Edit rejected: " << exception.what() << '\n';
+      }
+    } else if (choice == 20) {
+      PrintPending(session, output);
+    } else if (choice == 21) {
+      try {
+        pkmn::cli::red::editing::Validate(session);
+        output << "Validation passed.\n";
+      } catch (const std::exception &exception) {
+        output << "Validation failed: " << exception.what() << '\n';
+      }
+    } else if (choice == 22) {
+      if (session.at("pendingEdits").empty()) {
+        output << "No pending edits to save.\n";
+        continue;
+      }
+      return End(session,
+                 pkmn::cli::red::editing::DefaultOutputPath(session), output);
+    } else if (choice == 23) {
+      output << "Edits discarded; source remains unchanged.\n";
+      return 0;
+    } else {
+      output << "Invalid menu choice.\n";
+    }
+  }
+}
+
 } // namespace
 
 int Run(const std::vector<std::string> &arguments, std::ostream &output,
         std::ostream &error) {
   if (arguments.empty() || arguments.front() == "help" ||
-      arguments.front() == "--help") {
+      arguments.front() == "--help" ||
+      (arguments.size() == 2 &&
+       (arguments[1] == "help" || arguments[1] == "--help" ||
+        arguments[1] == "-h"))) {
     Help(output);
     return 0;
   }
@@ -160,11 +320,7 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
     }
     if (command == "pending-edits" && arguments.size() == 2) {
       const auto session = pkmn::cli::red::editing::Load(arguments[1]);
-      output << "Pending edits: " << session.at("pendingEdits").size() << '\n';
-      for (const auto &edit : session.at("pendingEdits"))
-        output << "- " << edit.at("path").get<std::string>() << ": "
-               << edit.at("previous").dump() << " -> "
-               << edit.at("value").dump() << '\n';
+      PrintPending(session, output);
       return 0;
     }
     if (command == "validate-edit" && arguments.size() == 2) {
@@ -185,20 +341,7 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
       return End(session, path, output);
     }
     if (command == "edit" && arguments.size() == 2) {
-      auto session = pkmn::cli::red::editing::Begin(arguments[1]);
-      output << "Interactive Red edit (leave a value blank to keep it)\n";
-      for (const auto &[label, option] :
-           std::vector<std::pair<std::string, std::string>>{
-               {"Trainer name", "--trainer-name"}, {"Rival name", "--rival-name"},
-               {"Money", "--money"}, {"Coins", "--coins"}}) {
-        output << label << ": " << std::flush;
-        std::string value;
-        std::getline(std::cin, value);
-        if (!value.empty())
-          ApplyArguments(session, {command, option, value}, 1);
-      }
-      return End(session, pkmn::cli::red::editing::DefaultOutputPath(session),
-                 output);
+      return Interactive(arguments[1], output);
     }
   } catch (const std::exception &exception) {
     error << "pkmn red " << command << ": " << exception.what() << '\n';

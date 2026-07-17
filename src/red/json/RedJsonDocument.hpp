@@ -30,6 +30,7 @@ struct LoadedDocument {
 };
 
 LoadedDocument LoadAndValidate(const std::filesystem::path& path);
+DocumentValidation ValidateDocument(const OrderedJson& root);
 save::RedSave::Bytes PhysicalBytes(const OrderedJson& root);
 
 }  // namespace pkmn::cli::red::json
