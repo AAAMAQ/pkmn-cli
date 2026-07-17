@@ -23,7 +23,7 @@
 
 - [ ] Create and sign the release tag.
 - [ ] Publish the source archive and calculate its SHA-256.
-- [ ] Replace the repository and SHA-256 placeholders in the Homebrew formula.
+- [ ] Convert the tested head-only formula to an immutable release URL and its downloaded SHA-256.
 - [ ] Run `brew audit --strict`, `brew style`, install, and formula test.
 - [ ] Confirm the installed generation resource is found relative to the installed executable.
 - [ ] Generate CPack artifacts, inspect their contents, and include the SPDX SBOM.

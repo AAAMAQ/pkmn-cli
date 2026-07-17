@@ -40,7 +40,7 @@ Install to a chosen prefix:
 cmake --install build --prefix /your/install/prefix
 ```
 
-For a user-local shell installation, use `--prefix "$HOME/.local"`, add `$HOME/.local/bin` to `PATH`, and run `pkmn doctor`. See [installation and Homebrew readiness](docs/INSTALL.md).
+For a user-local shell installation, use `--prefix "$HOME/.local"`, add `$HOME/.local/bin` to `PATH`, and run `pkmn doctor`. A real head-only Homebrew formula is included for public-branch testing without fabricated release metadata. See [installation and Homebrew testing](docs/HOMEBREW_INSTALL.md).
 
 ## Implemented commands
 

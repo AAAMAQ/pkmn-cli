@@ -43,7 +43,8 @@ The install step places the executable in `bin` and the identity-checked public 
 ## Homebrew readiness
 
 The draft formula is in `packaging/homebrew/pkmn-cli.rb`. See
-`docs/HOMEBREW_INSTALL.md`; placeholders remain deliberate until publication.
+`docs/HOMEBREW_INSTALL.md`; it is a real head-only testing formula until an
+immutable tagged archive and downloaded checksum exist.
 
 ## Uninstall
 

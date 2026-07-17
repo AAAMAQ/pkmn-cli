@@ -1,9 +1,12 @@
+# typed: strict
+# frozen_string_literal: true
+
+# Homebrew formula for the standalone Pokemon Red workflow CLI.
 class PkmnCli < Formula
   desc "Standalone unified CLI for verified Pokemon Red save workflows"
-  homepage "https://github.com/REPLACE_WITH_RELEASE_REPOSITORY/pkmn-cli"
-  url "https://github.com/REPLACE_WITH_RELEASE_REPOSITORY/pkmn-cli/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "REPLACE_WITH_RELEASE_TARBALL_SHA256"
+  homepage "https://github.com/AAAMAQ/pkmn-cli"
   license "MIT"
+  head "https://github.com/AAAMAQ/pkmn-cli.git", branch: "main"
 
   depends_on "cmake" => :build
 
@@ -16,7 +19,7 @@ class PkmnCli < Formula
   end
 
   test do
-    assert_match "pkmn 0.1.0", shell_output("#{bin}/pkmn --version")
+    assert_match "pkmn", shell_output("#{bin}/pkmn --version")
     assert_match "Standalone readiness: ready", shell_output("#{bin}/pkmn doctor")
   end
 end
