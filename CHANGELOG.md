@@ -22,6 +22,7 @@
 - Completed the 507-entry named-event layer; transactional output publication; proof self-verification; deep doctor; event discovery; copy-first checksum repair; edit dry-run/history/undo; schema enrichment; batch and pipeline workflows; verified Gen I name databases; validation profiles; Windows/release CI; CPack, universal-macOS, and SPDX packaging scaffolds.
 - Added `red summary` for readable and structured save statistics, `compare progress` for explaining gameplay changes between ordered backups, and `get-all-cmds` backed by the executable's authoritative compiled catalog.
 - Added an exhaustive command list and a non-technical installation and usage guide with safe output examples.
+- Added a complete copy-and-paste manual explaining all 38 endpoints with `backup.sav` examples, expected terminal output, generated filenames, and safety behavior.
 
 All notable changes to `pkmn-cli` will be documented here.
 

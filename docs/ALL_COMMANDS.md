@@ -6,6 +6,9 @@ The executable is the authority: after any Homebrew upgrade, run
 Use `--format json` for scripts or `--format markdown --output commands.md` to
 save a fresh reference without copying terminal text.
 
+For exact `backup.sav` examples and expected output for every endpoint, read
+[COMPLETE_USAGE_GUIDE.md](COMPLETE_USAGE_GUIDE.md).
+
 ## General
 
 | Command | Purpose |

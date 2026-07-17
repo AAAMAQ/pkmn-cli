@@ -157,6 +157,8 @@ pkmn get-all-cmds --format markdown --output my-pkmn-commands.md
 `get-all-cmds` does not read a stale downloaded file. It renders the catalog
 compiled into the installed executable, so a Homebrew update automatically
 updates the list. The repository copy is [ALL_COMMANDS.md](ALL_COMMANDS.md).
+For a copy-and-paste example, expected output, and file explanation for every
+endpoint, continue with [COMPLETE_USAGE_GUIDE.md](COMPLETE_USAGE_GUIDE.md).
 
 ## 9. Understand outputs and privacy
 
