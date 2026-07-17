@@ -480,6 +480,22 @@ Add `--format json` for structured validation output. Complex structures can
 be supplied with the documented `--bag-file`, `--party-file`, box, Daycare,
 Hall-of-Fame, Pokedex, options, playtime, and world-state file options.
 
+For common Pokémon, inventory, and progress edits, prefer the synchronized
+semantic commands:
+
+```sh
+pkmn red pokemon backup.edit-session.json party 1 rename SUWII
+pkmn red pokemon backup.edit-session.json nickname SUWII level 100
+pkmn red pokemon backup.edit-session.json party 1 move replace 1 FLY
+pkmn red bag backup.edit-session.json add "MASTER BALL" 99
+pkmn red bag backup.edit-session.json remove "POKE BALL"
+pkmn red progress backup.edit-session.json fly-destinations all
+```
+
+Use `--dry-run` with any semantic command. Add `--explain-error` to
+`edit-session` for corrective guidance when a low-level JSON-pointer edit is
+rejected. The progress preset marks all 11 Fly destinations, not every map.
+
 ### 19. `pkmn red pending-edits` — review staged changes
 
 Type:

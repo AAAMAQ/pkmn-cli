@@ -27,7 +27,8 @@ OrderedJson Text(const RedSave &save, std::size_t offset, std::size_t length) {
 
 OrderedJson Items(const RedSave &save, std::size_t countOffset,
                   std::size_t pairsOffset, std::size_t capacity) {
-  const auto declared = save.At(countOffset);
+  const auto rawDeclared = save.At(countOffset);
+  const auto declared = rawDeclared == 0xFF ? 0U : rawDeclared;
   const auto count = std::min<std::size_t>(declared, capacity);
   OrderedJson items = OrderedJson::array();
   for (std::size_t slot = 0; slot < count; ++slot) {
@@ -106,7 +107,11 @@ OrderedJson Pokemon(const RedSave &save, std::size_t record,
 
 OrderedJson Box(const RedSave &save, std::size_t base, int number) {
   const auto rawCount = save.At(base);
-  const auto count = std::min<std::size_t>(rawCount, 20);
+  // Unused external PC-box banks in otherwise valid saves may still contain
+  // erased SRAM (0xFF). Treat that erased count byte as an empty box instead
+  // of clamping it to 20 and decoding twenty 0xFF records as Pokemon.
+  const auto declaredCount = rawCount == 0xFF ? 0U : rawCount;
+  const auto count = std::min<std::size_t>(declaredCount, 20);
   OrderedJson pokemon = OrderedJson::array();
   for (std::size_t index = 0; index < count; ++index) {
     pokemon.push_back(Pokemon(save, base + 0x16 + index * 0x21, 0x21,
@@ -114,7 +119,7 @@ OrderedJson Box(const RedSave &save, std::size_t base, int number) {
                               base + 0x386 + index * 11, index + 1, false));
   }
   return {{"boxNumber", number},
-          {"declaredCount", rawCount},
+          {"declaredCount", declaredCount},
           {"count", pokemon.size()},
           {"speciesListHex", c::Hex(save.Slice(base + 1, 20))},
           {"pokemon", pokemon},
@@ -123,7 +128,8 @@ OrderedJson Box(const RedSave &save, std::size_t base, int number) {
 
 OrderedJson Party(const RedSave &save) {
   constexpr std::size_t base = 0x2F2C;
-  const auto rawCount = save.At(base);
+  const auto storedCount = save.At(base);
+  const auto rawCount = storedCount == 0xFF ? 0U : storedCount;
   const auto count = std::min<std::size_t>(rawCount, 6);
   OrderedJson pokemon = OrderedJson::array();
   for (std::size_t index = 0; index < count; ++index) {
@@ -138,7 +144,10 @@ OrderedJson Party(const RedSave &save) {
 }
 
 OrderedJson HallOfFame(const RedSave &save) {
-  const auto count = std::min<std::size_t>(save.At(0x284E), 50);
+  const auto storedCount = save.At(0x284E);
+  const auto count = storedCount == 0xFF
+                         ? 0U
+                         : std::min<std::size_t>(storedCount, 50);
   OrderedJson entries = OrderedJson::array();
   for (std::size_t entry = 0; entry < count; ++entry) {
     OrderedJson pokemon = OrderedJson::array();
@@ -177,6 +186,14 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
     boxes.push_back(Box(input, validation::SaveValidator::BoxOffset(index),
                         static_cast<int>(index + 1)));
   const auto currentRaw = input.At(0x284C);
+  const auto daycareMarker = input.At(0x2CF4);
+  const bool daycareInUse = daycareMarker != 0 && daycareMarker != 0xFF;
+  const RedSave emptySave(
+      RedSave::Bytes(RedSave::ExpectedSize, static_cast<std::uint8_t>(0)));
+  const auto daycarePokemon =
+      daycareInUse
+          ? Pokemon(input, 0x2D0B, 0x21, 0x2D00, 0x2CF5, 1, false)
+          : Pokemon(emptySave, 0x2D0B, 0x21, 0x2D00, 0x2CF5, 1, false);
 
   OrderedJson boxChecksums = OrderedJson::array();
   for (std::size_t index = 0; index < report.boxes.size(); ++index)
@@ -239,8 +256,7 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
         {"hasChangedBoxesBefore", (currentRaw & 0x80) != 0},
         {"cache", Box(input, 0x30C0, (currentRaw & 0x7F) + 1)}}},
       {"daycare",
-       {{"inUse", input.At(0x2CF4) != 0},
-        {"pokemon", Pokemon(input, 0x2D0B, 0x21, 0x2D00, 0x2CF5, 1, false)}}},
+       {{"inUse", daycareInUse}, {"pokemon", daycarePokemon}}},
       {"hallOfFame", HallOfFame(input)},
       {"summaryCounts",
        {{"eventFlagsSet", c::CountSetBits(input, 0x29F3, 0x140, 0xA00)},

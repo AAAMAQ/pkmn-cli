@@ -72,6 +72,23 @@ std::vector<std::uint8_t> ValidSyntheticSave() {
   return bytes;
 }
 
+void RepairSyntheticChecksums(std::vector<std::uint8_t> &bytes) {
+  using Validator = pkmn::cli::red::validation::SaveValidator;
+  for (std::size_t box = 0; box < 12; ++box) {
+    const auto bank = box / 6;
+    const auto withinBank = box % 6;
+    const auto start = Validator::BoxOffset(box);
+    bytes[Validator::BoxChecksumTables[bank] + withinBank] =
+        InvertedSum(bytes, start, start + Validator::BoxBlockSize - 1);
+  }
+  for (std::size_t bank = 0; bank < 2; ++bank)
+    bytes[Validator::BankStored[bank]] =
+        InvertedSum(bytes, Validator::BankStarts[bank],
+                    Validator::BankStored[bank] - 1);
+  bytes[Validator::MainStored] =
+      InvertedSum(bytes, Validator::MainStart, Validator::MainEnd);
+}
+
 } // namespace
 
 int main() {
@@ -94,7 +111,7 @@ int main() {
              commandCatalog.output ==
                  Run({"get-all-cmds", "--format", "json"}).output &&
              nlohmann::ordered_json::parse(commandCatalog.output)
-                     .at("commandCount") == 38 &&
+                     .at("commandCount") == 41 &&
              nlohmann::ordered_json::parse(commandCatalog.output)
                      .at("commands").at(0).contains("usage"),
          "get-all-cmds should expose the complete compiled command catalog");
@@ -228,6 +245,242 @@ int main() {
           includedDocument.at("decoded").contains("hallOfFame"),
       "decode should contain the required party, storage, and Hall of Fame "
       "sections");
+
+  auto erasedBoxSave = ValidSyntheticSave();
+  for (std::size_t box = 0; box < 12; ++box) {
+    const auto start =
+        pkmn::cli::red::validation::SaveValidator::BoxOffset(box);
+    std::fill(erasedBoxSave.begin() + static_cast<std::ptrdiff_t>(start),
+              erasedBoxSave.begin() + static_cast<std::ptrdiff_t>(
+                                          start + pkmn::cli::red::validation::
+                                                      SaveValidator::BoxBlockSize),
+              0xFF);
+    const auto bank = box / 6;
+    const auto withinBank = box % 6;
+    erasedBoxSave[pkmn::cli::red::validation::SaveValidator::
+                      BoxChecksumTables[bank] +
+                  withinBank] =
+        InvertedSum(erasedBoxSave, start,
+                    start + pkmn::cli::red::validation::SaveValidator::
+                                BoxBlockSize -
+                        1);
+  }
+  for (std::size_t bank = 0; bank < 2; ++bank)
+    erasedBoxSave[pkmn::cli::red::validation::SaveValidator::BankStored[bank]] =
+        InvertedSum(
+            erasedBoxSave,
+            pkmn::cli::red::validation::SaveValidator::BankStarts[bank],
+            pkmn::cli::red::validation::SaveValidator::BankStored[bank] - 1);
+  const fs::path erasedBoxSavePath = temp / "erased-boxes-valid.sav";
+  {
+    std::ofstream output(erasedBoxSavePath, std::ios::binary);
+    output.write(reinterpret_cast<const char *>(erasedBoxSave.data()),
+                 static_cast<std::streamsize>(erasedBoxSave.size()));
+  }
+  const auto erasedLoaded =
+      pkmn::cli::red::save::RedSave::Read(erasedBoxSavePath);
+  const auto erasedValidation =
+      pkmn::cli::red::validation::SaveValidator::Validate(erasedLoaded);
+  const auto erasedDocument = pkmn::cli::red::json::Decode(
+      erasedLoaded, "erased-boxes-valid.sav", erasedValidation, {false});
+  const auto &erasedBoxes =
+      erasedDocument.at("decoded").at("pcStorage").at("boxes");
+  Expect(erasedValidation.Valid() &&
+             std::all_of(erasedBoxes.begin(), erasedBoxes.end(),
+                         [](const auto &box) {
+                           return box.at("declaredCount") == 0 &&
+                                  box.at("count") == 0 &&
+                                  box.at("pokemon").empty();
+                         }),
+         "erased 0xFF PC-box banks should decode as empty boxes");
+
+  auto erasedCollections = ValidSyntheticSave();
+  erasedCollections[0x25C9] = 0xFF;
+  erasedCollections[0x25CA] = 0xFF;
+  erasedCollections[0x27E6] = 0xFF;
+  erasedCollections[0x27E7] = 0xFF;
+  erasedCollections[0x2F2C] = 0xFF;
+  erasedCollections[0x2CF4] = 0xFF;
+  erasedCollections[0x284E] = 0xFF;
+  RepairSyntheticChecksums(erasedCollections);
+  const auto erasedCollectionsSave =
+      pkmn::cli::red::save::RedSave(std::move(erasedCollections));
+  const auto erasedCollectionsValidation =
+      pkmn::cli::red::validation::SaveValidator::Validate(
+          erasedCollectionsSave);
+  const auto erasedCollectionsDocument = pkmn::cli::red::json::Decode(
+      erasedCollectionsSave, "erased-collections.sav",
+      erasedCollectionsValidation, {false});
+  const auto &erasedDecoded = erasedCollectionsDocument.at("decoded");
+  Expect(erasedCollectionsValidation.Valid() &&
+             erasedDecoded.at("inventory").at("bag").at("count") == 0 &&
+             erasedDecoded.at("inventory").at("pcItems").at("count") == 0 &&
+             erasedDecoded.at("party").at("count") == 0 &&
+             !erasedDecoded.at("daycare").at("inUse").get<bool>() &&
+             erasedDecoded.at("hallOfFame").at("recordCount") == 0,
+         "erased inventory, party, Daycare, and Hall of Fame markers should "
+         "decode as empty state");
+  const fs::path erasedEditSession = temp / "erased-boxes.edit-session.json";
+  Expect(Run({"red", "summary", erasedBoxSavePath.string()})
+                     .output.find("PC Pokemon: 0 across 12 boxes") !=
+                 std::string::npos &&
+             Run({"red", "begin-edit", erasedBoxSavePath.string(), "--output",
+                  erasedEditSession.string()})
+                     .code == 0 &&
+             Run({"red", "edit-session", erasedEditSession.string(),
+                  "--money", "5000", "--dry-run"})
+                     .code == 0,
+         "erased PC boxes should not block valid edit sessions");
+
+  auto semanticEditDocument = includedDocument;
+  semanticEditDocument.erase("physicalImage");
+  semanticEditDocument["decoded"]["party"] = {
+      {"declaredCount", 1},
+      {"count", 1},
+      {"speciesListHex", "B3FF00000000"},
+      {"pokemon",
+       nlohmann::ordered_json::array(
+           {{{"position", 1},
+             {"speciesId", 179},
+             {"speciesName", "WARTORTLE"},
+             {"pokedexNumber", 8},
+             {"level", 5},
+             {"nickname",
+              {{"value", "AQUA"},
+               {"losslessValue", "AQUA"},
+               {"rawHex", ""}}},
+             {"otName",
+              {{"value", "RED"},
+               {"losslessValue", "RED"},
+               {"rawHex", ""}}},
+             {"currentHp", 20},
+             {"status", 0},
+             {"types", nlohmann::ordered_json::array({21, 21})},
+             {"catchRate", 45},
+             {"moves",
+              nlohmann::ordered_json::array(
+                  {{{"slot", 1},
+                    {"moveId", 33},
+                    {"moveName", "TACKLE"},
+                    {"pp", 35},
+                    {"ppUps", 0},
+                    {"rawPp", 35}},
+                   {{"slot", 2},
+                    {"moveId", 0},
+                    {"moveName", "INVALID"},
+                    {"pp", 0},
+                    {"ppUps", 0},
+                    {"rawPp", 0}},
+                   {{"slot", 3},
+                    {"moveId", 0},
+                    {"moveName", "INVALID"},
+                    {"pp", 0},
+                    {"ppUps", 0},
+                    {"rawPp", 0}},
+                   {{"slot", 4},
+                    {"moveId", 0},
+                    {"moveName", "INVALID"},
+                    {"pp", 0},
+                    {"ppUps", 0},
+                    {"rawPp", 0}}})},
+             {"trainerId", 1234},
+             {"experience", 135},
+             {"statExperience",
+              {{"hp", 0},
+               {"attack", 0},
+               {"defense", 0},
+               {"speed", 0},
+               {"special", 0}}},
+             {"dvs",
+              {{"attack", 8},
+               {"defense", 8},
+               {"speed", 8},
+               {"special", 8},
+               {"hp", 0}}},
+             {"rawRecordHex", ""},
+             {"stats",
+              {{"maxHp", 20},
+               {"attack", 12},
+               {"defense", 13},
+               {"speed", 11},
+               {"special", 12}}}}})}};
+  const auto semanticEditSourceResult =
+      pkmn::cli::red::generation::Generate(semanticEditDocument);
+  const fs::path semanticEditSource = temp / "semantic-edit-source.sav";
+  {
+    std::ofstream output(semanticEditSource, std::ios::binary);
+    output.write(
+        reinterpret_cast<const char *>(semanticEditSourceResult.bytes.data()),
+        static_cast<std::streamsize>(semanticEditSourceResult.bytes.size()));
+  }
+  const fs::path semanticEditSession = temp / "semantic-edit.edit-session.json";
+  const fs::path semanticEditOutput = temp / "semantic-edit-output.sav";
+  const auto semanticBegin =
+      Run({"red", "begin-edit", semanticEditSource.string(), "--output",
+           semanticEditSession.string()});
+  const auto semanticRename =
+      Run({"red", "pokemon", semanticEditSession.string(), "species",
+           "WARTORTLE", "rename", "SUWII"});
+  const auto semanticLevel =
+      Run({"red", "pokemon", semanticEditSession.string(), "nickname",
+           "SUWII", "level", "100"});
+  const auto semanticMove =
+      Run({"red", "pokemon", semanticEditSession.string(), "party", "1",
+           "move", "replace", "1", "FLY"});
+  const auto semanticBagAdd =
+      Run({"red", "bag", semanticEditSession.string(), "add", "MASTER BALL",
+           "99"});
+  const auto semanticBagTemporary =
+      Run({"red", "bag", semanticEditSession.string(), "add", "POTION", "1"});
+  const auto semanticBagRemove =
+      Run({"red", "bag", semanticEditSession.string(), "remove", "POTION"});
+  const auto semanticProgress =
+      Run({"red", "progress", semanticEditSession.string(),
+           "fly-destinations", "all"});
+  const auto explainedExperience =
+      Run({"red", "edit-session", semanticEditSession.string(), "--set",
+           "/decoded/party/pokemon/0/experience", "100000000", "--dry-run",
+           "--explain-error"});
+  const auto semanticEnd =
+      Run({"red", "end-edit", semanticEditSession.string(), "--output",
+           semanticEditOutput.string()});
+  const auto semanticOutputSave =
+      pkmn::cli::red::save::RedSave::Read(semanticEditOutput);
+  const auto semanticOutputValidation =
+      pkmn::cli::red::validation::SaveValidator::Validate(semanticOutputSave);
+  const auto semanticOutputDocument = pkmn::cli::red::json::Decode(
+      semanticOutputSave, "semantic-edit-output.sav",
+      semanticOutputValidation, {false});
+  const auto &semanticPokemon =
+      semanticOutputDocument.at("decoded").at("party").at("pokemon").at(0);
+  const auto &semanticBag = semanticOutputDocument.at("decoded")
+                                .at("inventory")
+                                .at("bag")
+                                .at("items");
+  Expect(semanticBegin.code == 0 && semanticRename.code == 0 &&
+             semanticLevel.code == 0 && semanticMove.code == 0 &&
+             semanticBagAdd.code == 0 && semanticBagTemporary.code == 0 &&
+             semanticBagRemove.code == 0 && semanticProgress.code == 0 &&
+             explainedExperience.code ==
+                 pkmn::cli::ToInt(
+                     pkmn::cli::ExitCode::EditValidationFailure) &&
+             explainedExperience.error.find("24-bit") != std::string::npos &&
+             explainedExperience.error.find("Hint:") != std::string::npos &&
+             semanticEnd.code == 0 && semanticOutputValidation.Valid() &&
+             semanticPokemon.at("nickname").at("value") == "SUWII" &&
+             semanticPokemon.at("level") == 100 &&
+             semanticPokemon.at("experience") == 1059860 &&
+             semanticPokemon.at("stats").at("maxHp") > 20 &&
+             semanticPokemon.at("moves").at(0).at("moveId") == 19 &&
+             semanticPokemon.at("moves").at(0).at("pp") == 15 &&
+             semanticBag.size() == 1 &&
+             semanticBag.at(0).at("itemId") == 1 &&
+             semanticBag.at(0).at("quantity") == 99 &&
+             semanticOutputDocument.at("decoded")
+                     .at("worldStateRaw")
+                     .at("visitedTownsHex") == "FF07",
+         "semantic Pokemon, move, bag, progress, range, and explanation "
+         "workflows should round-trip through a synthetic save");
   Expect(includedDocument.at("decoded").at("events").at("flags").size() ==
                  507 &&
              includedDocument.at("decoded")

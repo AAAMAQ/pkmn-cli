@@ -6,6 +6,8 @@
 #include <stdexcept>
 
 #include "red/codec/Gen1Codec.hpp"
+#include "red/data/Gen1PokemonData.hpp"
+#include "red/data/Gen1PokemonMath.hpp"
 #include "red/events/EventCatalog.hpp"
 #include "red/data/Gen1Names.hpp"
 #include "red/validation/SaveValidator.hpp"
@@ -65,6 +67,22 @@ void ValidatePokemon(const OrderedJson& pokemon, bool party,
             validation.errors.push_back(path + ".speciesId is unsupported");
         if (level == 0 || level > 100)
             validation.errors.push_back(path + ".level must be in 1..100");
+        const auto experience = pokemon.at("experience").get<std::uint64_t>();
+        if (experience > 0xFFFFFFU)
+            validation.errors.push_back(
+                path + ".experience exceeds the 24-bit Gen I maximum of 16777215; "
+                "use a value in 0..16777215 or the semantic Pokemon level command");
+        else if (level >= 1 && level <= 100 && species <= 255) {
+            const auto* speciesData =
+                data::FindSpeciesData(static_cast<std::uint8_t>(species));
+            if (speciesData != nullptr &&
+                data::LevelFromExperience(*speciesData,
+                                          static_cast<std::uint32_t>(experience)) !=
+                    level)
+                validation.errors.push_back(
+                    path + ".experience does not match its species growth rate and level; "
+                    "use the semantic Pokemon level command to synchronize both fields");
+        }
         if (pokemon.at("types").size() != 2)
             validation.errors.push_back(path + ".types must contain two values");
         if (pokemon.at("moves").size() != 4)
@@ -72,12 +90,23 @@ void ValidatePokemon(const OrderedJson& pokemon, bool party,
         for (std::size_t index = 0; index < pokemon.at("moves").size(); ++index) {
             const auto& move = pokemon.at("moves").at(index);
             const auto moveId = move.at("moveId").get<unsigned>();
-            if (moveId > 255 ||
-                !data::IsValidMove(static_cast<std::uint8_t>(moveId)) ||
-                move.at("pp").get<unsigned>() > 63 ||
-                move.at("ppUps").get<unsigned>() > 3)
+            const auto pp = move.at("pp").get<unsigned>();
+            const auto ppUps = move.at("ppUps").get<unsigned>();
+            const bool emptyMove = moveId == 0 && pp == 0 && ppUps == 0;
+            bool validMove = emptyMove;
+            if (!emptyMove && moveId <= 255 && ppUps <= 3 &&
+                data::IsValidMove(static_cast<std::uint8_t>(moveId)))
+                validMove = pp <= data::MoveMaxPp(
+                                      static_cast<std::uint8_t>(moveId),
+                                      static_cast<std::uint8_t>(ppUps));
+            const auto packedPp = ppUps <= 3 && pp <= 63
+                                      ? ((ppUps << 6U) | pp)
+                                      : 256U;
+            if (!validMove || moveId > 255 || pp > 63 || ppUps > 3 ||
+                move.at("rawPp").get<unsigned>() != packedPp)
                 validation.errors.push_back(path + ".moves[" + std::to_string(index) +
-                                            "] is outside Gen I ranges");
+                                            "] has an invalid move, PP, PP Ups, or packed rawPp; "
+                                            "use the semantic Pokemon move command to synchronize them");
         }
         for (const auto* key : {"attack", "defense", "speed", "special"})
             if (pokemon.at("dvs").at(key).get<unsigned>() > 15)

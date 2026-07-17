@@ -40,7 +40,10 @@ For exact `backup.sav` examples and expected output for every endpoint, read
 |---|---|
 | `pkmn red edit <save.sav>` | Open the interactive copy-first editor. |
 | `pkmn red begin-edit <save.sav> [--output <session.json>]` | Start a scriptable semantic edit session. |
-| `pkmn red edit-session <session.json> <edits...> [--dry-run] [--format json]` | Stage and validate edits. |
+| `pkmn red edit-session <session.json> <edits...> [--dry-run] [--format json] [--explain-error]` | Stage and validate edits, with optional corrective guidance. |
+| `pkmn red pokemon <session.json> <party\|species\|nickname> <value> <rename\|level\|move> ... [--dry-run]` | Apply synchronized party-Pokémon edits. |
+| `pkmn red bag <session.json> <add <item> <quantity>\|remove <item>> [--dry-run]` | Safely add, merge, or remove bag stacks. |
+| `pkmn red progress <session.json> fly-destinations all [--dry-run]` | Mark all 11 verified Fly destinations visited. |
 | `pkmn red pending-edits <session.json> [--format json]` | Show staged edits. |
 | `pkmn red undo-edit <session.json> [--count <number>]` | Undo recent staged edits. |
 | `pkmn red edit-history <session.json> [--format json]` | Show edit history. |

@@ -23,6 +23,10 @@
 - Added `red summary` for readable and structured save statistics, `compare progress` for explaining gameplay changes between ordered backups, and `get-all-cmds` backed by the executable's authoritative compiled catalog.
 - Added an exhaustive command list and a non-technical installation and usage guide with safe output examples.
 - Added a complete copy-and-paste manual explaining all 38 endpoints with `backup.sav` examples, expected terminal output, generated filenames, and safety behavior.
+- Normalized erased `0xFF` PC boxes and other uninitialized Red collections as empty state instead of fake records.
+- Added semantic party-Pokémon selectors and synchronized rename, level/experience/stat/HP, and move/PP editing.
+- Added safe bag add/merge/remove commands, the verified all-Fly-destinations progress preset, 24-bit/growth-rate experience validation, move-specific PP validation, and actionable edit-error hints.
+- Expanded the compiled catalog to 41 endpoints and added synthetic end-to-end coverage for the new edit workflows.
 
 All notable changes to `pkmn-cli` will be documented here.
 

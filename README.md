@@ -87,6 +87,10 @@ pkmn red repair-checksums input.sav
 pkmn red validate-batch one.sav two.sav --format json
 pkmn red begin-edit input.sav
 pkmn red edit-session input.edit-session.json --money 999999 --trainer-name RED
+pkmn red pokemon input.edit-session.json party 1 level 100
+pkmn red pokemon input.edit-session.json species WARTORTLE move replace 1 FLY
+pkmn red bag input.edit-session.json add "MASTER BALL" 99
+pkmn red progress input.edit-session.json fly-destinations all
 pkmn red pending-edits input.edit-session.json
 pkmn red edit-history input.edit-session.json
 pkmn red undo-edit input.edit-session.json
@@ -106,7 +110,7 @@ pkmn red end-edit input.edit-session.json
 
 `pkmn compare physical` reports hashes, percentages, first/last differences, and contiguous equal/different ranges mapped to save banks. `compare semantic` provides the complete field classification model and JSON/Markdown output controls. `pkmn proof red` runs decode, generation, re-decode, both comparisons, determinism, and physical-image-isolation checks and creates the complete report set and emulator checklist. Optional deterministic ZIP packages contain save data and require publication review. `proof post-emulator` validates a manual emulator round trip and can explicitly complete the manifest gate; automated proof never claims that gate passed on its own.
 
-Red editing is copy-first. `red edit` provides a looped interactive editor; `begin-edit` creates a semantic-only session, `edit-session` accumulates named, file-backed, or JSON-pointer edits—including the verified 507-entry event catalog—`validate-edit` performs an in-memory schema/generation/checksum gate, and `end-edit` writes a new save plus JSON/Markdown reports. The source hash is rechecked at every validation. Arbitrary locations are rejected; generated edits use the verified Red's-house preset. See the complete [edit-mode guide](docs/EDIT_MODE.md).
+Red editing is copy-first. `red edit` provides a looped interactive editor; `begin-edit` creates a semantic-only session; `edit-session` accumulates named, file-backed, or JSON-pointer edits—including the verified 507-entry event catalog; and semantic `pokemon`, `bag`, and `progress` commands synchronize dependent fields automatically. `validate-edit` performs an in-memory schema/generation/checksum gate, and `end-edit` writes a new save plus JSON/Markdown reports. The source hash is rechecked at every validation. Arbitrary locations are rejected; generated edits use the verified Red's-house preset. See the complete [edit-mode guide](docs/EDIT_MODE.md).
 
 ## Command documentation
 

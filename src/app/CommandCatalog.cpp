@@ -5,7 +5,7 @@
 namespace pkmn::cli {
 namespace {
 
-constexpr std::array<CommandSpec, 38> kCommands{{
+constexpr std::array<CommandSpec, 41> kCommands{{
     {"General", "doctor", "pkmn doctor [--deep] [--format json]",
      "Check internal readiness; --deep runs a deterministic generation self-test."},
     {"General", "completion", "pkmn completion <bash|zsh|fish>",
@@ -55,8 +55,17 @@ constexpr std::array<CommandSpec, 38> kCommands{{
      "pkmn red begin-edit <save.sav> [--output <session.json>]",
      "Start a scriptable semantic edit session."},
     {"Pokemon Red editing", "red edit-session",
-     "pkmn red edit-session <session.json> <edits...> [--dry-run] [--format json]",
+     "pkmn red edit-session <session.json> <edits...> [--dry-run] [--format json] [--explain-error]",
      "Stage and validate one or more edits."},
+    {"Pokemon Red editing", "red pokemon",
+     "pkmn red pokemon <session.json> <party|species|nickname> <value> <rename|level|move> ... [--dry-run]",
+     "Apply coherent party-Pokemon name, level/stat, or move/PP edits."},
+    {"Pokemon Red editing", "red bag",
+     "pkmn red bag <session.json> <add <item> <quantity>|remove <item>> [--dry-run]",
+     "Add, merge, or remove bag stacks with synchronized slots and counts."},
+    {"Pokemon Red editing", "red progress",
+     "pkmn red progress <session.json> fly-destinations all [--dry-run]",
+     "Apply verified progress presets without arbitrary map-state mutation."},
     {"Pokemon Red editing", "red pending-edits",
      "pkmn red pending-edits <session.json> [--format json]",
      "Show staged edits."},

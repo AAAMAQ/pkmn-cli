@@ -27,6 +27,7 @@ add_library(pkmn_cli_core
     src/red/comparison/Comparison.cpp
     src/red/comparison/ProgressComparison.cpp
     src/red/data/Gen1Names.cpp
+    src/red/data/Gen1PokemonMath.cpp
     src/red/editing/EditSession.cpp
     src/red/events/EventCatalog.cpp
     src/red/generation/SemanticGenerator.cpp

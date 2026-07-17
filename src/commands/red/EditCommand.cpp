@@ -3,10 +3,15 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
+#include <cctype>
 #include <map>
 #include <stdexcept>
 
 #include "app/ExitCode.hpp"
+#include "red/data/Gen1Names.hpp"
+#include "red/data/Gen1PokemonData.hpp"
+#include "red/data/Gen1PokemonMath.hpp"
 #include "red/editing/EditSession.hpp"
 #include "util/OutputPath.hpp"
 #include "util/AtomicOutput.hpp"
@@ -14,6 +19,7 @@
 namespace pkmn::cli::commands::red::edit {
 namespace {
 using Json = pkmn::cli::red::editing::Json;
+namespace data = pkmn::cli::red::data;
 
 void Help(std::ostream &out) {
   out << "Usage:\n"
@@ -27,6 +33,15 @@ void Help(std::ostream &out) {
       << "  pkmn red validate-edit <session.json>\n"
       << "  pkmn red end-edit <session.json> [--output <output.sav>] "
          "[--auto-suffix] [--dry-run] [--format json]\n\n"
+      << "Semantic edits:\n"
+      << "  pkmn red pokemon <session.json> party <slot> rename <name>\n"
+      << "  pkmn red pokemon <session.json> party <slot> level <1..100>\n"
+      << "  pkmn red pokemon <session.json> party <slot> move replace "
+         "<move-slot> <move>\n"
+      << "  Selectors may also be: species <name> or nickname <name>.\n"
+      << "  pkmn red bag <session.json> add <item> <quantity>\n"
+      << "  pkmn red bag <session.json> remove <item>\n"
+      << "  pkmn red progress <session.json> fly-destinations all\n\n"
       << "Named edits: --trainer-name <text>, --rival-name <text>, "
          "--trainer-id <n>, --money <n>, --coins <n>, --badges <0..255|all>, "
          "--selected-box <1..12>, --event <EVENT_NAME> <on|off>\n"
@@ -57,6 +72,204 @@ Json LoadJsonValue(const std::filesystem::path &path) {
   Json value;
   input >> value;
   return value;
+}
+
+std::string NormalizedName(std::string value) {
+  std::string normalized;
+  for (const auto character : value) {
+    if (std::isalnum(static_cast<unsigned char>(character)))
+      normalized.push_back(static_cast<char>(
+          std::toupper(static_cast<unsigned char>(character))));
+  }
+  return normalized;
+}
+
+template <typename NameFunction, typename ValidFunction>
+std::uint8_t LookupId(const std::string &input, const std::string &label,
+                      NameFunction name, ValidFunction valid) {
+  std::size_t used = 0;
+  try {
+    const auto numeric = std::stoul(input, &used);
+    if (used == input.size() && numeric <= 255 &&
+        valid(static_cast<std::uint8_t>(numeric)))
+      return static_cast<std::uint8_t>(numeric);
+  } catch (const std::exception &) {
+  }
+  const auto wanted = NormalizedName(input);
+  for (std::size_t id = 1; id <= 255; ++id)
+    if (valid(static_cast<std::uint8_t>(id)) &&
+        NormalizedName(std::string(name(static_cast<std::uint8_t>(id)))) ==
+            wanted)
+      return static_cast<std::uint8_t>(id);
+  throw std::runtime_error("unknown Gen I " + label + ": " + input);
+}
+
+std::size_t FindPartyPokemon(const Json &session, const std::string &selector,
+                             const std::string &value) {
+  const auto &party = session.at("document").at("decoded").at("party").at("pokemon");
+  if (selector == "party") {
+    const auto slot = ParseUnsigned(value, party.size(), "party slot")
+                          .get<std::size_t>();
+    if (slot == 0)
+      throw std::runtime_error("party slot must be in 1.." +
+                               std::to_string(party.size()));
+    return slot - 1;
+  }
+  std::vector<std::size_t> matches;
+  if (selector == "species") {
+    const auto species = LookupId(value, "species", data::SpeciesName,
+                                  data::IsValidSpecies);
+    for (std::size_t index = 0; index < party.size(); ++index)
+      if (party.at(index).at("speciesId") == species)
+        matches.push_back(index);
+  } else if (selector == "nickname") {
+    const auto nickname = NormalizedName(value);
+    for (std::size_t index = 0; index < party.size(); ++index)
+      if (NormalizedName(party.at(index)
+                             .at("nickname")
+                             .at("value")
+                             .get<std::string>()) == nickname)
+        matches.push_back(index);
+  } else {
+    throw std::runtime_error(
+        "Pokemon selector must be party, species, or nickname");
+  }
+  if (matches.empty())
+    throw std::runtime_error("no party Pokemon matched " + selector + " " +
+                             value);
+  if (matches.size() > 1)
+    throw std::runtime_error("party Pokemon selector is ambiguous; use a party slot");
+  return matches.front();
+}
+
+std::string PokemonPath(std::size_t index) {
+  return "/decoded/party/pokemon/" + std::to_string(index);
+}
+
+void SetPokemonLevel(Json &session, std::size_t index, std::uint8_t level) {
+  const auto path = PokemonPath(index);
+  const auto &mon = session.at("document").at("decoded").at("party").at("pokemon").at(index);
+  const auto speciesId = mon.at("speciesId").get<std::uint8_t>();
+  const auto *species = data::FindSpeciesData(speciesId);
+  if (species == nullptr)
+    throw std::runtime_error("selected Pokemon species has no verified stat data");
+  const auto &dvs = mon.at("dvs");
+  const auto &statExperience = mon.at("statExperience");
+  Json stats = {
+      {"maxHp", data::CalculateStat(species->baseHp, dvs.at("hp"),
+                                    statExperience.at("hp"), level, true)},
+      {"attack", data::CalculateStat(species->baseAttack, dvs.at("attack"),
+                                     statExperience.at("attack"), level, false)},
+      {"defense", data::CalculateStat(species->baseDefense, dvs.at("defense"),
+                                      statExperience.at("defense"), level, false)},
+      {"speed", data::CalculateStat(species->baseSpeed, dvs.at("speed"),
+                                    statExperience.at("speed"), level, false)},
+      {"special", data::CalculateStat(species->baseSpecial, dvs.at("special"),
+                                      statExperience.at("special"), level, false)}};
+  const auto oldCurrent = mon.at("currentHp").get<std::uint16_t>();
+  const auto oldMaximum = mon.at("stats").at("maxHp").get<std::uint16_t>();
+  const auto newMaximum = stats.at("maxHp").get<std::uint16_t>();
+  const auto missing = oldMaximum > oldCurrent ? oldMaximum - oldCurrent : 0;
+  const auto newCurrent = oldCurrent == 0
+                              ? 0
+                              : std::max<int>(1, newMaximum -
+                                                     std::min<std::uint16_t>(missing, newMaximum));
+  pkmn::cli::red::editing::AddEdit(session, path + "/level", level);
+  pkmn::cli::red::editing::AddEdit(
+      session, path + "/experience",
+      data::ExperienceForLevel(species->growthRate, level));
+  pkmn::cli::red::editing::AddEdit(session, path + "/stats", stats);
+  pkmn::cli::red::editing::AddEdit(session, path + "/currentHp", newCurrent);
+}
+
+void ReplacePokemonMove(Json &session, std::size_t pokemonIndex,
+                        std::size_t moveSlot, const std::string &moveName) {
+  if (moveSlot == 0 || moveSlot > 4)
+    throw std::runtime_error("move slot must be in 1..4");
+  const auto moveId = LookupId(moveName, "move", data::MoveName,
+                               data::IsValidMove);
+  const auto pp = data::MoveMaxPp(moveId, 0);
+  const auto path = PokemonPath(pokemonIndex) + "/moves/" +
+                    std::to_string(moveSlot - 1);
+  pkmn::cli::red::editing::AddEdit(session, path + "/moveId", moveId);
+  pkmn::cli::red::editing::AddEdit(
+      session, path + "/moveName", std::string(data::MoveName(moveId)));
+  pkmn::cli::red::editing::AddEdit(session, path + "/pp", pp);
+  pkmn::cli::red::editing::AddEdit(session, path + "/ppUps", 0);
+  pkmn::cli::red::editing::AddEdit(session, path + "/rawPp", pp);
+}
+
+void NormalizeBag(Json &bag) {
+  auto &items = bag.at("items");
+  for (std::size_t index = 0; index < items.size(); ++index)
+    items.at(index)["slot"] = index + 1;
+  bag["count"] = items.size();
+  bag["declaredCount"] = items.size();
+}
+
+void AddBagItem(Json &session, const std::string &itemName,
+                std::uint8_t quantity) {
+  if (quantity == 0 || quantity > 99)
+    throw std::runtime_error("bag quantity must be in 1..99");
+  const auto itemId = LookupId(itemName, "item", data::ItemName,
+                               data::IsValidItem);
+  auto bag = session.at("document").at("decoded").at("inventory").at("bag");
+  auto &items = bag.at("items");
+  for (auto &item : items) {
+    if (item.at("itemId") == itemId) {
+      const auto combined = item.at("quantity").get<unsigned>() + quantity;
+      if (combined > 99)
+        throw std::runtime_error(
+            "bag stack would exceed 99; remove it or add a smaller quantity");
+      item["quantity"] = combined;
+      NormalizeBag(bag);
+      pkmn::cli::red::editing::AddEdit(
+          session, "/decoded/inventory/bag", bag);
+      return;
+    }
+  }
+  if (items.size() >= bag.at("capacity").get<std::size_t>())
+    throw std::runtime_error("bag is full; remove an item before adding another");
+  items.push_back({{"slot", items.size() + 1},
+                   {"itemId", itemId},
+                   {"itemName", std::string(data::ItemName(itemId))},
+                   {"quantity", quantity}});
+  NormalizeBag(bag);
+  pkmn::cli::red::editing::AddEdit(session, "/decoded/inventory/bag", bag);
+}
+
+void RemoveBagItem(Json &session, const std::string &itemName) {
+  const auto itemId = LookupId(itemName, "item", data::ItemName,
+                               data::IsValidItem);
+  auto bag = session.at("document").at("decoded").at("inventory").at("bag");
+  auto &items = bag.at("items");
+  const auto found = std::find_if(items.begin(), items.end(),
+                                  [itemId](const Json &item) {
+                                    return item.at("itemId") == itemId;
+                                  });
+  if (found == items.end())
+    throw std::runtime_error("bag does not contain " + itemName);
+  items.erase(found);
+  NormalizeBag(bag);
+  pkmn::cli::red::editing::AddEdit(session, "/decoded/inventory/bag", bag);
+}
+
+std::string ExplainError(const std::string &message) {
+  if (message.find("experience") != std::string::npos)
+    return "Gen I experience is 24-bit. Prefer `pkmn red pokemon <session> "
+           "party <slot> level <1..100>` so level, experience, HP, and stats "
+           "stay synchronized.";
+  if (message.find("moves[") != std::string::npos)
+    return "Prefer the semantic Pokemon move command; it synchronizes move "
+           "ID, display name, PP, PP Ups, and packed raw PP.";
+  if (message.find("speciesId is unsupported") != std::string::npos)
+    return "Re-decode the source with the latest pkmn build. Erased 0xFF PC "
+           "boxes are normalized automatically.";
+  if (message.find("count/array") != std::string::npos)
+    return "Use the semantic bag or Pokemon commands so collection counts and "
+           "slots are synchronized automatically.";
+  return "Run `pkmn red validate-edit <session>` after each semantic edit and "
+         "use the path in the error to identify the rejected field.";
 }
 
 void ApplyArguments(Json &session, const std::vector<std::string> &args,
@@ -215,6 +428,16 @@ void PrintPending(const Json &session, std::ostream &output) {
            << edit.at("value").dump() << '\n';
 }
 
+void FinishSemanticEdit(const std::filesystem::path &sessionPath,
+                        Json &session, bool dryRun, std::ostream &output) {
+  pkmn::cli::red::editing::Validate(session);
+  if (!dryRun)
+    pkmn::cli::red::editing::Save(sessionPath, session, false);
+  output << (dryRun ? "Semantic edit dry run passed; session unchanged\n"
+                    : "Semantic edit staged and validated\n")
+         << "Pending edits: " << session.at("pendingEdits").size() << '\n';
+}
+
 int Interactive(const std::filesystem::path &source, std::ostream &output) {
   auto session = pkmn::cli::red::editing::Begin(source);
   const std::vector<std::pair<std::string, std::string>> actions = {
@@ -353,6 +576,9 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
     return 0;
   }
   const auto &command = arguments.front();
+  const bool explainError =
+      std::find(arguments.begin(), arguments.end(), "--explain-error") !=
+      arguments.end();
   try {
     if (command == "begin-edit" &&
         (arguments.size() == 2 ||
@@ -368,6 +594,75 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
              << "\nSource is read-only; physicalImage is excluded.\n";
       return 0;
     }
+    if (command == "pokemon" || command == "bag" || command == "progress") {
+      const bool dryRun =
+          std::find(arguments.begin(), arguments.end(), "--dry-run") !=
+          arguments.end();
+      auto semanticArguments = arguments;
+      semanticArguments.erase(
+          std::remove_if(semanticArguments.begin(), semanticArguments.end(),
+                         [](const std::string &value) {
+                           return value == "--dry-run" ||
+                                  value == "--explain-error";
+                         }),
+          semanticArguments.end());
+      if (semanticArguments.size() < 2)
+        throw std::runtime_error("semantic edit requires an edit session");
+      const std::filesystem::path sessionPath = semanticArguments[1];
+      auto session = pkmn::cli::red::editing::Load(sessionPath);
+      if (command == "pokemon") {
+        if (semanticArguments.size() < 6)
+          throw std::runtime_error("invalid semantic Pokemon edit arguments");
+        const auto index = FindPartyPokemon(
+            session, semanticArguments[2], semanticArguments[3]);
+        const auto &action = semanticArguments[4];
+        if (action == "rename" && semanticArguments.size() == 6) {
+          pkmn::cli::red::editing::AddEdit(
+              session, PokemonPath(index) + "/nickname/value",
+              semanticArguments[5]);
+        } else if (action == "level" && semanticArguments.size() == 6) {
+          const auto level = ParseUnsigned(semanticArguments[5], 100,
+                                           "Pokemon level")
+                                 .get<std::uint8_t>();
+          if (level == 0)
+            throw std::runtime_error("Pokemon level must be in 1..100");
+          SetPokemonLevel(session, index, level);
+        } else if (action == "move" && semanticArguments.size() == 8 &&
+                   semanticArguments[5] == "replace") {
+          const auto slot = ParseUnsigned(semanticArguments[6], 4,
+                                          "move slot")
+                                .get<std::size_t>();
+          ReplacePokemonMove(session, index, slot, semanticArguments[7]);
+        } else {
+          throw std::runtime_error(
+              "Pokemon action must be rename, level, or move replace");
+        }
+      } else if (command == "bag") {
+        if (semanticArguments.size() == 5 &&
+            semanticArguments[2] == "add") {
+          const auto quantity = ParseUnsigned(semanticArguments[4], 99,
+                                              "bag quantity")
+                                    .get<std::uint8_t>();
+          AddBagItem(session, semanticArguments[3], quantity);
+        } else if (semanticArguments.size() == 4 &&
+                   semanticArguments[2] == "remove") {
+          RemoveBagItem(session, semanticArguments[3]);
+        } else {
+          throw std::runtime_error(
+              "bag action must be add <item> <quantity> or remove <item>");
+        }
+      } else {
+        if (semanticArguments.size() != 4 ||
+            semanticArguments[2] != "fly-destinations" ||
+            semanticArguments[3] != "all")
+          throw std::runtime_error(
+              "supported progress preset: fly-destinations all");
+        pkmn::cli::red::editing::AddEdit(
+            session, "/decoded/worldStateRaw/visitedTownsHex", "FF07");
+      }
+      FinishSemanticEdit(sessionPath, session, dryRun, output);
+      return 0;
+    }
     if (command == "edit-session" && arguments.size() >= 3) {
       auto session = pkmn::cli::red::editing::Load(arguments[1]);
       bool dryRun = false;
@@ -376,6 +671,8 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
       for (std::size_t index = 2; index < arguments.size(); ++index) {
         if (arguments[index] == "--dry-run")
           dryRun = true;
+        else if (arguments[index] == "--explain-error")
+          continue;
         else if (arguments[index] == "--format" &&
                  index + 1 < arguments.size() &&
                  arguments[index + 1] == "json") {
@@ -509,6 +806,8 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
     }
   } catch (const std::exception &exception) {
     error << "pkmn red " << command << ": " << exception.what() << '\n';
+    if (explainError)
+      error << "Hint: " << ExplainError(exception.what()) << '\n';
     return command == "end-edit" ? ToInt(ExitCode::OutputFailure)
                                   : ToInt(ExitCode::EditValidationFailure);
   }
