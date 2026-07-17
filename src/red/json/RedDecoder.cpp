@@ -106,7 +106,11 @@ OrderedJson Pokemon(const RedSave &save, std::size_t record,
 
 OrderedJson Box(const RedSave &save, std::size_t base, int number) {
   const auto rawCount = save.At(base);
-  const auto count = std::min<std::size_t>(rawCount, 20);
+  // Unused external PC-box banks in otherwise valid saves may still contain
+  // erased SRAM (0xFF). Treat that erased count byte as an empty box instead
+  // of clamping it to 20 and decoding twenty 0xFF records as Pokemon.
+  const auto declaredCount = rawCount == 0xFF ? 0U : rawCount;
+  const auto count = std::min<std::size_t>(declaredCount, 20);
   OrderedJson pokemon = OrderedJson::array();
   for (std::size_t index = 0; index < count; ++index) {
     pokemon.push_back(Pokemon(save, base + 0x16 + index * 0x21, 0x21,
@@ -114,7 +118,7 @@ OrderedJson Box(const RedSave &save, std::size_t base, int number) {
                               base + 0x386 + index * 11, index + 1, false));
   }
   return {{"boxNumber", number},
-          {"declaredCount", rawCount},
+          {"declaredCount", declaredCount},
           {"count", pokemon.size()},
           {"speciesListHex", c::Hex(save.Slice(base + 1, 20))},
           {"pokemon", pokemon},

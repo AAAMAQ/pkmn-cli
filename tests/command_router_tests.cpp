@@ -228,6 +228,65 @@ int main() {
           includedDocument.at("decoded").contains("hallOfFame"),
       "decode should contain the required party, storage, and Hall of Fame "
       "sections");
+
+  auto erasedBoxSave = ValidSyntheticSave();
+  for (std::size_t box = 0; box < 12; ++box) {
+    const auto start =
+        pkmn::cli::red::validation::SaveValidator::BoxOffset(box);
+    std::fill(erasedBoxSave.begin() + static_cast<std::ptrdiff_t>(start),
+              erasedBoxSave.begin() + static_cast<std::ptrdiff_t>(
+                                          start + pkmn::cli::red::validation::
+                                                      SaveValidator::BoxBlockSize),
+              0xFF);
+    const auto bank = box / 6;
+    const auto withinBank = box % 6;
+    erasedBoxSave[pkmn::cli::red::validation::SaveValidator::
+                      BoxChecksumTables[bank] +
+                  withinBank] =
+        InvertedSum(erasedBoxSave, start,
+                    start + pkmn::cli::red::validation::SaveValidator::
+                                BoxBlockSize -
+                        1);
+  }
+  for (std::size_t bank = 0; bank < 2; ++bank)
+    erasedBoxSave[pkmn::cli::red::validation::SaveValidator::BankStored[bank]] =
+        InvertedSum(
+            erasedBoxSave,
+            pkmn::cli::red::validation::SaveValidator::BankStarts[bank],
+            pkmn::cli::red::validation::SaveValidator::BankStored[bank] - 1);
+  const fs::path erasedBoxSavePath = temp / "erased-boxes-valid.sav";
+  {
+    std::ofstream output(erasedBoxSavePath, std::ios::binary);
+    output.write(reinterpret_cast<const char *>(erasedBoxSave.data()),
+                 static_cast<std::streamsize>(erasedBoxSave.size()));
+  }
+  const auto erasedLoaded =
+      pkmn::cli::red::save::RedSave::Read(erasedBoxSavePath);
+  const auto erasedValidation =
+      pkmn::cli::red::validation::SaveValidator::Validate(erasedLoaded);
+  const auto erasedDocument = pkmn::cli::red::json::Decode(
+      erasedLoaded, "erased-boxes-valid.sav", erasedValidation, {false});
+  const auto &erasedBoxes =
+      erasedDocument.at("decoded").at("pcStorage").at("boxes");
+  Expect(erasedValidation.Valid() &&
+             std::all_of(erasedBoxes.begin(), erasedBoxes.end(),
+                         [](const auto &box) {
+                           return box.at("declaredCount") == 0 &&
+                                  box.at("count") == 0 &&
+                                  box.at("pokemon").empty();
+                         }),
+         "erased 0xFF PC-box banks should decode as empty boxes");
+  const fs::path erasedEditSession = temp / "erased-boxes.edit-session.json";
+  Expect(Run({"red", "summary", erasedBoxSavePath.string()})
+                     .output.find("PC Pokemon: 0 across 12 boxes") !=
+                 std::string::npos &&
+             Run({"red", "begin-edit", erasedBoxSavePath.string(), "--output",
+                  erasedEditSession.string()})
+                     .code == 0 &&
+             Run({"red", "edit-session", erasedEditSession.string(),
+                  "--money", "5000", "--dry-run"})
+                     .code == 0,
+         "erased PC boxes should not block valid edit sessions");
   Expect(includedDocument.at("decoded").at("events").at("flags").size() ==
                  507 &&
              includedDocument.at("decoded")
