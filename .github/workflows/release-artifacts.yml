@@ -34,7 +34,7 @@ jobs:
         run: ctest --test-dir build -C Release --output-on-failure
       - name: Package
         run: cpack --config build/CPackConfig.cmake -C Release -B build/packages
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: pkmn-cli-${{ matrix.name }}
           path: build/packages/*
