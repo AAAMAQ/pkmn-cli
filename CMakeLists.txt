@@ -12,7 +12,9 @@ include(GNUInstallDirs)
 include(CTest)
 
 add_library(pkmn_cli_core
+    src/app/CommandCatalog.cpp
     src/app/CommandRouter.cpp
+    src/commands/catalog/CatalogCommand.cpp
     src/commands/completion/CompletionCommand.cpp
     src/commands/config/ConfigCommand.cpp
     src/commands/doctor/DoctorCommand.cpp
@@ -23,6 +25,7 @@ add_library(pkmn_cli_core
     src/commands/rjson/RjsonCommand.cpp
     src/red/codec/Gen1Codec.cpp
     src/red/comparison/Comparison.cpp
+    src/red/comparison/ProgressComparison.cpp
     src/red/data/Gen1Names.cpp
     src/red/editing/EditSession.cpp
     src/red/events/EventCatalog.cpp
@@ -30,6 +33,7 @@ add_library(pkmn_cli_core
     src/red/json/RedDecoder.cpp
     src/red/json/RedJsonDocument.cpp
     src/red/proof/PostEmulator.cpp
+    src/red/reporting/SaveSummary.cpp
     src/red/save/RedSave.cpp
     src/red/validation/SaveValidator.cpp
     src/util/Sha256.cpp

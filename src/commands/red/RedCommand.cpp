@@ -14,6 +14,7 @@
 #include "red/json/RedDecoder.hpp"
 #include "red/events/EventCatalog.hpp"
 #include "red/generation/SemanticGenerator.hpp"
+#include "red/reporting/SaveSummary.hpp"
 #include "red/save/RedSave.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/OutputPath.hpp"
@@ -24,6 +25,8 @@ namespace pkmn::cli::commands::red {
 namespace {
 void PrintHelp(std::ostream& output) {
     output << "Usage:\n"
+           << "  pkmn red summary <input.sav> [--format text|json|markdown] "
+              "[--output <file>]\n"
            << "  pkmn red decode <input.sav> [--output <file.red.json>]\n"
            << "                       [--include-physical-image|--no-physical-image] "
               "[--auto-suffix]\n"
@@ -40,7 +43,74 @@ void PrintHelp(std::ostream& output) {
            << "  pkmn red validate-post-emulator <before.sav> <after.sav> "
               "[--output-dir <directory>]\n"
            << "  pkmn red edit <input.sav>\n"
-           << "  pkmn red begin-edit|edit-session|pending-edits|validate-edit|end-edit ...\n";
+           << "  pkmn red begin-edit <input.sav> [--output <session.json>]\n"
+           << "  pkmn red edit-session <session.json> <edits...>\n"
+           << "  pkmn red pending-edits <session.json> [--format json]\n"
+           << "  pkmn red undo-edit <session.json> [--count <number>]\n"
+           << "  pkmn red edit-history <session.json> [--format json]\n"
+           << "  pkmn red annotate-edit <session.json> <note>\n"
+           << "  pkmn red validate-edit <session.json>\n"
+           << "  pkmn red end-edit <session.json> [--output <save.sav>]\n";
+}
+
+int RunSummary(const std::vector<std::string> &arguments,
+               std::ostream &output, std::ostream &error) {
+    if (arguments.size() < 2) {
+        error << "pkmn red summary: input save is required\n";
+        return ToInt(ExitCode::InvalidArguments);
+    }
+    const std::filesystem::path inputPath = arguments[1];
+    std::filesystem::path outputPath;
+    std::string format = "text";
+    for (std::size_t index = 2; index < arguments.size(); ++index) {
+        if (arguments[index] == "--format" && index + 1 < arguments.size())
+            format = arguments[++index];
+        else if (arguments[index] == "--output" && index + 1 < arguments.size())
+            outputPath = arguments[++index];
+        else {
+            error << "pkmn red summary: invalid option\n";
+            return ToInt(ExitCode::InvalidArguments);
+        }
+    }
+    if (format != "text" && format != "json" && format != "markdown") {
+        error << "pkmn red summary: format must be text, json, or markdown\n";
+        return ToInt(ExitCode::InvalidArguments);
+    }
+    try {
+        const auto save = pkmn::cli::red::save::RedSave::Read(inputPath);
+        const auto integrity =
+            pkmn::cli::red::validation::SaveValidator::Validate(save);
+        if (!integrity.expectedSize)
+            return ToInt(ExitCode::InvalidInput);
+        if (!integrity.Valid()) {
+            error << "pkmn red summary: checksum validation failed\n";
+            return ToInt(ExitCode::ChecksumFailure);
+        }
+        const auto document = pkmn::cli::red::json::Decode(
+            save, inputPath.filename().string(), integrity,
+            {.includePhysicalImage = false});
+        const auto summary =
+            pkmn::cli::red::reporting::BuildSaveSummary(document);
+        const auto contents =
+            format == "json"
+                ? summary.dump(2) + '\n'
+                : (format == "markdown"
+                       ? pkmn::cli::red::reporting::SaveSummaryMarkdown(summary)
+                       : pkmn::cli::red::reporting::SaveSummaryText(summary));
+        if (outputPath.empty() || outputPath == "-")
+            output << contents;
+        else {
+            util::WriteTextAtomic(outputPath, contents);
+            output << "Readable save summary written: "
+                   << outputPath.filename().string() << '\n';
+        }
+        return 0;
+    } catch (const std::exception &exception) {
+        error << "pkmn red summary: " << exception.what() << '\n';
+        return std::string(exception.what()).find("overwrite") != std::string::npos
+                   ? ToInt(ExitCode::OutputFailure)
+                   : ToInt(ExitCode::InvalidInput);
+    }
 }
 
 void PrintReport(const pkmn::cli::red::validation::ValidationReport& report, std::ostream& output) {
@@ -440,6 +510,8 @@ int Run(const std::vector<std::string>& arguments, std::ostream& output, std::os
         output << "\nAll listed commands use the internal Red engine.\n";
         return ToInt(ExitCode::Success);
     }
+    if (arguments.front() == "summary")
+        return RunSummary(arguments, output, error);
     if (arguments.front() == "decode") return RunDecode(arguments, output, error);
     if (arguments.front() == "events") return RunEvents(arguments, output, error);
     if (arguments.front() == "repair-checksums")
