@@ -24,9 +24,11 @@ jobs:
       - name: Formula style
         run: brew style packaging/homebrew/pkmn-cli.rb
       - name: Install from public HEAD
-        run: brew install --HEAD --build-from-source ./packaging/homebrew/pkmn-cli.rb
+        run: |
+          brew tap AAAMAQ/pkmn
+          brew install --HEAD --build-from-source AAAMAQ/pkmn/pkmn-cli
       - name: Formula test
-        run: brew test pkmn-cli
+        run: brew test AAAMAQ/pkmn/pkmn-cli
       - name: Installed deep smoke test
         run: |
           pkmn --version

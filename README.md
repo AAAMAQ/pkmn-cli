@@ -42,6 +42,14 @@ cmake --install build --prefix /your/install/prefix
 
 For a user-local shell installation, use `--prefix "$HOME/.local"`, add `$HOME/.local/bin` to `PATH`, and run `pkmn doctor`. A real head-only Homebrew formula is included for public-branch testing without fabricated release metadata. See [installation and Homebrew testing](docs/HOMEBREW_INSTALL.md).
 
+Pre-release Homebrew testing:
+
+```sh
+brew tap AAAMAQ/pkmn
+brew install --HEAD AAAMAQ/pkmn/pkmn-cli
+pkmn doctor --deep
+```
+
 ## Implemented commands
 
 ```text
