@@ -64,7 +64,7 @@ Proof output is evidence, not source material. Do not commit it. Automated check
 
 See `docs/PROOF_WORKFLOW.md` for artifact, privacy, ZIP, and emulator-gate details.
 
-New users can follow `docs/BEGINNERS_GUIDE.md`; the exhaustive endpoint table is `docs/ALL_COMMANDS.md`.
+New users can follow `docs/BEGINNERS_GUIDE.md`; exact examples and expected outputs for every endpoint are in `docs/COMPLETE_USAGE_GUIDE.md`; the exhaustive endpoint table is `docs/ALL_COMMANDS.md`.
 
 ## Exit codes
 

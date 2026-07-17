@@ -110,7 +110,7 @@ Red editing is copy-first. `red edit` provides a looped interactive editor; `beg
 
 ## Command documentation
 
-See the [exhaustive command list](docs/ALL_COMMANDS.md), [complete command reference](docs/COMMAND_REFERENCE.md), [beginner's guide](docs/BEGINNERS_GUIDE.md), and [Red JSON schema](docs/RED_JSON_SCHEMA.md). Focused editing, reconstruction, proof, installation, and future-FireRed documents are under `docs/`. Public-data-only examples are in [examples/README.md](examples/README.md).
+See the copy-and-paste [complete usage guide](docs/COMPLETE_USAGE_GUIDE.md), [exhaustive command list](docs/ALL_COMMANDS.md), [command reference](docs/COMMAND_REFERENCE.md), [beginner's guide](docs/BEGINNERS_GUIDE.md), and [Red JSON schema](docs/RED_JSON_SCHEMA.md). Focused editing, reconstruction, proof, installation, and future-FireRed documents are under `docs/`. Public-data-only examples are in [examples/README.md](examples/README.md).
 
 ## Generation is not reconstruction
 
