@@ -22,6 +22,7 @@ add_library(pkmn_cli_core
     src/red/codec/Gen1Codec.cpp
     src/red/comparison/Comparison.cpp
     src/red/editing/EditSession.cpp
+    src/red/events/EventCatalog.cpp
     src/red/generation/SemanticGenerator.cpp
     src/red/json/RedDecoder.cpp
     src/red/json/RedJsonDocument.cpp

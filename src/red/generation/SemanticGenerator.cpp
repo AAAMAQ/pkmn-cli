@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "red/codec/Gen1Codec.hpp"
+#include "red/events/EventCatalog.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/ResourceLocator.hpp"
 #include "util/Sha256.hpp"
@@ -255,7 +256,13 @@ Result Generate(const Json &document) {
       Name(bytes, o + 2, mon.at("nickname"));
     }
   const auto &raw = d.at("worldStateRaw");
-  HexRange(bytes, 0x29F3, 0x140, raw, "eventFlagsHex");
+  auto eventBytes = codec::DecodeHex(raw.at("eventFlagsHex").get<std::string>());
+  if (eventBytes.size() != 0x140)
+    throw std::runtime_error("eventFlagsHex has the wrong byte length");
+  if (d.contains("events") || d.contains("trainerBattles") ||
+      d.contains("staticBattles") || d.contains("storyProgress"))
+    events::ApplyNamedState(d, eventBytes);
+  std::copy(eventBytes.begin(), eventBytes.end(), bytes.begin() + 0x29F3);
   HexRange(bytes, 0x289C, 0x100, raw, "scriptsHex");
   HexRange(bytes, 0x2852, 29, raw, "missableObjectsHex");
   HexRange(bytes, 0x299C, 7, raw, "hiddenItemsHex");

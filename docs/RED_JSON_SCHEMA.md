@@ -27,7 +27,9 @@ The canonical extension is `.red.json`, format identity is `pkmn-red-master-save
 - selected-box state and current working-box cache;
 - Daycare and Hall of Fame;
 - aggregate summary counts;
-- supported raw event, script, missable-object, hidden-item, hidden-coin, and visited-town byte fields.
+- supported raw event, script, missable-object, hidden-item, hidden-coin, and visited-town byte fields;
+- a 507-entry verified named-event catalog with synchronized trainer-battle,
+  static-encounter, and story-progress views.
 
 Pokémon records include species, level, names, HP/status/types, moves/PP/PP Ups, trainer ID, experience, stat experience, DVs, and party stats when applicable. Raw record fields are diagnostic/derived and are not semantic-generation authority.
 
@@ -39,4 +41,6 @@ Pokémon records include species, level, names, HP/status/types, moves/PP/PP Ups
 
 `pkmn rjson validate` rejects unsupported schema versions, missing required sections, semantic range/structure failures, and invalid physical images. Future incompatible schemas must use a new version and explicit migration tooling rather than silently changing `0.1.0` meaning.
 
-Named event/story/trainer/static classifications remain deferred; the verified raw world-state ranges are preserved and generated deterministically.
+Named event records carry their verified bit index, source constant, human label,
+category, and state. Overlapping views must agree. Named editing synchronizes the
+views and the lossless raw event range before deterministic generation.

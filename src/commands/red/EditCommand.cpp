@@ -25,7 +25,7 @@ void Help(std::ostream &out) {
          "[--auto-suffix]\n\n"
       << "Named edits: --trainer-name <text>, --rival-name <text>, "
          "--trainer-id <n>, --money <n>, --coins <n>, --badges <0..255|all>, "
-         "--selected-box <1..12>\n"
+         "--selected-box <1..12>, --event <EVENT_NAME> <on|off>\n"
       << "Complex value files: --bag-file, --pc-items-file, --party-file, "
          "--boxes-file, --current-box-file, --daycare-file, "
          "--hall-of-fame-file, --pokedex-file, --options-file, "
@@ -60,6 +60,20 @@ void ApplyArguments(Json &session, const std::vector<std::string> &args,
     if (i + 1 >= args.size())
       throw std::runtime_error("edit option requires a value");
     const auto &option = args[i];
+    if (option == "--event" || option == "--story-flag" ||
+        option == "--trainer-battle" || option == "--static-encounter") {
+      if (i + 2 >= args.size())
+        throw std::runtime_error(option + " requires an event name and on/off");
+      const auto &state = args[i + 2];
+      if (state != "on" && state != "off" && state != "true" &&
+          state != "false" && state != "1" && state != "0")
+        throw std::runtime_error("named event value must be on or off");
+      pkmn::cli::red::editing::AddNamedEventEdit(
+          session, args[i + 1],
+          state == "on" || state == "true" || state == "1");
+      i += 2;
+      continue;
+    }
     if (option == "--set" || option == "--set-file") {
       if (i + 2 >= args.size())
         throw std::runtime_error(option +
@@ -214,18 +228,19 @@ int Interactive(const std::filesystem::path &source, std::ostream &output) {
       {"Options object from JSON file", "--options-file"},
       {"Playtime object from JSON file", "--playtime-file"},
       {"Supported world-state object from JSON file", "--world-state-file"},
-      {"Selected box (1..12)", "--selected-box"}};
+      {"Selected box (1..12)", "--selected-box"},
+      {"Named event/story/trainer/static flag", "--event"}};
   while (true) {
     output << "\nPokemon Red copy-first editor\nSource: "
            << source.filename().string() << "\nPending edits: "
            << session.at("pendingEdits").size() << "\n";
     for (std::size_t index = 0; index < actions.size(); ++index)
       output << index + 1 << ". " << actions[index].first << '\n';
-    output << "19. Advanced JSON-pointer edit\n"
-              "20. View pending edits\n"
-              "21. Validate pending edits\n"
-              "22. Save validated edited copy\n"
-              "23. Discard edits and exit\nChoice: "
+    output << "20. Advanced JSON-pointer edit\n"
+              "21. View pending edits\n"
+              "22. Validate pending edits\n"
+              "23. Save validated edited copy\n"
+              "24. Discard edits and exit\nChoice: "
            << std::flush;
     std::string choiceText;
     if (!std::getline(std::cin, choiceText)) {
@@ -240,6 +255,24 @@ int Interactive(const std::filesystem::path &source, std::ostream &output) {
       continue;
     }
     if (choice >= 1 && choice <= actions.size()) {
+      if (choice == 19) {
+        output << "Verified EVENT_NAME: " << std::flush;
+        std::string name;
+        std::getline(std::cin, name);
+        output << "State (on/off): " << std::flush;
+        std::string state;
+        std::getline(std::cin, state);
+        auto candidate = session;
+        try {
+          ApplyArguments(candidate, {"edit", "--event", name, state}, 1);
+          pkmn::cli::red::editing::Validate(candidate);
+          session = std::move(candidate);
+          output << "Named event edit staged and validated.\n";
+        } catch (const std::exception &exception) {
+          output << "Edit rejected: " << exception.what() << '\n';
+        }
+        continue;
+      }
       output << (choice <= 6 || choice == 18 ? "Value: " : "JSON file: ")
              << std::flush;
       std::string value;
@@ -259,7 +292,7 @@ int Interactive(const std::filesystem::path &source, std::ostream &output) {
       }
       continue;
     }
-    if (choice == 19) {
+    if (choice == 20) {
       output << "JSON pointer: " << std::flush;
       std::string pointer;
       std::getline(std::cin, pointer);
@@ -275,23 +308,23 @@ int Interactive(const std::filesystem::path &source, std::ostream &output) {
       } catch (const std::exception &exception) {
         output << "Edit rejected: " << exception.what() << '\n';
       }
-    } else if (choice == 20) {
-      PrintPending(session, output);
     } else if (choice == 21) {
+      PrintPending(session, output);
+    } else if (choice == 22) {
       try {
         pkmn::cli::red::editing::Validate(session);
         output << "Validation passed.\n";
       } catch (const std::exception &exception) {
         output << "Validation failed: " << exception.what() << '\n';
       }
-    } else if (choice == 22) {
+    } else if (choice == 23) {
       if (session.at("pendingEdits").empty()) {
         output << "No pending edits to save.\n";
         continue;
       }
       return End(session,
                  pkmn::cli::red::editing::DefaultOutputPath(session), output);
-    } else if (choice == 23) {
+    } else if (choice == 24) {
       output << "Edits discarded; source remains unchanged.\n";
       return 0;
     } else {

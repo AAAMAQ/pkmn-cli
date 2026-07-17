@@ -1,10 +1,15 @@
 #include "red/editing/EditSession.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <set>
 #include <stdexcept>
+#include <tuple>
+#include <vector>
 
 #include "red/save/RedSave.hpp"
+#include "red/codec/Gen1Codec.hpp"
+#include "red/events/EventCatalog.hpp"
 #include "red/json/RedJsonDocument.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
@@ -32,7 +37,8 @@ void RequireEditablePointer(const std::string &pointer) {
       "trainer",         "rival",      "moneyAndCoins", "badges",
       "options",         "pokedex",    "inventory",     "party",
       "pcStorage",       "currentBoxCache", "daycare",  "hallOfFame",
-      "worldStateRaw",   "playtime"};
+      "worldStateRaw",   "playtime", "events", "trainerBattles",
+      "staticBattles",   "storyProgress"};
   const auto begin = std::string("/decoded/").size();
   const auto end = pointer.find('/', begin);
   const auto root = pointer.substr(begin, end - begin);
@@ -126,8 +132,64 @@ void AddEdit(Json &session, const std::string &pointer, const Json &value) {
     for (std::size_t index = 0; index < entries.size(); ++index)
       entries.at(index)["owned"] = (raw & (1U << index)) != 0;
   }
+  if (pointer == "/decoded/worldStateRaw" ||
+      pointer == "/decoded/worldStateRaw/eventFlagsHex") {
+    const auto bytes = codec::DecodeHex(
+        decoded.at("worldStateRaw").at("eventFlagsHex").get<std::string>());
+    const auto named = events::DecodeNamedState(bytes);
+    for (const auto &[key, namedValue] : named.items())
+      decoded[key] = namedValue;
+  }
   session.at("pendingEdits").push_back(
       {{"path", pointer}, {"previous", previous}, {"value", value}});
+}
+
+void AddNamedEventEdit(Json &session, const std::string &name, bool value) {
+  RequireSession(session);
+  auto &decoded = session.at("document").at("decoded");
+  if (!decoded.contains("events"))
+    throw std::runtime_error("document has no named event catalog");
+  int index = -1;
+  bool previous = false;
+  for (auto &record : decoded.at("events").at("flags")) {
+    if (record.at("name").get<std::string>() == name) {
+      index = record.at("flagIndex").get<int>();
+      previous = record.at("value").get<bool>();
+      record["value"] = value;
+      break;
+    }
+  }
+  if (index < 0)
+    throw std::runtime_error("unknown verified Pokemon Red event name: " + name);
+  for (const auto &[root, records, key] :
+       std::vector<std::tuple<const char *, const char *, const char *>>{
+           {"trainerBattles", "records", "completed"},
+           {"staticBattles", "records", "completed"},
+           {"storyProgress", "storyFlags", "completed"}})
+    for (auto &record : decoded.at(root).at(records))
+      if (record.at("flagIndex").get<int>() == index)
+        record[key] = value;
+  auto bytes = codec::DecodeHex(
+      decoded.at("worldStateRaw").at("eventFlagsHex").get<std::string>());
+  auto &byte = bytes.at(static_cast<std::size_t>(index / 8));
+  const auto mask = static_cast<std::uint8_t>(1U << (index % 8));
+  byte = value ? static_cast<std::uint8_t>(byte | mask)
+               : static_cast<std::uint8_t>(byte & ~mask);
+  decoded.at("worldStateRaw")["eventFlagsHex"] = codec::Hex(bytes);
+  decoded.at("events")["set"] = std::count_if(
+      decoded.at("events").at("flags").begin(),
+      decoded.at("events").at("flags").end(),
+      [](const Json &record) { return record.at("value").get<bool>(); });
+  for (const auto &[root, records] :
+       std::vector<std::pair<const char *, const char *>>{
+           {"trainerBattles", "records"}, {"staticBattles", "records"},
+           {"storyProgress", "storyFlags"}})
+    decoded.at(root)["complete"] = std::count_if(
+        decoded.at(root).at(records).begin(), decoded.at(root).at(records).end(),
+        [](const Json &record) { return record.at("completed").get<bool>(); });
+  session.at("pendingEdits").push_back(
+      {{"path", "/decoded/events/by-name/" + name},
+       {"previous", previous}, {"value", value}, {"flagIndex", index}});
 }
 
 generation::Result Validate(const Json &session) {

@@ -8,7 +8,12 @@ Editing is always copy-first. `pkmn` validates the source, records its SHA-256, 
 pkmn red edit savefile.sav
 ```
 
-The looped menu supports trainer/core values and file-backed complex structures for inventory, party, all boxes, current-box cache, Daycare, Hall of Fame, Pokédex, options, playtime, and verified raw world state. It also provides advanced JSON-pointer editing, pending-edit preview, validation, final save, and discard actions. Each staged action is validated before it becomes pending.
+The looped menu supports trainer/core values, verified named events, and
+file-backed complex structures for inventory, party, all boxes, current-box
+cache, Daycare, Hall of Fame, Pokédex, options, playtime, and verified raw world
+state. It also provides advanced JSON-pointer editing, pending-edit preview,
+validation, final save, and discard actions. Each staged action is validated
+before it becomes pending.
 
 Arbitrary location editing is not offered. Generated edits use the emulator-verified Red's-house second-floor preset.
 
@@ -28,7 +33,9 @@ Named scalar options are:
 
 - `--trainer-name`, `--rival-name`, `--trainer-id`;
 - `--money`, `--coins`, `--badges <0..255|all>`;
-- `--selected-box <1..12>`.
+- `--selected-box <1..12>`;
+- `--event EVENT_NAME on|off`, with `--story-flag`, `--trainer-battle`, and
+  `--static-encounter` aliases.
 
 Complex options read the complete JSON value for their semantic field:
 

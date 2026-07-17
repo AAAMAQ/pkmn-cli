@@ -15,6 +15,7 @@ Json Load(const std::filesystem::path &sessionPath);
 void Save(const std::filesystem::path &sessionPath, const Json &session,
           bool refuseCollision);
 void AddEdit(Json &session, const std::string &pointer, const Json &value);
+void AddNamedEventEdit(Json &session, const std::string &name, bool value);
 generation::Result Validate(const Json &session);
 std::filesystem::path DefaultSessionPath(const std::filesystem::path &source);
 std::filesystem::path DefaultOutputPath(const Json &session);

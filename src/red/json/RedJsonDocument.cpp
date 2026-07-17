@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include "red/codec/Gen1Codec.hpp"
+#include "red/events/EventCatalog.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
 
@@ -256,6 +257,11 @@ DocumentValidation ValidateDocument(const OrderedJson& root) {
                  {"hiddenCoinsHex", 2}, {"visitedTownsHex", 2}})
             if (codec::DecodeHex(world.at(key).get<std::string>()).size() != length)
                 validation.errors.push_back(std::string(key) + " has the wrong byte length");
+        const bool hasAnyNamedState = decoded.contains("events") ||
+            decoded.contains("trainerBattles") || decoded.contains("staticBattles") ||
+            decoded.contains("storyProgress");
+        if (hasAnyNamedState)
+            events::ValidateNamedState(decoded, validation.errors);
     } catch (const std::exception& exception) {
         validation.errors.push_back(std::string("invalid semantic field type: ") + exception.what());
     }

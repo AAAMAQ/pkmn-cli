@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -195,6 +196,16 @@ int main() {
           includedDocument.at("decoded").contains("hallOfFame"),
       "decode should contain the required party, storage, and Hall of Fame "
       "sections");
+  Expect(includedDocument.at("decoded").at("events").at("flags").size() ==
+                 507 &&
+             includedDocument.at("decoded")
+                 .at("trainerBattles").at("records").is_array() &&
+             includedDocument.at("decoded")
+                 .at("staticBattles").at("records").is_array() &&
+             includedDocument.at("decoded")
+                 .at("storyProgress").at("storyFlags").is_array(),
+         "decode should expose the complete verified named-event catalog and "
+         "classified views");
 
   const fs::path excludedJson = temp / "excluded.red.json";
   const auto excludedDecode =
@@ -619,9 +630,35 @@ int main() {
            "--badges all should stage all eight badges");
   }
 
+  const fs::path eventSession = temp / "event.edit-session.json";
+  const fs::path eventOutput = temp / "named-event-output.sav";
+  Expect(Run({"red", "begin-edit", validSavePath.string(), "--output",
+              eventSession.string()}).code == 0 &&
+             Run({"red", "edit-session", eventSession.string(), "--event",
+                  "EVENT_GOT_STARTER", "on"}).code == 0 &&
+             Run({"red", "end-edit", eventSession.string(), "--output",
+                  eventOutput.string()}).code == 0,
+         "named verified event flags should be editable and generatable");
+  const auto eventSave = pkmn::cli::red::save::RedSave::Read(eventOutput);
+  const auto eventDecoded = pkmn::cli::red::json::Decode(
+      eventSave, "named-event-output.sav",
+      pkmn::cli::red::validation::SaveValidator::Validate(eventSave), {false});
+  const auto &eventFlags = eventDecoded.at("decoded").at("events").at("flags");
+  const auto starter = std::find_if(
+      eventFlags.begin(), eventFlags.end(), [](const auto &record) {
+        return record.at("name") == "EVENT_GOT_STARTER";
+      });
+  Expect(starter != eventFlags.end() && starter->at("value") == true &&
+             (eventSave.At(0x29F3 + 34 / 8) & (1U << (34 % 8))) != 0,
+         "named event edits should synchronize canonical and raw event state");
+  Expect(Run({"red", "edit-session", eventSession.string(), "--event",
+              "EVENT_NOT_A_REAL_FLAG", "on"}).code ==
+             pkmn::cli::ToInt(pkmn::cli::ExitCode::EditValidationFailure),
+         "unknown named events should fail closed");
+
   const fs::path interactiveOutput =
       temp / "synthetic-valid_generated_trainer.sav";
-  std::istringstream interactiveInput("1\nRED\n22\n");
+  std::istringstream interactiveInput("1\nRED\n23\n");
   auto *originalInputBuffer = std::cin.rdbuf(interactiveInput.rdbuf());
   const auto interactiveEdit =
       Run({"red", "edit", validSavePath.string()});

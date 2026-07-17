@@ -8,6 +8,7 @@
 
 #include "app/Version.hpp"
 #include "red/codec/Gen1Codec.hpp"
+#include "red/events/EventCatalog.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
 
@@ -247,11 +248,22 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
       {"hiddenItemsHex", c::Hex(input.Slice(0x299C, 7))},
       {"hiddenCoinsHex", c::Hex(input.Slice(0x29AA, 2))},
       {"visitedTownsHex", c::Hex(input.Slice(0x29B7, 2))}};
+  const auto namedState = events::DecodeNamedState(input.Slice(0x29F3, 0x140));
+  for (const auto &[key, value] : namedState.items())
+    decoded[key] = value;
   std::size_t scripts = 0;
   for (const auto byte : input.Slice(0x289C, 97))
     if (byte != 0)
       ++scripts;
   decoded["summaryCounts"]["nonzeroScriptBytes"] = scripts;
+  decoded["summaryCounts"]["trainerFlagsSet"] =
+      decoded.at("trainerBattles").at("complete");
+  decoded["summaryCounts"]["staticEncounterFlagsSet"] =
+      decoded.at("staticBattles").at("complete");
+  decoded["summaryCounts"]["storyFlagsSet"] =
+      decoded.at("storyProgress").at("complete");
+  decoded["summaryCounts"]["classification"] =
+      "verified named catalog plus lossless raw event bytes";
 
   OrderedJson document = {
       {"schema",
