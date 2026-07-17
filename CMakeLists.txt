@@ -23,9 +23,11 @@ add_library(pkmn_cli_core
     src/red/generation/SemanticGenerator.cpp
     src/red/json/RedDecoder.cpp
     src/red/json/RedJsonDocument.cpp
+    src/red/proof/PostEmulator.cpp
     src/red/save/RedSave.cpp
     src/red/validation/SaveValidator.cpp
     src/util/Sha256.cpp
+    src/util/ZipWriter.cpp
     src/util/ResourceLocator.cpp
 )
 

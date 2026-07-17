@@ -11,6 +11,7 @@
 #include "app/CommandRouter.hpp"
 #include "app/ExitCode.hpp"
 #include "red/json/RedDecoder.hpp"
+#include "red/generation/SemanticGenerator.hpp"
 #include "red/save/RedSave.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
@@ -289,6 +290,43 @@ int main() {
       {"compare", "semantic", includedJson.string(), excludedJson.string()});
   Expect(semanticSame.code == 0,
          "semantic comparison should ignore archival physical-image presence");
+  const auto physicalJson =
+      Run({"compare", "physical", generatedA.string(), generatedA.string(),
+           "--format", "json"});
+  Expect(physicalJson.code == 0 &&
+             nlohmann::ordered_json::parse(physicalJson.output)
+                 .at("identical")
+                 .get<bool>(),
+         "comparison commands should support machine-readable JSON stdout");
+  const fs::path semanticReportJson = temp / "semantic-report.json";
+  const fs::path semanticReportMarkdown = temp / "semantic-report.md";
+  Expect(Run({"compare", "semantic", includedJson.string(),
+              excludedJson.string(), "--output-json",
+              semanticReportJson.string(), "--output-markdown",
+              semanticReportMarkdown.string()})
+                 .code == 0 &&
+             fs::exists(semanticReportJson) &&
+             fs::exists(semanticReportMarkdown),
+         "comparison commands should write collision-safe JSON and Markdown "
+         "reports");
+  Expect(Run({"compare", "semantic", includedJson.string(),
+              excludedJson.string(), "--output-json",
+              semanticReportJson.string()})
+                 .code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
+         "comparison report outputs should never be overwritten");
+  auto derivedDifference = excludedDocument;
+  derivedDifference["decoded"]["trainer"]["name"]["rawHex"] = "00";
+  const fs::path derivedDifferenceJson = temp / "derived-difference.json";
+  std::ofstream(derivedDifferenceJson) << derivedDifference.dump(2);
+  const auto derivedComparison =
+      Run({"compare", "semantic", excludedJson.string(),
+           derivedDifferenceJson.string(), "--format", "json"});
+  Expect(derivedComparison.code == 0 &&
+             nlohmann::ordered_json::parse(derivedComparison.output)
+                     .at("classificationCounts")
+                     .at("derived_match") ==
+                 1,
+         "semantic comparison should classify derived raw-field differences");
   auto semanticDifference = excludedDocument;
   semanticDifference["decoded"]["moneyAndCoins"]["money"] = 123456;
   const fs::path semanticDifferenceJson = temp / "semantic-difference.json";
@@ -308,6 +346,12 @@ int main() {
              fs::exists(proofDirectory / "physical-comparison.json") &&
              fs::exists(proofDirectory / "semantic-comparison.md") &&
              fs::exists(proofDirectory / "semantic-comparison.json") &&
+             fs::exists(proofDirectory / "summary-comparison.md") &&
+             fs::exists(proofDirectory / "summary-comparison.json") &&
+             fs::exists(proofDirectory / "semantic-json-comparison.md") &&
+             fs::exists(proofDirectory / "semantic-json-comparison.json") &&
+             fs::exists(proofDirectory / "archival-json-comparison.md") &&
+             fs::exists(proofDirectory / "archival-json-comparison.json") &&
              fs::exists(proofDirectory / "proof-manifest.json") &&
              fs::exists(proofDirectory / "emulator-checklist.md"),
          "proof red should create the complete report and emulator-checklist "
@@ -324,6 +368,93 @@ int main() {
               proofDirectory.string()})
                  .code == pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure),
          "proof workflow should refuse an existing proof directory");
+
+  auto postEmulatorBytes =
+      pkmn::cli::red::save::RedSave::Read(generatedA).BytesView();
+  postEmulatorBytes[0x2CEF] = 12;
+  pkmn::cli::red::generation::RepairChecksums(postEmulatorBytes);
+  const fs::path postEmulatorSave = temp / "post-emulator.sav";
+  {
+    std::ofstream save(postEmulatorSave, std::ios::binary);
+    save.write(reinterpret_cast<const char *>(postEmulatorBytes.data()),
+               static_cast<std::streamsize>(postEmulatorBytes.size()));
+  }
+  const fs::path postEmulatorDirectory = temp / "post-emulator-validation";
+  const auto postEmulator =
+      Run({"red", "validate-post-emulator", generatedA.string(),
+           postEmulatorSave.string(), "--output-dir",
+           postEmulatorDirectory.string()});
+  Expect(postEmulator.code == 0 &&
+             fs::exists(postEmulatorDirectory /
+                        "post-emulator-validation.json") &&
+             fs::exists(postEmulatorDirectory /
+                        "post-emulator-validation.md"),
+         "post-emulator validation should accept checksum-valid expected "
+         "runtime drift and write reports");
+  Expect(Run({"proof", "post-emulator", "--before", generatedA.string(),
+              "--after", postEmulatorSave.string(), "--proof-dir",
+              proofDirectory.string()})
+                 .code == 0,
+         "post-emulator proof continuation should update an existing proof "
+         "package when explicitly requested");
+  {
+    std::ifstream manifestInput(proofDirectory / "proof-manifest.json");
+    manifestInput >> proofManifest;
+  }
+  Expect(proofManifest.at("emulatorValidation") == "passed" &&
+             proofManifest.at("postEmulatorValidation").at("passed") == true,
+         "proof continuation should record the completed emulator gate");
+
+  auto unexpectedPostDocument = excludedDocument;
+  unexpectedPostDocument["decoded"]["trainer"]["name"]["value"] = "BLUE";
+  unexpectedPostDocument["decoded"]["trainer"]["name"]["losslessValue"] =
+      "BLUE";
+  const auto unexpectedPostResult =
+      pkmn::cli::red::generation::Generate(unexpectedPostDocument);
+  const fs::path unexpectedPostSave = temp / "unexpected-post-emulator.sav";
+  {
+    std::ofstream save(unexpectedPostSave, std::ios::binary);
+    save.write(
+        reinterpret_cast<const char *>(unexpectedPostResult.bytes.data()),
+        static_cast<std::streamsize>(unexpectedPostResult.bytes.size()));
+  }
+  Expect(Run({"proof", "post-emulator", "--before", generatedA.string(),
+              "--after", unexpectedPostSave.string(), "--output-dir",
+              (temp / "unexpected-post-report").string()})
+                 .code == pkmn::cli::ToInt(
+                              pkmn::cli::ExitCode::PostEmulatorValidationFailure),
+         "post-emulator validation should fail on unexpected identity drift");
+
+  const fs::path zippedProofA = temp / "zipped-proof-a";
+  const fs::path zippedProofB = temp / "zipped-proof-b";
+  const fs::path proofZipA = temp / "proof-a.zip";
+  const fs::path proofZipB = temp / "proof-b.zip";
+  Expect(Run({"proof", "red", validSavePath.string(), "--output-dir",
+              zippedProofA.string(), "--zip-output", proofZipA.string()})
+                 .code == 0 &&
+             Run({"proof", "red", validSavePath.string(), "--output-dir",
+                  zippedProofB.string(), "--zip-output", proofZipB.string()})
+                     .code == 0,
+         "proof red should create explicitly requested standalone ZIP "
+         "packages");
+  auto ReadBinary = [](const fs::path &path) {
+    std::ifstream input(path, std::ios::binary | std::ios::ate);
+    const auto size = input.tellg();
+    std::vector<std::uint8_t> bytes(static_cast<std::size_t>(size));
+    input.seekg(0);
+    input.read(reinterpret_cast<char *>(bytes.data()),
+               static_cast<std::streamsize>(bytes.size()));
+    return bytes;
+  };
+  const auto zipA = ReadBinary(proofZipA);
+  const auto zipB = ReadBinary(proofZipB);
+  const std::string zipText(zipA.begin(), zipA.end());
+  Expect(zipA == zipB && zipA.size() > 4 && zipA[0] == 'P' && zipA[1] == 'K',
+         "proof ZIP packages should be deterministic ZIP archives");
+  Expect(zipText.find(temp.string()) == std::string::npos &&
+             zipText.find("proof-manifest.json") != std::string::npos,
+         "proof ZIPs should contain logical artifact names without private "
+         "absolute paths");
 
   const auto sourceBeforeEdit =
       pkmn::cli::red::save::RedSave::Read(validSavePath).BytesView();

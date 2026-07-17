@@ -31,11 +31,16 @@ Arbitrary location edits are rejected. Generated and edited semantic saves use t
 
 ## Comparison and proof
 
-- `pkmn compare physical <a.sav> <b.sav>` reports SHA-256, byte counts and percentages, first/last difference, and contiguous differing ranges.
-- `pkmn compare semantic <a.red.json> <b.red.json>` reports field-aware differences and distinguishes permitted safe-location canonicalization.
-- `pkmn proof red <source.sav> [--output-dir <directory>]` decodes, generates, re-decodes, compares, proves determinism and physical-image isolation, and writes machine/human reports plus a manual emulator checklist.
+- `pkmn compare physical <a.sav> <b.sav> [report options]` reports SHA-256, byte counts and percentages, first/last difference, and contiguous differing ranges.
+- `pkmn compare semantic <a.red.json> <b.red.json> [report options]` reports field-aware differences classified as exact, normalized, derived, synchronized mirror, permitted canonical, runtime drift, cache drift, deferred, or unexpected.
+- Comparison report options are `--format markdown|json`, `--output-json <file>`, and `--output-markdown <file>`.
+- `pkmn proof red <source.sav> [--output-dir <directory>] [--zip|--zip-output <archive.zip>]` decodes, generates, re-decodes, compares, proves determinism and physical-image isolation, and writes the complete machine/human report set plus a manual emulator checklist.
+- `pkmn red validate-post-emulator <before.sav> <after.sav> [--output-dir <directory>]` validates and classifies an emulator round trip without modifying either save.
+- `pkmn proof post-emulator --before <save> --after <save> [--output-dir <directory>|--proof-dir <proof-package>]` performs independent validation or explicitly advances an existing proof manifest.
 
 Proof output is evidence, not source material. Do not commit it. Automated checks do not claim that the manual emulator gate passed.
+
+See `docs/PROOF_WORKFLOW.md` for artifact, privacy, ZIP, and emulator-gate details.
 
 ## Exit codes
 

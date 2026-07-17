@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <map>
 #include <sstream>
 
 #include "util/Sha256.hpp"
@@ -20,34 +21,72 @@ std::string SaveRegion(std::size_t offset) {
   return "bank3-boxes-7-12";
 }
 
+bool EndsWith(const std::string &value, const std::string &suffix) {
+  return value.size() >= suffix.size() &&
+         value.compare(value.size() - suffix.size(), suffix.size(), suffix) ==
+             0;
+}
+
+bool GameplayMutable(const std::string &path) {
+  for (const auto *root : {"/moneyAndCoins/", "/badges/", "/playtime/",
+                           "/location/", "/options/", "/pokedex/",
+                           "/inventory/", "/party/", "/pcStorage/",
+                           "/currentBoxCache/", "/daycare/", "/hallOfFame/",
+                           "/worldStateRaw/", "/summaryCounts/"})
+    if (path.rfind(root, 0) == 0)
+      return true;
+  return false;
+}
+
+std::string Classification(const std::string &path,
+                           const SemanticOptions &options) {
+  if (EndsWith(path, "/rawHex") || EndsWith(path, "/rawRecordHex") ||
+      EndsWith(path, "/rawBlockHex") || EndsWith(path, "/rawSlotHex") ||
+      EndsWith(path, "/speciesListHex") ||
+      path.rfind("/summaryCounts/", 0) == 0)
+    return "derived_match";
+  if (EndsWith(path, "/losslessValue"))
+    return "normalized_match";
+  if (EndsWith(path, "/mirrorRaw"))
+    return "synchronized_mirror_match";
+  if (path.rfind("/location/", 0) == 0)
+    return options.postEmulator ? "expected_runtime_drift"
+                                : "permitted_canonical_difference";
+  if (path.rfind("/currentBoxCache/", 0) == 0)
+    return options.postEmulator ? "expected_runtime_drift"
+                                : "expected_cache_difference";
+  if (options.postEmulator && GameplayMutable(path))
+    return "expected_runtime_drift";
+  return "unexpected_mismatch";
+}
+
 void Differences(const Json &a, const Json &b, const std::string &path,
-                 Json &rows) {
+                 const SemanticOptions &options, Json &rows,
+                 std::size_t &exactLeaves) {
   if (a.type() != b.type()) {
     rows.push_back({{"path", path},
-                    {"classification", "unexpected_mismatch"},
+                    {"classification", Classification(path, options)},
                     {"left", a},
                     {"right", b}});
     return;
   }
   if (a.is_object()) {
     for (auto it = a.begin(); it != a.end(); ++it) {
-      if (it.key() == "rawHex" || it.key() == "rawRecordHex" ||
-          it.key() == "rawBlockHex" || it.key() == "speciesListHex")
-        continue;
       if (!b.contains(it.key()))
         rows.push_back({{"path", path + "/" + it.key()},
-                        {"classification", "unexpected_mismatch"},
+                        {"classification",
+                         Classification(path + "/" + it.key(), options)},
                         {"left", it.value()},
                         {"right", nullptr}});
       else
-        Differences(it.value(), b.at(it.key()), path + "/" + it.key(), rows);
+        Differences(it.value(), b.at(it.key()), path + "/" + it.key(),
+                    options, rows, exactLeaves);
     }
     for (auto it = b.begin(); it != b.end(); ++it)
-      if (it.key() != "rawHex" && it.key() != "rawRecordHex" &&
-          it.key() != "rawBlockHex" && it.key() != "speciesListHex" &&
-          !a.contains(it.key()))
+      if (!a.contains(it.key()))
         rows.push_back({{"path", path + "/" + it.key()},
-                        {"classification", "unexpected_mismatch"},
+                        {"classification",
+                         Classification(path + "/" + it.key(), options)},
                         {"left", nullptr},
                         {"right", it.value()}});
     return;
@@ -55,23 +94,22 @@ void Differences(const Json &a, const Json &b, const std::string &path,
   if (a.is_array()) {
     const auto common = std::min(a.size(), b.size());
     for (std::size_t i = 0; i < common; ++i)
-      Differences(a.at(i), b.at(i), path + "/" + std::to_string(i), rows);
+      Differences(a.at(i), b.at(i), path + "/" + std::to_string(i), options,
+                  rows, exactLeaves);
     if (a.size() != b.size())
       rows.push_back({{"path", path},
-                      {"classification", "unexpected_mismatch"},
+                      {"classification", Classification(path, options)},
                       {"leftSize", a.size()},
                       {"rightSize", b.size()}});
     return;
   }
-  if (a != b) {
-    const bool location = path.rfind("/location/", 0) == 0;
+  if (a != b)
     rows.push_back({{"path", path},
-                    {"classification",
-                     location ? "permitted_safe_location_canonicalization"
-                              : "unexpected_mismatch"},
+                    {"classification", Classification(path, options)},
                     {"left", a},
                     {"right", b}});
-  }
+  else
+    ++exactLeaves;
 }
 } // namespace
 
@@ -116,8 +154,10 @@ json::OrderedJson ComparePhysical(const save::RedSave::Bytes &a,
     }
   }
   if (inRange)
-    ranges.push_back({{"start", rangeStart}, {"endInclusive", common - 1},
-                      {"region", SaveRegion(rangeStart)}, {"classification", "physical_difference"}});
+    ranges.push_back({{"start", rangeStart},
+                      {"endInclusive", common - 1},
+                      {"region", SaveRegion(rangeStart)},
+                      {"classification", "physical_difference"}});
   if (inEqualRange)
     equalRanges.push_back(
         {{"start", equalStart}, {"endInclusive", common - 1}});
@@ -148,17 +188,39 @@ json::OrderedJson ComparePhysical(const save::RedSave::Bytes &a,
 }
 
 json::OrderedJson CompareSemantic(const json::OrderedJson &a,
-                                  const json::OrderedJson &b) {
+                                  const json::OrderedJson &b,
+                                  const SemanticOptions &options) {
   Json rows = Json::array();
-  Differences(a.at("decoded"), b.at("decoded"), "", rows);
+  std::size_t exactLeaves = 0;
+  Differences(a.at("decoded"), b.at("decoded"), "", options, rows,
+              exactLeaves);
   std::size_t unexpected = 0, permitted = 0;
-  for (const auto &row : rows)
-    (row.at("classification") == "unexpected_mismatch" ? unexpected
-                                                       : permitted)++;
+  std::map<std::string, std::size_t> counts = {
+      {"exact_match", exactLeaves},
+      {"normalized_match", 0},
+      {"derived_match", 0},
+      {"synchronized_mirror_match", 0},
+      {"permitted_canonical_difference", 0},
+      {"expected_runtime_drift", 0},
+      {"expected_cache_difference", 0},
+      {"unsupported_or_deferred", 0},
+      {"unexpected_mismatch", 0}};
+  for (const auto &row : rows) {
+    const auto classification =
+        row.at("classification").get<std::string>();
+    ++counts[classification];
+    (classification == "unexpected_mismatch" ? unexpected : permitted)++;
+  }
+  Json classificationCounts = Json::object();
+  for (const auto &[name, count] : counts)
+    classificationCounts[name] = count;
   return {{"equivalent", unexpected == 0},
+          {"policy", options.postEmulator ? "post-emulator" : "generation"},
+          {"exactLeafCount", exactLeaves},
           {"differenceCount", rows.size()},
           {"unexpectedMismatchCount", unexpected},
           {"permittedDifferenceCount", permitted},
+          {"classificationCounts", classificationCounts},
           {"differences", rows}};
 }
 
@@ -188,7 +250,18 @@ std::string SemanticMarkdown(const json::OrderedJson &r) {
     << (r.at("equivalent").get<bool>() ? "yes" : "no")
     << "\n- Unexpected mismatches: " << r.at("unexpectedMismatchCount")
     << "\n- Permitted differences: " << r.at("permittedDifferenceCount")
-    << "\n";
+    << "\n- Exact semantic leaves: " << r.at("exactLeafCount")
+    << "\n- Policy: " << r.at("policy").get<std::string>() << "\n";
+  if (!r.at("differences").empty()) {
+    o << "\n## Field differences\n\n"
+         "| Path | Classification | Left | Right |\n"
+         "|---|---|---|---|\n";
+    for (const auto &difference : r.at("differences"))
+      o << "| `" << difference.at("path").get<std::string>() << "` | "
+        << difference.at("classification").get<std::string>() << " | `"
+        << difference.value("left", Json(nullptr)).dump() << "` | `"
+        << difference.value("right", Json(nullptr)).dump() << "` |\n";
+  }
   return o.str();
 }
 } // namespace pkmn::cli::red::comparison

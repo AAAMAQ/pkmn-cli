@@ -58,6 +58,9 @@ pkmn rjson generate input.red.json [output.sav]
 pkmn compare physical first.sav second.sav
 pkmn compare semantic first.red.json second.red.json
 pkmn proof red input.sav
+pkmn proof red input.sav --zip
+pkmn red validate-post-emulator before.sav after.sav
+pkmn proof post-emulator --before before.sav --after after.sav
 pkmn red begin-edit input.sav
 pkmn red edit-session input.edit-session.json --money 999999 --trainer-name RED
 pkmn red pending-edits input.edit-session.json
@@ -73,7 +76,7 @@ pkmn red end-edit input.edit-session.json
 
 `pkmn rjson generate` uses only decoded semantic fields. It ignores target `physicalImage`, rewrites supported trainer/core, inventory, Pokédex, party, permanent/current storage, Daycare, Hall of Fame, events/scripts/missables/hidden-state fields, canonicalizes unsafe locations to the verified Red's-house baseline, regenerates all checksums, and writes JSON/Markdown reports. The bundled public template is identity-checked before use.
 
-`pkmn compare physical` reports hashes, percentages, first/last differences, and contiguous equal/different ranges mapped to save banks. `compare semantic` classifies safe-location canonicalization separately from unexpected mismatches. `pkmn proof red` runs decode, generation, re-decode, both comparisons, determinism, and physical-image-isolation checks and creates an emulator checklist; automated proof never claims the manual emulator gate has passed.
+`pkmn compare physical` reports hashes, percentages, first/last differences, and contiguous equal/different ranges mapped to save banks. `compare semantic` provides the complete field classification model and JSON/Markdown output controls. `pkmn proof red` runs decode, generation, re-decode, both comparisons, determinism, and physical-image-isolation checks and creates the complete report set and emulator checklist. Optional deterministic ZIP packages contain save data and require publication review. `proof post-emulator` validates a manual emulator round trip and can explicitly complete the manifest gate; automated proof never claims that gate passed on its own.
 
 Red editing is copy-first. `begin-edit` creates a semantic-only session, `edit-session` accumulates named or JSON-pointer edits, `validate-edit` performs an in-memory generation/checksum gate, and `end-edit` writes a new save plus JSON/Markdown reports. The source hash is rechecked at every validation. Arbitrary locations are rejected; generated edits use the verified Red's-house preset. Complex supported structures—including inventory, party, boxes, current-box cache, Daycare, Hall of Fame, and raw supported event state—are scriptable through `--set /decoded/... <JSON-value>`.
 

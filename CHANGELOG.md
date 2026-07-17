@@ -15,6 +15,7 @@
 - Added physical and field-aware semantic comparison plus the complete internal `proof red` decode/generate/redecode/determinism/isolation/report/checklist workflow.
 - Added interactive and scriptable copy-first Red edit sessions with multiple pending edits, source identity checks, safe-location enforcement, checksum validation, collision protection, and edit reports.
 - Added macOS/Linux CI, installed documentation, a clean release verification script, Homebrew formula draft, command/install/release documentation, and public-data-only examples.
+- Added complete semantic-difference classifications, machine-readable comparison output, post-emulator validation/proof continuation, expanded proof reports, and deterministic privacy-marked ZIP proof packages.
 
 All notable changes to `pkmn-cli` will be documented here.
 

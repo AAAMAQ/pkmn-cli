@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "app/ExitCode.hpp"
+#include "commands/proof/ProofCommand.hpp"
 #include "commands/red/EditCommand.hpp"
 #include "red/json/RedDecoder.hpp"
 #include "red/save/RedSave.hpp"
@@ -19,6 +20,8 @@ void PrintHelp(std::ostream& output) {
            << "                       [--include-physical-image|--no-physical-image]\n"
            << "  pkmn red inspect <input.sav>\n"
            << "  pkmn red validate <input.sav>\n"
+           << "  pkmn red validate-post-emulator <before.sav> <after.sav> "
+              "[--output-dir <directory>]\n"
            << "  pkmn red edit <input.sav>\n"
            << "  pkmn red begin-edit|edit-session|pending-edits|validate-edit|end-edit ...\n";
 }
@@ -107,6 +110,17 @@ int Run(const std::vector<std::string>& arguments, std::ostream& output, std::os
         return ToInt(ExitCode::Success);
     }
     if (arguments.front() == "decode") return RunDecode(arguments, output, error);
+    if (arguments.front() == "validate-post-emulator" &&
+        (arguments.size() == 3 ||
+         (arguments.size() == 5 && arguments[3] == "--output-dir"))) {
+        std::vector<std::string> proofArguments = {
+            "--before", arguments[1], "--after", arguments[2]};
+        if (arguments.size() == 5) {
+            proofArguments.push_back("--output-dir");
+            proofArguments.push_back(arguments[4]);
+        }
+        return commands::proof::RunPostEmulator(proofArguments, output, error);
+    }
     if (arguments.front() == "edit" || arguments.front() == "begin-edit" ||
         arguments.front() == "edit-session" || arguments.front() == "pending-edits" ||
         arguments.front() == "validate-edit" || arguments.front() == "end-edit")
