@@ -30,9 +30,9 @@ pkmn completion fish | source  # fish
 
 The manual page is installed as `pkmn(1)`.
 
-Maintainers can run `scripts/verify-release.sh` for a fresh temporary build,
-test, install, and installed-binary smoke test, and `scripts/privacy-scan.sh`
-before preparing public artifacts.
+Maintainers can run `scripts/verify-release.sh` for a committed-source archive,
+fresh temporary build, test, install, and installed-binary smoke test. It also
+runs `scripts/privacy-scan.sh` before preparing public artifacts.
 
 CPack creates `.tar.gz` packages on supported platforms and `.deb` packages on
 Linux. Windows CI verifies `pkmn.exe`; the macOS universal helper is under
