@@ -1,11 +1,13 @@
 #include "red/json/RedJsonDocument.hpp"
 
+#include <array>
 #include <fstream>
 #include <set>
 #include <stdexcept>
 
 #include "red/codec/Gen1Codec.hpp"
 #include "red/events/EventCatalog.hpp"
+#include "red/data/Gen1Names.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
 
@@ -58,7 +60,8 @@ void ValidatePokemon(const OrderedJson& pokemon, bool party,
         const auto species = pokemon.at("speciesId").get<unsigned>();
         const auto level = pokemon.at("level").get<unsigned>();
         const auto hp = pokemon.at("currentHp").get<unsigned>();
-        if (species == 0 || species == 255 || species > 255)
+        if (species > 255 ||
+            !data::IsValidSpecies(static_cast<std::uint8_t>(species)))
             validation.errors.push_back(path + ".speciesId is unsupported");
         if (level == 0 || level > 100)
             validation.errors.push_back(path + ".level must be in 1..100");
@@ -68,7 +71,9 @@ void ValidatePokemon(const OrderedJson& pokemon, bool party,
             validation.errors.push_back(path + ".moves must contain four slots");
         for (std::size_t index = 0; index < pokemon.at("moves").size(); ++index) {
             const auto& move = pokemon.at("moves").at(index);
-            if (move.at("moveId").get<unsigned>() > 255 ||
+            const auto moveId = move.at("moveId").get<unsigned>();
+            if (moveId > 255 ||
+                !data::IsValidMove(static_cast<std::uint8_t>(moveId)) ||
                 move.at("pp").get<unsigned>() > 63 ||
                 move.at("ppUps").get<unsigned>() > 3)
                 validation.errors.push_back(path + ".moves[" + std::to_string(index) +
@@ -100,12 +105,41 @@ void ValidateItems(const OrderedJson& collection, const std::string& path,
         for (std::size_t index = 0; index < items.size(); ++index) {
             const auto id = items.at(index).at("itemId").get<unsigned>();
             const auto quantity = items.at(index).at("quantity").get<unsigned>();
-            if (id == 0 || id == 255 || id > 255 || quantity == 0 || quantity > 99)
+            if (id > 255 ||
+                !data::IsValidItem(static_cast<std::uint8_t>(id)) ||
+                quantity == 0 || quantity > 99)
                 validation.errors.push_back(path + ".items[" + std::to_string(index) +
                                             "] has an invalid ID or quantity");
         }
     } catch (const std::exception& exception) {
         validation.errors.push_back(path + " has invalid inventory data: " + exception.what());
+    }
+}
+
+void WarnBadgeEventRelationships(const OrderedJson& decoded,
+                                 DocumentValidation& validation) {
+    if (!decoded.contains("events") ||
+        !decoded.at("events").contains("flags"))
+        return;
+    const auto badges = decoded.at("badges").at("raw").get<unsigned>();
+    const std::array<std::pair<int, const char*>, 8> gymEvents{{
+        {119, "Boulder/Brock"}, {191, "Cascade/Misty"},
+        {359, "Thunder/Lt. Surge"}, {425, "Rainbow/Erika"},
+        {601, "Soul/Koga"}, {865, "Marsh/Sabrina"},
+        {665, "Volcano/Blaine"}, {81, "Earth/Giovanni"}}};
+    for (std::size_t bit = 0; bit < gymEvents.size(); ++bit) {
+        const auto [flagIndex, label] = gymEvents[bit];
+        for (const auto& record : decoded.at("events").at("flags")) {
+            if (record.value("flagIndex", -1) != flagIndex) continue;
+            const bool badge = (badges & (1U << bit)) != 0;
+            const bool battle = record.value("value", false);
+            if (badge != battle)
+                validation.warnings.push_back(
+                    std::string(label) +
+                    " badge and verified gym-battle event differ; this can be "
+                    "transient in gameplay but should be reviewed before generation");
+            break;
+        }
     }
 }
 
@@ -126,10 +160,20 @@ save::RedSave::Bytes PhysicalBytes(const OrderedJson& root) {
 }
 
 LoadedDocument LoadAndValidate(const std::filesystem::path& path) {
-    LoadedDocument result;
     try {
         std::ifstream input(path);
         if (!input) throw std::runtime_error("could not open Red JSON input");
+        return LoadAndValidate(input);
+    } catch (const std::exception& exception) {
+        LoadedDocument result;
+        result.validation.errors.push_back(std::string("invalid JSON: ") + exception.what());
+        return result;
+    }
+}
+
+LoadedDocument LoadAndValidate(std::istream& input) {
+    LoadedDocument result;
+    try {
         input >> result.root;
         result.validation.syntaxValid = true;
     } catch (const std::exception& exception) {
@@ -242,7 +286,8 @@ DocumentValidation ValidateDocument(const OrderedJson& root) {
                 const auto species = mon.at("speciesId").get<unsigned>();
                 const auto level = mon.at("level").get<unsigned>();
                 if (order < 1 || order > 6 || !orders.insert(order).second ||
-                    species == 0 || species == 255 || species > 255 ||
+                    species > 255 ||
+                    !data::IsValidSpecies(static_cast<std::uint8_t>(species)) ||
                     level == 0 || level > 100)
                     validation.errors.push_back("Hall of Fame entry has invalid slot/species/level");
                 ValidateText(mon.at("nickname"), "$.decoded.hallOfFame.nickname",
@@ -262,6 +307,8 @@ DocumentValidation ValidateDocument(const OrderedJson& root) {
             decoded.contains("storyProgress");
         if (hasAnyNamedState)
             events::ValidateNamedState(decoded, validation.errors);
+        if (hasAnyNamedState && validation.errors.empty())
+            WarnBadgeEventRelationships(decoded, validation);
     } catch (const std::exception& exception) {
         validation.errors.push_back(std::string("invalid semantic field type: ") + exception.what());
     }

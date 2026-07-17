@@ -1,0 +1,45 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "pkmn-cli-0.1.0",
+  "documentNamespace": "https://github.com/AAAMAQ/pkmn-cli/sbom/0.1.0",
+  "creationInfo": {
+    "created": "2026-07-17T00:00:00Z",
+    "creators": ["Organization: MAQ / BiG MAQ Studios"]
+  },
+  "packages": [
+    {
+      "name": "pkmn-cli",
+      "SPDXID": "SPDXRef-Package-pkmn-cli",
+      "versionInfo": "0.1.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "JSON for Modern C++",
+      "SPDXID": "SPDXRef-Package-nlohmann-json",
+      "versionInfo": "3.12.0",
+      "downloadLocation": "https://github.com/nlohmann/json",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-pkmn-cli"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-pkmn-cli",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-nlohmann-json"
+    }
+  ]
+}

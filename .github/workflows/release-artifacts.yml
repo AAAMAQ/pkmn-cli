@@ -1,0 +1,41 @@
+name: Release artifact candidates
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: linux-x86_64
+          - os: macos-14
+            name: macos-arm64
+          - os: macos-13
+            name: macos-x86_64
+          - os: windows-latest
+            name: windows-x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Package
+        run: cpack --config build/CPackConfig.cmake -C Release -B build/packages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pkmn-cli-${{ matrix.name }}
+          path: build/packages/*
+          if-no-files-found: error

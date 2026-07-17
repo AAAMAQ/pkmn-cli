@@ -19,6 +19,7 @@
 - Expanded editing into a validated looped terminal application with broad file-backed named fields, advanced value-file support, derived-field synchronization, and detailed in-memory semantic validation.
 - Added JSON output for diagnostic commands, generated bash/zsh/fish completion, an installed `pkmn(1)` manual, and dedicated schema, reconstruction, editing, proof, and future-FireRed documentation.
 - Added immutable `config show` policy reporting and explicit collision-safe `_2`/`_3` output suffixing across decode, generation, reconstruction, editing, and proof workflows.
+- Completed the 507-entry named-event layer; transactional output publication; proof self-verification; deep doctor; event discovery; copy-first checksum repair; edit dry-run/history/undo; schema enrichment; batch and pipeline workflows; verified Gen I name databases; validation profiles; Windows/release CI; CPack, universal-macOS, and SPDX packaging scaffolds.
 
 All notable changes to `pkmn-cli` will be documented here.
 

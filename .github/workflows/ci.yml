@@ -29,3 +29,22 @@ jobs:
           "$RUNNER_TEMP/pkmn-install/bin/pkmn" --help
           "$RUNNER_TEMP/pkmn-install/bin/pkmn" --version
           "$RUNNER_TEMP/pkmn-install/bin/pkmn" doctor
+
+  windows-build-test-install:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Install
+        run: cmake --install build --config Release --prefix "${{ runner.temp }}/pkmn-install"
+      - name: Installed CLI smoke test
+        shell: pwsh
+        run: |
+          & "${{ runner.temp }}/pkmn-install/bin/pkmn.exe" --help
+          & "${{ runner.temp }}/pkmn-install/bin/pkmn.exe" --version
+          & "${{ runner.temp }}/pkmn-install/bin/pkmn.exe" doctor --deep

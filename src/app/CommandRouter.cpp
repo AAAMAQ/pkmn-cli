@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <array>
 #include <ostream>
+#include <sstream>
+#include <cstdlib>
 #include <string_view>
 
 #include "app/ExitCode.hpp"
@@ -34,6 +36,55 @@ bool IsVersion(std::string_view argument) {
 int CommandRouter::Run(const std::vector<std::string>& arguments,
                        std::ostream& output,
                        std::ostream& error) const {
+    static thread_local bool environmentApplied = false;
+    if (!environmentApplied &&
+        (arguments.empty() ||
+         (arguments.front() != "--quiet" && arguments.front() != "--verbose" &&
+          arguments.front() != "--no-color"))) {
+        std::vector<std::string> configured;
+        if (const char *quiet = std::getenv("PKMN_QUIET");
+            quiet != nullptr && std::string_view(quiet) == "1")
+            configured.push_back("--quiet");
+        if (const char *verbose = std::getenv("PKMN_VERBOSE");
+            verbose != nullptr && std::string_view(verbose) == "1")
+            configured.push_back("--verbose");
+        if (std::getenv("NO_COLOR") != nullptr)
+            configured.push_back("--no-color");
+        if (!configured.empty()) {
+            configured.insert(configured.end(), arguments.begin(), arguments.end());
+            environmentApplied = true;
+            const int result = Run(configured, output, error);
+            environmentApplied = false;
+            return result;
+        }
+    }
+    if (!arguments.empty() &&
+        (arguments.front() == "--quiet" || arguments.front() == "--verbose" ||
+         arguments.front() == "--no-color")) {
+        bool quiet = false;
+        bool verbose = false;
+        std::size_t begin = 0;
+        while (begin < arguments.size()) {
+            if (arguments[begin] == "--quiet") quiet = true;
+            else if (arguments[begin] == "--verbose") verbose = true;
+            else if (arguments[begin] != "--no-color") break;
+            ++begin;
+        }
+        if (quiet && verbose) {
+            error << "pkmn: --quiet and --verbose cannot be combined\n";
+            return ToInt(ExitCode::InvalidArguments);
+        }
+        const std::vector<std::string> stripped(arguments.begin() + begin,
+                                                arguments.end());
+        if (quiet) {
+            std::ostringstream discarded;
+            return Run(stripped, discarded, error);
+        }
+        if (verbose)
+            output << "[pkmn] version=" << kVersion
+                   << " standalone=true color=false\n";
+        return Run(stripped, output, error);
+    }
     if (arguments.empty() || IsHelp(arguments.front())) {
         PrintHelp(output);
         return ToInt(ExitCode::Success);
@@ -92,12 +143,16 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  pkmn doctor\n"
         << "  pkmn --help\n"
         << "  pkmn --version\n\n"
+        << "Global controls (before the command): --quiet, --verbose, --no-color\n\n"
         << "Available now:\n"
         << "  doctor               Check standalone internal-engine readiness\n"
         << "  completion           Generate bash, zsh, or fish completions\n"
         << "  config show          Show compiled safety/default policy\n"
         << "  red inspect          Inspect save integrity using the internal Red engine\n"
         << "  red validate         Validate all known Red save checksums internally\n"
+        << "  red repair-checksums Write a validated checksum-repaired copy\n"
+        << "  red events           Discover verified named Red event flags\n"
+        << "  red *-batch          Validate or decode several saves\n"
         << "  red validate-post-emulator  Validate emulator round-trip drift\n"
         << "  red decode           Export canonical .red.json internally\n"
         << "  red edit             Interactive validated copy editing\n"
@@ -106,11 +161,15 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  rjson validate       Validate canonical Red JSON internally\n"
         << "  rjson generate       Generate a Red save from semantic fields\n"
         << "  rjson reconstruct    Restore an archival physical image\n"
+        << "  rjson migrate        Enrich compatible canonical Red JSON\n"
+        << "  rjson schema         Describe the canonical schema contract\n"
+        << "  rjson generate-batch Generate multiple semantic saves\n"
         << "\n"
         << "  compare physical     Compare save bytes and difference ranges\n"
         << "  compare semantic     Compare canonical Red semantic JSON\n"
         << "  proof red            Run the internal Red proof pipeline\n"
         << "  proof post-emulator  Continue proof after manual emulator testing\n"
+        << "  proof verify         Verify a proof directory or deterministic ZIP\n"
         << "\nReserved/planned command domains:\n"
         << "  fred, frjson         Future FireRed workflows (not implemented)\n"
         << "  convert              Future Red-to-FireRed conversion (not implemented)\n\n"

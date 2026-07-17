@@ -14,5 +14,7 @@ std::vector<ZipEntry>
 ReadProofDirectoryEntries(const std::filesystem::path &directory);
 void WriteDeterministicZip(const std::filesystem::path &output,
                            const std::vector<ZipEntry> &entries);
+std::vector<ZipEntry> ReadDeterministicZip(
+    const std::filesystem::path &input);
 
 } // namespace pkmn::cli::util

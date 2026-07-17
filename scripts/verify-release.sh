@@ -14,3 +14,4 @@ cd "$work_dir"
 "$work_dir/install/bin/pkmn" --help
 "$work_dir/install/bin/pkmn" --version
 "$work_dir/install/bin/pkmn" doctor
+"$work_dir/install/bin/pkmn" doctor --deep

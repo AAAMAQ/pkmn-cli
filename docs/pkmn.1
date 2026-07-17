@@ -16,7 +16,7 @@ Show available and reserved commands.
 .B pkmn --version
 Show the CLI version.
 .TP
-.B pkmn doctor [--format text|json]
+.B pkmn doctor [--deep] [--format text|json]
 Report standalone internal-engine readiness.
 .TP
 .B pkmn completion bash|zsh|fish
@@ -40,9 +40,18 @@ Run durable scriptable edit sessions.
 .TP
 .B pkmn red validate-post-emulator BEFORE AFTER
 Validate and classify a manual emulator round trip.
+.TP
+.B pkmn red repair-checksums SAVE [--output COPY]
+Write a checksum-repaired copy and report without changing SAVE.
+.TP
+.B pkmn red events list|search|show ...
+Discover the verified named-event catalog.
+.TP
+.B pkmn red validate-batch|decode-batch ...
+Run multi-save validation or transactional decoding.
 .SH RED JSON COMMANDS
 .TP
-.B pkmn rjson inspect|validate FILE [--format json]
+.B pkmn rjson inspect|validate FILE [--format json] [--profile PROFILE]
 Validate canonical schema, semantics, and optional physical image.
 .TP
 .B pkmn rjson generate FILE [OUTPUT]
@@ -50,6 +59,9 @@ Generate a deterministic semantic save without using physicalImage authority.
 .TP
 .B pkmn rjson reconstruct FILE [--output OUTPUT]
 Perform exact archival reconstruction requiring physicalImage.
+.TP
+.B pkmn rjson migrate FILE | pkmn rjson schema | pkmn rjson generate-batch ...
+Enrich compatible canonical documents or generate several transactionally.
 .SH COMPARISON AND PROOF
 .TP
 .B pkmn compare physical A B
@@ -63,6 +75,9 @@ Run decode, generation, re-decode, comparison, determinism, isolation, report, a
 .TP
 .B pkmn proof post-emulator --before SAVE --after SAVE [--proof-dir DIR]
 Complete the manual emulator proof gate after validating expected drift.
+.TP
+.B pkmn proof verify DIRECTORY|ZIP
+Verify proof artifact hashes, ZIP safety, JSON, and generated checksums.
 .SH SAFETY
 Inputs and existing outputs are not overwritten. Semantic generation never uses physicalImage as authority. Reconstruction is explicitly archival. Arbitrary runtime location editing is disabled. Proof packages contain save data and require publication review.
 .PP

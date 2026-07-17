@@ -19,10 +19,10 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local words="doctor config red rjson compare proof completion fred frjson convert"
   case "${COMP_WORDS[1]}" in
-    red) words="decode inspect validate validate-post-emulator edit begin-edit edit-session pending-edits validate-edit end-edit" ;;
-    rjson) words="inspect validate generate reconstruct" ;;
-    compare) words="physical semantic" ;;
-    proof) words="red post-emulator" ;;
+    red) words="decode inspect validate repair-checksums events validate-batch decode-batch validate-post-emulator edit begin-edit edit-session pending-edits undo-edit edit-history annotate-edit validate-edit end-edit" ;;
+    rjson) words="inspect validate generate reconstruct migrate schema generate-batch" ;;
+    compare) words="physical semantic semantic-batch" ;;
+    proof) words="red post-emulator verify" ;;
     config) words="show" ;;
   esac
   COMPREPLY=( $(compgen -W "$words" -- "$cur") )
@@ -39,10 +39,10 @@ _pkmn() {
     return
   fi
   case "$words[2]" in
-    red) _values 'Red command' decode inspect validate validate-post-emulator edit begin-edit edit-session pending-edits validate-edit end-edit ;;
-    rjson) _values 'Red JSON command' inspect validate generate reconstruct ;;
-    compare) _values 'comparison command' physical semantic ;;
-    proof) _values 'proof command' red post-emulator ;;
+    red) _values 'Red command' decode inspect validate repair-checksums events validate-batch decode-batch validate-post-emulator edit begin-edit edit-session pending-edits undo-edit edit-history annotate-edit validate-edit end-edit ;;
+    rjson) _values 'Red JSON command' inspect validate generate reconstruct migrate schema generate-batch ;;
+    compare) _values 'comparison command' physical semantic semantic-batch ;;
+    proof) _values 'proof command' red post-emulator verify ;;
     config) _values 'configuration command' show ;;
   esac
 }
@@ -51,10 +51,10 @@ compdef _pkmn pkmn
   } else {
     output << R"(complete -c pkmn -f
 complete -c pkmn -n '__fish_use_subcommand' -a 'doctor config red rjson compare proof completion fred frjson convert'
-complete -c pkmn -n '__fish_seen_subcommand_from red' -a 'decode inspect validate validate-post-emulator edit begin-edit edit-session pending-edits validate-edit end-edit'
-complete -c pkmn -n '__fish_seen_subcommand_from rjson' -a 'inspect validate generate reconstruct'
-complete -c pkmn -n '__fish_seen_subcommand_from compare' -a 'physical semantic'
-complete -c pkmn -n '__fish_seen_subcommand_from proof' -a 'red post-emulator'
+complete -c pkmn -n '__fish_seen_subcommand_from red' -a 'decode inspect validate repair-checksums events validate-batch decode-batch validate-post-emulator edit begin-edit edit-session pending-edits undo-edit edit-history annotate-edit validate-edit end-edit'
+complete -c pkmn -n '__fish_seen_subcommand_from rjson' -a 'inspect validate generate reconstruct migrate schema generate-batch'
+complete -c pkmn -n '__fish_seen_subcommand_from compare' -a 'physical semantic semantic-batch'
+complete -c pkmn -n '__fish_seen_subcommand_from proof' -a 'red post-emulator verify'
 complete -c pkmn -n '__fish_seen_subcommand_from config' -a 'show'
 )";
   }

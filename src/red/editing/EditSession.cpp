@@ -10,9 +10,12 @@
 #include "red/save/RedSave.hpp"
 #include "red/codec/Gen1Codec.hpp"
 #include "red/events/EventCatalog.hpp"
+#include "red/comparison/Comparison.hpp"
+#include "red/data/Gen1Names.hpp"
 #include "red/json/RedJsonDocument.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
+#include "util/AtomicOutput.hpp"
 
 namespace pkmn::cli::red::editing {
 namespace {
@@ -63,6 +66,8 @@ Json Begin(const std::filesystem::path &source) {
             {"sha256", util::Sha256Hex(save.BytesView())}}},
           {"document", std::move(document)},
           {"pendingEdits", Json::array()},
+          {"commandHistory", Json::array()},
+          {"annotations", Json::array()},
           {"policy",
            {{"sourceOverwriteAllowed", false},
             {"physicalImageGenerationAuthority", false},
@@ -84,10 +89,10 @@ void Save(const std::filesystem::path &sessionPath, const Json &session,
   RequireSession(session);
   if (refuseCollision && std::filesystem::exists(sessionPath))
     throw std::runtime_error("refusing to overwrite existing edit session");
-  std::ofstream output(sessionPath, std::ios::binary | std::ios::trunc);
-  output << session.dump(2) << '\n';
-  if (!output)
-    throw std::runtime_error("could not write complete edit session");
+  if (!refuseCollision && std::filesystem::exists(sessionPath))
+    util::ReplaceTextAtomic(sessionPath, session.dump(2) + '\n');
+  else
+    util::WriteTextAtomic(sessionPath, session.dump(2) + '\n');
 }
 
 void AddEdit(Json &session, const std::string &pointer, const Json &value) {
@@ -98,6 +103,13 @@ void AddEdit(Json &session, const std::string &pointer, const Json &value) {
   if (!document.contains(path))
     throw std::runtime_error("edit pointer does not identify an existing field");
   const auto previous = document.at(path);
+  if ((pointer == "/decoded/worldStateRaw/scriptsHex" && value != previous) ||
+      (pointer == "/decoded/worldStateRaw" && value.is_object() &&
+       value.contains("scriptsHex") && previous.is_object() &&
+       previous.contains("scriptsHex") &&
+       value.at("scriptsHex") != previous.at("scriptsHex")))
+    throw std::runtime_error(
+        "unverified raw script editing is disabled; preserve scriptsHex");
   document[path] = value;
   if ((pointer.ends_with("/name/value") ||
        pointer.ends_with("/nickname/value") ||
@@ -142,6 +154,9 @@ void AddEdit(Json &session, const std::string &pointer, const Json &value) {
   }
   session.at("pendingEdits").push_back(
       {{"path", pointer}, {"previous", previous}, {"value", value}});
+  session["commandHistory"].push_back(
+      {{"sequence", session["commandHistory"].size() + 1},
+       {"action", "edit"}, {"path", pointer}});
 }
 
 void AddNamedEventEdit(Json &session, const std::string &name, bool value) {
@@ -190,6 +205,69 @@ void AddNamedEventEdit(Json &session, const std::string &name, bool value) {
   session.at("pendingEdits").push_back(
       {{"path", "/decoded/events/by-name/" + name},
        {"previous", previous}, {"value", value}, {"flagIndex", index}});
+  session["commandHistory"].push_back(
+      {{"sequence", session["commandHistory"].size() + 1},
+       {"action", "named-event-edit"}, {"name", name},
+       {"value", value}});
+}
+
+void UndoLast(Json &session, std::size_t count) {
+  RequireSession(session);
+  if (count == 0 || count > session.at("pendingEdits").size())
+    throw std::runtime_error("undo count exceeds pending edit count");
+  for (std::size_t undone = 0; undone < count; ++undone) {
+    const auto edit = session.at("pendingEdits").back();
+    session.at("pendingEdits").erase(session.at("pendingEdits").end() - 1);
+    const auto path = edit.at("path").get<std::string>();
+    bool generatedReversal = true;
+    if (path == "/decoded/location/@preset") {
+      session.at("document").at("decoded")["location"] = edit.at("previous");
+      generatedReversal = false;
+    } else if (path.starts_with("/decoded/events/by-name/"))
+      AddNamedEventEdit(session,
+                        path.substr(std::string("/decoded/events/by-name/").size()),
+                        edit.at("previous").get<bool>());
+    else
+      AddEdit(session, path, edit.at("previous"));
+    if (generatedReversal) {
+      session.at("pendingEdits").erase(session.at("pendingEdits").end() - 1);
+      session.at("commandHistory").erase(
+          session.at("commandHistory").end() - 1);
+    }
+  }
+  session["commandHistory"].push_back(
+      {{"sequence", session["commandHistory"].size() + 1},
+       {"action", "undo"}, {"count", count}});
+}
+
+void AddAnnotation(Json &session, const std::string &note) {
+  RequireSession(session);
+  if (note.empty())
+    throw std::runtime_error("edit-session annotation cannot be empty");
+  session["annotations"].push_back(
+      {{"sequence", session["annotations"].size() + 1}, {"note", note}});
+  session["commandHistory"].push_back(
+      {{"sequence", session["commandHistory"].size() + 1},
+       {"action", "annotation"}});
+}
+
+void ApplySafeLocationPreset(Json &session, const std::string &preset) {
+  RequireSession(session);
+  if (preset != "reds-house-2f")
+    throw std::runtime_error(
+        "unknown safe location preset (supported: reds-house-2f)");
+  auto &location = session.at("document").at("decoded").at("location");
+  const auto previous = location;
+  location = {{"mapId", 38}, {"mapName", data::MapName(38)},
+              {"x", 3}, {"y", 6}, {"xBlock", 1}, {"yBlock", 0},
+              {"previousMapId", 0},
+              {"previousMapName", data::MapName(0)}};
+  session.at("pendingEdits").push_back(
+      {{"path", "/decoded/location/@preset"},
+       {"previous", previous}, {"value", location}, {"preset", preset}});
+  session["commandHistory"].push_back(
+      {{"sequence", session["commandHistory"].size() + 1},
+       {"action", "safe-location-preset"}, {"preset", preset}});
 }
 
 generation::Result Validate(const Json &session) {
@@ -213,6 +291,27 @@ generation::Result Validate(const Json &session) {
       save::RedSave(result.bytes));
   if (!integrity.Valid())
     throw std::runtime_error("edited output failed checksum validation");
+  const auto redecoded = json::Decode(save::RedSave(result.bytes),
+                                      "validated-edit-output.sav", integrity,
+                                      {.includePhysicalImage = false});
+  const auto semanticComparison = comparison::CompareSemantic(
+      session.at("document"), redecoded);
+  if (!semanticComparison.at("equivalent").get<bool>()) {
+    std::string first = "unknown";
+    for (const auto &difference : semanticComparison.at("differences"))
+      if (difference.at("classification") == "unexpected_mismatch") {
+        first = difference.at("path").get<std::string>();
+        break;
+      }
+    throw std::runtime_error(
+        "edited output did not preserve requested semantic state after "
+        "re-decode; first unexpected path: " + first);
+  }
+  result.report["editRoundTrip"] = {
+      {"redecoded", true},
+      {"semanticEquivalentUnderPolicy", true},
+      {"unexpectedMismatchCount",
+       semanticComparison.at("unexpectedMismatchCount")}};
   return result;
 }
 

@@ -23,17 +23,23 @@ Arbitrary location editing is not offered. Generated edits use the emulator-veri
 pkmn red begin-edit savefile.sav
 pkmn red edit-session savefile.edit-session.json --money 999999 --badges all
 pkmn red pending-edits savefile.edit-session.json
+pkmn red annotate-edit savefile.edit-session.json "reason for this change"
+pkmn red edit-history savefile.edit-session.json
+pkmn red undo-edit savefile.edit-session.json
 pkmn red validate-edit savefile.edit-session.json
 pkmn red end-edit savefile.edit-session.json
 ```
 
 `end-edit --auto-suffix` selects `_2`, `_3`, and later output/report names when the preferred name exists. Without it, collisions fail closed.
 
+`edit-session --dry-run` evaluates requested edits without changing the session. `end-edit --dry-run` executes generation, checksum validation, re-decode, and semantic comparison without publishing a save or reports. Use `--format json` for automation. Session history and annotations remain semantic metadata and never enter generated save bytes.
+
 Named scalar options are:
 
 - `--trainer-name`, `--rival-name`, `--trainer-id`;
 - `--money`, `--coins`, `--badges <0..255|all>`;
 - `--selected-box <1..12>`;
+- `--location-preset reds-house-2f` (the only emulator-verified preset currently enabled);
 - `--event EVENT_NAME on|off`, with `--story-flag`, `--trainer-battle`, and
   `--static-encounter` aliases.
 
@@ -64,8 +70,10 @@ pkmn red edit-session session.json \
 
 Only existing fields under the supported `/decoded` edit surface are accepted. Location pointers and unsupported roots are rejected. Collection counts and badge mirrors are synchronized automatically.
 
+Raw `scriptsHex` mutation is rejected with a dedicated unsupported-script diagnostic. The field remains preserved for lossless supported generation, but public arbitrary script editing is intentionally unavailable.
+
 ## Validation
 
 Edit validation covers schema identity, money/coin ranges, Gen I text encoding and length, clock values, Pokédex bitfield sizes, inventory capacities and quantities, party and box counts, Pokémon species/level/move/PP/DV/HP constraints, selected/current-box structures, Daycare, Hall of Fame, world-state byte lengths, source identity, generated write ranges, and all Red checksums.
 
-Output reports list every staged change and state explicitly that the source was not overwritten.
+Validation also generates a candidate in memory, validates all checksums, re-decodes it, and compares the requested supported semantics against what was actually encoded. Output reports list every staged change and state explicitly that the source was not overwritten.

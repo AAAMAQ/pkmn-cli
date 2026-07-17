@@ -33,6 +33,8 @@ PostEmulatorResult ValidatePostEmulator(
       beforeDocument, afterDocument, {.postEmulator = true});
   const bool passed = semantic.at("equivalent").get<bool>();
   json::OrderedJson report = {
+      {"format", "pkmn-post-emulator-validation"},
+      {"reportVersion", "1.0.0"},
       {"workflow", "post-emulator-validation"},
       {"before",
        {{"logicalName", beforePath.filename().string()},

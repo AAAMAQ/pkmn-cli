@@ -3,8 +3,8 @@
 #include "red/comparison/Comparison.hpp"
 #include "red/json/RedJsonDocument.hpp"
 #include "red/save/RedSave.hpp"
+#include "util/AtomicOutput.hpp"
 #include <filesystem>
-#include <fstream>
 #include <ostream>
 
 namespace pkmn::cli::commands::compare {
@@ -42,18 +42,12 @@ OutputOptions ParseOutputOptions(const std::vector<std::string> &arguments) {
 
 void Emit(const red::json::OrderedJson &report, const std::string &markdown,
           const OutputOptions &options, std::ostream &output) {
-  if (!options.jsonPath.empty()) {
-    std::ofstream file(options.jsonPath, std::ios::binary);
-    file << report.dump(2) << '\n';
-    if (!file)
-      throw std::runtime_error("could not write JSON comparison report");
-  }
-  if (!options.markdownPath.empty()) {
-    std::ofstream file(options.markdownPath, std::ios::binary);
-    file << markdown;
-    if (!file)
-      throw std::runtime_error("could not write Markdown comparison report");
-  }
+  util::OutputTransaction transaction;
+  if (!options.jsonPath.empty())
+    transaction.StageText(options.jsonPath, report.dump(2) + '\n');
+  if (!options.markdownPath.empty())
+    transaction.StageText(options.markdownPath, markdown);
+  transaction.Commit();
   output << (options.jsonToStdout ? report.dump(2) + "\n" : markdown);
 }
 } // namespace
@@ -64,11 +58,73 @@ int Run(const std::vector<std::string> &a, std::ostream &out,
     out << "Usage:\n"
            "  pkmn compare physical <a.sav> <b.sav> [report options]\n"
            "  pkmn compare semantic <a.red.json> <b.red.json> [report options]\n"
+           "  pkmn compare semantic-batch <baseline.red.json> "
+           "<candidate.red.json>... [--format json]\n"
            "Report options:\n"
            "  --format markdown|json\n"
            "  --output-json <report.json>\n"
            "  --output-markdown <report.md>\n";
     return 0;
+  }
+  if (a[0] == "semantic-batch") {
+    bool json = false;
+    std::vector<std::filesystem::path> inputs;
+    for (std::size_t index = 1; index < a.size(); ++index) {
+      if (a[index] == "--format" && index + 1 < a.size() &&
+          a[index + 1] == "json") {
+        json = true;
+        ++index;
+      } else if (a[index].starts_with("--")) {
+        err << "pkmn compare semantic-batch: invalid option\n";
+        return ToInt(ExitCode::InvalidArguments);
+      } else
+        inputs.emplace_back(a[index]);
+    }
+    if (inputs.size() < 2) {
+      err << "pkmn compare semantic-batch: baseline and candidates required\n";
+      return ToInt(ExitCode::InvalidArguments);
+    }
+    try {
+      const auto baseline = red::json::LoadAndValidate(inputs.front());
+      if (!baseline.validation.Valid())
+        throw std::runtime_error("baseline failed semantic validation");
+      auto rows = red::json::OrderedJson::array();
+      std::size_t equivalent = 0;
+      for (std::size_t index = 1; index < inputs.size(); ++index) {
+        const auto candidate = red::json::LoadAndValidate(inputs[index]);
+        if (!candidate.validation.Valid())
+          throw std::runtime_error(inputs[index].filename().string() +
+                                   " failed semantic validation");
+        const auto comparison = red::comparison::CompareSemantic(
+            baseline.root, candidate.root);
+        equivalent += comparison.at("equivalent").get<bool>();
+        rows.push_back({{"candidate", inputs[index].filename().string()},
+                        {"equivalent", comparison.at("equivalent")},
+                        {"unexpectedMismatchCount",
+                         comparison.at("unexpectedMismatchCount")},
+                        {"comparison", comparison}});
+      }
+      const auto report = red::json::OrderedJson{
+          {"command", "compare semantic-batch"},
+          {"baseline", inputs.front().filename().string()},
+          {"candidateCount", inputs.size() - 1},
+          {"equivalentCount", equivalent}, {"results", rows}};
+      if (json)
+        out << report.dump(2) << '\n';
+      else {
+        out << "Semantic batch comparison\nEquivalent: " << equivalent << '/'
+            << inputs.size() - 1 << '\n';
+        for (const auto &row : rows)
+          out << (row.at("equivalent").get<bool>() ? "[ok] " : "[diff] ")
+              << row.at("candidate").get<std::string>() << '\n';
+      }
+      return equivalent == inputs.size() - 1
+                 ? 0
+                 : ToInt(ExitCode::SemanticMismatch);
+    } catch (const std::exception &exception) {
+      err << "pkmn compare semantic-batch: " << exception.what() << '\n';
+      return ToInt(ExitCode::InvalidInput);
+    }
   }
   if (a.size() < 3 || (a[0] != "physical" && a[0] != "semantic")) {
     err << "pkmn compare: invalid arguments\n";

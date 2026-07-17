@@ -9,6 +9,7 @@
 #include "app/Version.hpp"
 #include "red/codec/Gen1Codec.hpp"
 #include "red/events/EventCatalog.hpp"
+#include "red/data/Gen1Names.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
 
@@ -35,6 +36,7 @@ OrderedJson Items(const RedSave &save, std::size_t countOffset,
       break;
     items.push_back({{"slot", slot + 1},
                      {"itemId", id},
+                     {"itemName", data::ItemName(id)},
                      {"quantity", save.At(pairsOffset + slot * 2U + 1)}});
   }
   return {{"declaredCount", declared},
@@ -51,15 +53,22 @@ OrderedJson Pokemon(const RedSave &save, std::size_t record,
   OrderedJson moves = OrderedJson::array();
   for (std::size_t index = 0; index < 4; ++index) {
     const auto rawPp = save.At(record + 0x1D + index);
+    const auto moveId = save.At(record + 0x08 + index);
     moves.push_back({{"slot", index + 1},
-                     {"moveId", save.At(record + 0x08 + index)},
+                     {"moveId", moveId},
+                     {"moveName", data::MoveName(moveId)},
                      {"pp", rawPp & 0x3F},
                      {"ppUps", rawPp >> 6},
                      {"rawPp", rawPp}});
   }
+  const auto speciesId = save.At(record);
   OrderedJson result = {
       {"position", position},
-      {"speciesId", save.At(record)},
+      {"speciesId", speciesId},
+      {"speciesName", data::SpeciesName(speciesId)},
+      {"pokedexNumber", data::PokedexNumber(speciesId) < 0
+                            ? OrderedJson(nullptr)
+                            : OrderedJson(data::PokedexNumber(speciesId))},
       {"level", save.At(record + (party ? 0x21 : 0x03))},
       {"nickname", Text(save, nickname, 11)},
       {"otName", Text(save, otName, 11)},
@@ -140,6 +149,8 @@ OrderedJson HallOfFame(const RedSave &save) {
         continue;
       pokemon.push_back({{"partyOrder", slot + 1},
                          {"speciesId", species},
+                         {"speciesName", data::SpeciesName(species)},
+                         {"pokedexNumber", data::PokedexNumber(species)},
                          {"level", save.At(offset + 1)},
                          {"nickname", Text(save, offset + 2, 11)},
                          {"rawSlotHex", c::Hex(save.Slice(offset, 0x10))}});
@@ -199,11 +210,13 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
         {"frames", input.At(0x2CF1)}}},
       {"location",
        {{"mapId", input.At(0x260A)},
+        {"mapName", data::MapName(input.At(0x260A))},
         {"x", input.At(0x260E)},
         {"y", input.At(0x260D)},
         {"xBlock", input.At(0x2610)},
         {"yBlock", input.At(0x260F)},
-        {"previousMapId", input.At(0x2611)}}},
+        {"previousMapId", input.At(0x2611)},
+        {"previousMapName", data::MapName(input.At(0x2611))}}},
       {"options",
        {{"raw", input.At(0x2601)},
         {"textSpeed", input.At(0x2601) & 0x07},

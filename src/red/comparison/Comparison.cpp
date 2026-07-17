@@ -43,6 +43,9 @@ std::string Classification(const std::string &path,
   if (EndsWith(path, "/rawHex") || EndsWith(path, "/rawRecordHex") ||
       EndsWith(path, "/rawBlockHex") || EndsWith(path, "/rawSlotHex") ||
       EndsWith(path, "/speciesListHex") ||
+      EndsWith(path, "/speciesName") || EndsWith(path, "/pokedexNumber") ||
+      EndsWith(path, "/moveName") || EndsWith(path, "/itemName") ||
+      EndsWith(path, "/mapName") || EndsWith(path, "/previousMapName") ||
       path.rfind("/summaryCounts/", 0) == 0)
     return "derived_match";
   if (EndsWith(path, "/losslessValue"))
@@ -63,6 +66,16 @@ std::string Classification(const std::string &path,
 void Differences(const Json &a, const Json &b, const std::string &path,
                  const SemanticOptions &options, Json &rows,
                  std::size_t &exactLeaves) {
+  if (a.is_number() && b.is_number()) {
+    if (a == b)
+      ++exactLeaves;
+    else
+      rows.push_back({{"path", path},
+                      {"classification", Classification(path, options)},
+                      {"left", a},
+                      {"right", b}});
+    return;
+  }
   if (a.type() != b.type()) {
     rows.push_back({{"path", path},
                     {"classification", Classification(path, options)},
@@ -171,7 +184,9 @@ json::OrderedJson ComparePhysical(const save::RedSave::Bytes &a,
                       {"classification", "size_difference"}});
   }
   const auto total = std::max(a.size(), b.size());
-  return {{"leftSize", a.size()},
+  return {{"format", "pkmn-physical-comparison"},
+          {"reportVersion", "1.0.0"},
+          {"leftSize", a.size()},
           {"rightSize", b.size()},
           {"leftSha256", util::Sha256Hex(a)},
           {"rightSha256", util::Sha256Hex(b)},
@@ -214,7 +229,9 @@ json::OrderedJson CompareSemantic(const json::OrderedJson &a,
   Json classificationCounts = Json::object();
   for (const auto &[name, count] : counts)
     classificationCounts[name] = count;
-  return {{"equivalent", unexpected == 0},
+  return {{"format", "pkmn-semantic-comparison"},
+          {"reportVersion", "1.0.0"},
+          {"equivalent", unexpected == 0},
           {"policy", options.postEmulator ? "post-emulator" : "generation"},
           {"exactLeafCount", exactLeaves},
           {"differenceCount", rows.size()},

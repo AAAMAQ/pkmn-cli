@@ -28,4 +28,12 @@ The continuation validates both saves, records their hashes, classifies expected
 
 `pkmn red validate-post-emulator <before.sav> <after.sav>` provides the same independent validation in positional Red-command form.
 
+Every artifact except the self-referential manifest is SHA-256 listed. Verify a
+directory or deterministic ZIP independently:
+
+```sh
+pkmn proof verify source.pkmn-proof
+pkmn proof verify source.pkmn-proof.zip --format json
+```
+
 Neither command runs an emulator, distributes a ROM, or modifies either save. Proof directories and ZIP files are private ignored evidence by default.

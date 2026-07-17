@@ -9,6 +9,7 @@
 #include "app/ExitCode.hpp"
 #include "red/editing/EditSession.hpp"
 #include "util/OutputPath.hpp"
+#include "util/AtomicOutput.hpp"
 
 namespace pkmn::cli::commands::red::edit {
 namespace {
@@ -20,12 +21,16 @@ void Help(std::ostream &out) {
       << "  pkmn red begin-edit <save.sav> [--output <session.json>]\n"
       << "  pkmn red edit-session <session.json> [edits...]\n"
       << "  pkmn red pending-edits <session.json>\n"
+      << "  pkmn red undo-edit <session.json> [--count <n>]\n"
+      << "  pkmn red edit-history <session.json> [--format json]\n"
+      << "  pkmn red annotate-edit <session.json> <note>\n"
       << "  pkmn red validate-edit <session.json>\n"
       << "  pkmn red end-edit <session.json> [--output <output.sav>] "
-         "[--auto-suffix]\n\n"
+         "[--auto-suffix] [--dry-run] [--format json]\n\n"
       << "Named edits: --trainer-name <text>, --rival-name <text>, "
          "--trainer-id <n>, --money <n>, --coins <n>, --badges <0..255|all>, "
          "--selected-box <1..12>, --event <EVENT_NAME> <on|off>\n"
+      << "Safe location: --location-preset reds-house-2f\n"
       << "Complex value files: --bag-file, --pc-items-file, --party-file, "
          "--boxes-file, --current-box-file, --daycare-file, "
          "--hall-of-fame-file, --pokedex-file, --options-file, "
@@ -72,6 +77,10 @@ void ApplyArguments(Json &session, const std::vector<std::string> &args,
           session, args[i + 1],
           state == "on" || state == "true" || state == "1");
       i += 2;
+      continue;
+    }
+    if (option == "--location-preset") {
+      pkmn::cli::red::editing::ApplySafeLocationPreset(session, args[++i]);
       continue;
     }
     if (option == "--set" || option == "--set-file") {
@@ -153,22 +162,20 @@ void WriteResult(const std::filesystem::path &outputPath,
   for (const auto &path : {outputPath, jsonReport, markdownReport})
     if (std::filesystem::exists(path))
       throw std::runtime_error("refusing to overwrite output or edit report");
-  std::ofstream save(outputPath, std::ios::binary);
-  save.write(reinterpret_cast<const char *>(result.bytes.data()),
-             static_cast<std::streamsize>(result.bytes.size()));
-  if (!save)
-    throw std::runtime_error("could not write complete edited save");
   Json report = result.report;
   report["workflow"] = "validated-copy-edit";
   report["pendingEdits"] = session.at("pendingEdits");
   report["sourceOverwritten"] = false;
-  std::ofstream(jsonReport) << report.dump(2) << '\n';
-  std::ofstream(markdownReport)
-      << "# Pokemon Red Edit Report\n\n- Source overwritten: no\n- "
-         "Pending edits applied: "
-      << session.at("pendingEdits").size()
-      << "\n- Checksums regenerated and validated: yes\n\n"
-      << result.markdownReport;
+  const auto markdown =
+      "# Pokemon Red Edit Report\n\n- Source overwritten: no\n- Pending edits "
+      "applied: " + std::to_string(session.at("pendingEdits").size()) +
+      "\n- Checksums regenerated and validated: yes\n\n" +
+      result.markdownReport;
+  util::OutputTransaction transaction;
+  transaction.StageBinary(outputPath, result.bytes);
+  transaction.StageText(jsonReport, report.dump(2) + '\n');
+  transaction.StageText(markdownReport, markdown);
+  transaction.Commit();
 }
 
 bool EditOutputAvailable(const std::filesystem::path &outputPath) {
@@ -361,18 +368,90 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
              << "\nSource is read-only; physicalImage is excluded.\n";
       return 0;
     }
-    if (command == "edit-session" && arguments.size() >= 4) {
+    if (command == "edit-session" && arguments.size() >= 3) {
       auto session = pkmn::cli::red::editing::Load(arguments[1]);
-      ApplyArguments(session, arguments, 2);
+      bool dryRun = false;
+      bool json = false;
+      std::vector<std::string> filtered(arguments.begin(), arguments.begin() + 2);
+      for (std::size_t index = 2; index < arguments.size(); ++index) {
+        if (arguments[index] == "--dry-run")
+          dryRun = true;
+        else if (arguments[index] == "--format" &&
+                 index + 1 < arguments.size() &&
+                 arguments[index + 1] == "json") {
+          json = true;
+          ++index;
+        } else
+          filtered.push_back(arguments[index]);
+      }
+      if (filtered.size() < 4)
+        throw std::runtime_error("edit-session requires at least one edit");
+      ApplyArguments(session, filtered, 2);
+      const auto result = pkmn::cli::red::editing::Validate(session);
+      if (!dryRun)
+        pkmn::cli::red::editing::Save(arguments[1], session, false);
+      if (json)
+        output << Json({{"valid", true}, {"dryRun", dryRun},
+                        {"sessionPersisted", !dryRun},
+                        {"pendingEditCount", session.at("pendingEdits").size()},
+                        {"generatedSha256", result.report.at("outputSha256")}}).dump(2)
+               << '\n';
+      else
+        output << (dryRun ? "Dry-run edits validated; session unchanged: "
+                          : "Pending edits updated and validated: ")
+               << session.at("pendingEdits").size() << '\n';
+      return 0;
+    }
+    if (command == "pending-edits" &&
+        (arguments.size() == 2 ||
+         (arguments.size() == 4 && arguments[2] == "--format" &&
+          arguments[3] == "json"))) {
+      const auto session = pkmn::cli::red::editing::Load(arguments[1]);
+      if (arguments.size() == 4)
+        output << Json({{"pendingEditCount", session.at("pendingEdits").size()},
+                        {"pendingEdits", session.at("pendingEdits")}}).dump(2)
+               << '\n';
+      else
+        PrintPending(session, output);
+      return 0;
+    }
+    if (command == "undo-edit" && arguments.size() >= 2) {
+      auto session = pkmn::cli::red::editing::Load(arguments[1]);
+      std::size_t count = 1;
+      if (arguments.size() == 4 && arguments[2] == "--count")
+        count = ParseUnsigned(arguments[3], session.at("pendingEdits").size(),
+                              "undo count").get<std::size_t>();
+      else if (arguments.size() != 2)
+        throw std::runtime_error("invalid undo-edit arguments");
+      pkmn::cli::red::editing::UndoLast(session, count);
       pkmn::cli::red::editing::Validate(session);
       pkmn::cli::red::editing::Save(arguments[1], session, false);
-      output << "Pending edits updated and validated: "
+      output << "Pending edits undone: " << count << "\nRemaining: "
              << session.at("pendingEdits").size() << '\n';
       return 0;
     }
-    if (command == "pending-edits" && arguments.size() == 2) {
+    if (command == "annotate-edit" && arguments.size() == 3) {
+      auto session = pkmn::cli::red::editing::Load(arguments[1]);
+      pkmn::cli::red::editing::AddAnnotation(session, arguments[2]);
+      pkmn::cli::red::editing::Save(arguments[1], session, false);
+      output << "Edit-session annotation recorded\n";
+      return 0;
+    }
+    if (command == "edit-history" &&
+        (arguments.size() == 2 ||
+         (arguments.size() == 4 && arguments[2] == "--format" &&
+          arguments[3] == "json"))) {
       const auto session = pkmn::cli::red::editing::Load(arguments[1]);
-      PrintPending(session, output);
+      const Json history = {{"commandHistory", session.value(
+                                 "commandHistory", Json::array())},
+                            {"annotations", session.value(
+                                 "annotations", Json::array())}};
+      if (arguments.size() == 4)
+        output << history.dump(2) << '\n';
+      else
+        output << "Command history: " << history.at("commandHistory").size()
+               << "\nAnnotations: " << history.at("annotations").size()
+               << '\n';
       return 0;
     }
     if (command == "validate-edit" && arguments.size() == 2) {
@@ -387,13 +466,39 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
       auto session = pkmn::cli::red::editing::Load(arguments[1]);
       auto path = pkmn::cli::red::editing::DefaultOutputPath(session);
       bool autoSuffix = false;
+      bool dryRun = false;
+      bool json = false;
       for (std::size_t index = 2; index < arguments.size(); ++index) {
         if (arguments[index] == "--output" && index + 1 < arguments.size())
           path = arguments[++index];
         else if (arguments[index] == "--auto-suffix")
           autoSuffix = true;
+        else if (arguments[index] == "--dry-run")
+          dryRun = true;
+        else if (arguments[index] == "--format" &&
+                 index + 1 < arguments.size() &&
+                 arguments[index + 1] == "json") {
+          json = true;
+          ++index;
+        }
         else
           throw std::runtime_error("invalid end-edit option");
+      }
+      if (dryRun) {
+        if (session.at("pendingEdits").empty())
+          throw std::runtime_error("edit session has no pending edits");
+        const auto result = pkmn::cli::red::editing::Validate(session);
+        if (json)
+          output << Json({{"valid", true}, {"dryRun", true},
+                          {"outputWritten", false},
+                          {"plannedOutput", path.filename().string()},
+                          {"generatedSha256", result.report.at("outputSha256")}})
+                        .dump(2)
+                 << '\n';
+        else
+          output << "Edit dry run: passed\nOutput written: no\nPlanned output: "
+                 << path.filename().string() << '\n';
+        return 0;
       }
       if (autoSuffix)
         path = AutoSuffixEditOutput(path);

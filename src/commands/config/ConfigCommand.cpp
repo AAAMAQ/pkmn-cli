@@ -39,6 +39,10 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
       {"arbitraryLocationEditing", false},
       {"safeGeneratedLocation", "Red's house second floor"},
       {"canonicalRedJsonSchema", "0.1.0"},
+      {"environmentVariables",
+       nlohmann::ordered_json::array({"PKMN_QUIET=1", "PKMN_VERBOSE=1",
+                                      "NO_COLOR"})},
+      {"transactionalOutputWrites", true},
       {"fireRedSupport", "not-implemented"}};
   if (json)
     output << policy.dump(2) << '\n';
@@ -51,6 +55,8 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
               "Reconstruction physicalImage authority: required\n"
               "Arbitrary location editing: disabled\n"
               "Safe generated location: Red's house second floor\n"
+              "Environment controls: PKMN_QUIET=1, PKMN_VERBOSE=1, NO_COLOR\n"
+              "Transactional output writes: enabled\n"
               "FireRed support: not implemented\n";
   return 0;
 }

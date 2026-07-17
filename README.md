@@ -48,6 +48,7 @@ For a user-local shell installation, use `--prefix "$HOME/.local"`, add `$HOME/.
 pkmn --help
 pkmn --version
 pkmn doctor
+pkmn doctor --deep
 pkmn completion zsh
 pkmn config show
 pkmn red decode input.sav
@@ -55,22 +56,31 @@ pkmn red inspect input.sav
 pkmn red validate input.sav
 pkmn rjson inspect input.red.json
 pkmn rjson validate input.red.json
+pkmn rjson schema --format json
+pkmn rjson migrate input.red.json
 pkmn rjson reconstruct input.red.json
 pkmn rjson generate input.red.json [output.sav]
+pkmn rjson generate-batch one.red.json two.red.json --output-dir generated
 pkmn compare physical first.sav second.sav
 pkmn compare semantic first.red.json second.red.json
 pkmn proof red input.sav
 pkmn proof red input.sav --zip
 pkmn red validate-post-emulator before.sav after.sav
 pkmn proof post-emulator --before before.sav --after after.sav
+pkmn proof verify input.pkmn-proof
+pkmn red events search starter
+pkmn red repair-checksums input.sav
+pkmn red validate-batch one.sav two.sav --format json
 pkmn red begin-edit input.sav
 pkmn red edit-session input.edit-session.json --money 999999 --trainer-name RED
 pkmn red pending-edits input.edit-session.json
+pkmn red edit-history input.edit-session.json
+pkmn red undo-edit input.edit-session.json
 pkmn red validate-edit input.edit-session.json
 pkmn red end-edit input.edit-session.json
 ```
 
-`pkmn doctor` reports the modules compiled into the standalone executable. It does not search for or invoke Save Genie or Save Generator. No save, ROM, or evidence file is read by the doctor.
+`pkmn doctor` reports the modules compiled into the standalone executable. It does not search for or invoke Save Genie or Save Generator. `doctor --deep` uses only the bundled public template for an in-memory deterministic round trip; it never reads a user save, ROM, or evidence file.
 
 `pkmn config show` reports immutable compiled safety defaults. Output-producing workflows refuse collisions unless `--auto-suffix` is explicitly requested, in which case numbered alternatives are selected without overwriting data.
 
@@ -111,7 +121,7 @@ Semantic generation must never read `physicalImage` as authority. Reconstruction
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/PRIVACY_AND_PUBLICATION.md](docs/PRIVACY_AND_PUBLICATION.md), and the preserved planning material in [Pkmn Unified CLI Plan](Pkmn%20Unified%20CLI%20Plan/).
 
-Release maintainers should also follow [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md). CI builds, tests, installs, and smoke-tests the standalone executable on macOS and Linux.
+Release maintainers should also follow [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md). CI builds, tests, installs, and smoke-tests the standalone executable on macOS, Linux, and Windows. CPack source/binary packaging, a universal-macOS helper, Linux package notes, and an SPDX SBOM are included as release scaffolding.
 
 ## License
 

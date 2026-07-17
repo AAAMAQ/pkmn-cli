@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <istream>
 #include <vector>
 
 #include "red/json/RedDecoder.hpp"
@@ -30,6 +31,7 @@ struct LoadedDocument {
 };
 
 LoadedDocument LoadAndValidate(const std::filesystem::path& path);
+LoadedDocument LoadAndValidate(std::istream& input);
 DocumentValidation ValidateDocument(const OrderedJson& root);
 save::RedSave::Bytes PhysicalBytes(const OrderedJson& root);
 

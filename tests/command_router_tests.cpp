@@ -13,6 +13,7 @@
 #include "app/ExitCode.hpp"
 #include "red/json/RedDecoder.hpp"
 #include "red/generation/SemanticGenerator.hpp"
+#include "red/data/Gen1Names.hpp"
 #include "red/save/RedSave.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
@@ -87,6 +88,12 @@ int main() {
   const auto version = Run({"--version"});
   Expect(version.code == 0, "--version should succeed");
   Expect(version.output == "pkmn 0.1.0\n", "version output should be stable");
+  Expect(Run({"--quiet", "--version"}).output.empty() &&
+             Run({"--verbose", "--no-color", "--version"})
+                     .output.find("standalone=true") != std::string::npos &&
+             Run({"--quiet", "--verbose", "--version"}).code ==
+                 pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidArguments),
+         "global quiet, verbose, and no-color controls should be predictable");
   Expect(Run({"completion", "bash"}).output.find("complete -F") !=
                  std::string::npos &&
              Run({"completion", "zsh"}).output.find("#compdef pkmn") !=
@@ -142,6 +149,12 @@ int main() {
                      .at("standaloneReadiness") ==
                  "ready",
          "doctor should support machine-readable JSON output");
+  const auto deepDoctor = Run({"doctor", "--deep", "--format", "json"});
+  Expect(deepDoctor.code == 0 &&
+             nlohmann::ordered_json::parse(deepDoctor.output)
+                 .at("deepSelfTest").at("deterministic") == true,
+         "doctor --deep should run an internal deterministic generation "
+         "round trip");
 
   namespace fs = std::filesystem;
   const fs::path temp =
@@ -167,6 +180,11 @@ int main() {
   Expect(pkmn::cli::util::Sha256Hex({}) ==
              "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
          "portable SHA-256 should match the empty-message standard vector");
+  Expect(pkmn::cli::red::data::SpeciesName(153) == "BULBASAUR" &&
+             pkmn::cli::red::data::MoveName(1) == "POUND" &&
+             pkmn::cli::red::data::ItemName(1) == "MASTER BALL" &&
+             !pkmn::cli::red::data::MapName(38).empty(),
+         "verified Gen I species, move, item, and map names should be bundled");
 
   const fs::path includedJson = temp / "included.red.json";
   const auto includedDecode =
@@ -206,6 +224,14 @@ int main() {
                  .at("storyProgress").at("storyFlags").is_array(),
          "decode should expose the complete verified named-event catalog and "
          "classified views");
+  const auto eventSearch =
+      Run({"red", "events", "search", "articuno", "--format", "json"});
+  Expect(eventSearch.code == 0 &&
+             nlohmann::ordered_json::parse(eventSearch.output)
+                     .at("records").at(0).at("name") ==
+                 "EVENT_BEAT_ARTICUNO" &&
+             Run({"red", "events", "show", "EVENT_GOT_STARTER"}).code == 0,
+         "event discovery should search and show verified catalog records");
 
   const fs::path excludedJson = temp / "excluded.red.json";
   const auto excludedDecode =
@@ -222,6 +248,52 @@ int main() {
              !excludedDocument.at("reconstruction").at("available").get<bool>(),
          "no-physical-image should omit archival bytes and mark reconstruction "
          "unavailable");
+  const auto pipedDecode = Run({"red", "decode", validSavePath.string(),
+                                "--output", "-", "--no-physical-image"});
+  Expect(pipedDecode.code == 0 &&
+             nlohmann::ordered_json::parse(pipedDecode.output)
+                     .at("schema").at("schemaVersion") == "0.1.0",
+         "red decode should support canonical JSON on stdout without status "
+         "noise");
+  {
+    std::istringstream input(excludedDocument.dump());
+    auto *original = std::cin.rdbuf(input.rdbuf());
+    const auto pipedValidation =
+        Run({"rjson", "validate", "-", "--format", "json"});
+    std::cin.rdbuf(original);
+    Expect(pipedValidation.code == 0 &&
+               nlohmann::ordered_json::parse(pipedValidation.output)
+                   .at("valid") == true,
+           "rjson validation should accept canonical JSON from stdin");
+  }
+  {
+    std::istringstream input(excludedDocument.dump());
+    auto *original = std::cin.rdbuf(input.rdbuf());
+    const auto pipedGeneration = Run({"rjson", "generate", "-", "-"});
+    std::cin.rdbuf(original);
+    Expect(pipedGeneration.code == 0 &&
+               pipedGeneration.output.size() ==
+                   pkmn::cli::red::save::RedSave::ExpectedSize,
+           "semantic generation should support JSON stdin and binary stdout");
+  }
+  auto legacySemanticDocument = excludedDocument;
+  for (const auto *field : {"events", "trainerBattles", "staticBattles",
+                            "storyProgress"})
+    legacySemanticDocument["decoded"].erase(field);
+  const fs::path legacySemanticJson = temp / "legacy-semantic.red.json";
+  const fs::path migratedSemanticJson = temp / "legacy-semantic.migrated.red.json";
+  std::ofstream(legacySemanticJson) << legacySemanticDocument.dump(2);
+  Expect(Run({"rjson", "migrate", legacySemanticJson.string(), "--output",
+              migratedSemanticJson.string()}).code == 0 &&
+             fs::exists(migratedSemanticJson),
+         "rjson migrate should enrich compatible canonical documents safely");
+  {
+    nlohmann::ordered_json migrated;
+    std::ifstream(migratedSemanticJson) >> migrated;
+    Expect(migrated.at("decoded").at("events").at("flags").size() == 507 &&
+               migrated.at("migration").at("semanticValuesChanged") == false,
+           "migration should add the verified catalog without semantic changes");
+  }
   const auto inspectRjson = Run({"rjson", "inspect", includedJson.string()});
   Expect(
       inspectRjson.code == 0 &&
@@ -234,6 +306,50 @@ int main() {
                  std::string::npos,
          "rjson validate should accept semantic-only JSON and report "
          "reconstruction unavailable");
+  Expect(Run({"rjson", "validate", excludedJson.string(), "--profile",
+              "strict"}).code == 0 &&
+             Run({"rjson", "validate", excludedJson.string(), "--profile",
+                  "generation"}).code == 0 &&
+             Run({"rjson", "validate", excludedJson.string(), "--profile",
+                  "archival"}).code ==
+                 pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidInput) &&
+             Run({"rjson", "validate", includedJson.string(), "--profile",
+                  "archival"}).code == 0,
+         "validation profiles should distinguish strict semantic and archival "
+         "requirements");
+  const auto schemaCapabilities =
+      Run({"rjson", "schema", "--format", "json"});
+  Expect(schemaCapabilities.code == 0 &&
+             nlohmann::ordered_json::parse(schemaCapabilities.output)
+                     .at("namedEventCatalogSize") == 507 &&
+             nlohmann::ordered_json::parse(schemaCapabilities.output)
+                     .at("physicalImageUsedForGeneration") == false,
+         "schema discovery should expose the supported contract and authority "
+         "boundary");
+  const fs::path secondValidSavePath = temp / "synthetic-valid-second.sav";
+  {
+    std::ofstream copy(secondValidSavePath, std::ios::binary);
+    copy.write(reinterpret_cast<const char *>(validSave.data()),
+               static_cast<std::streamsize>(validSave.size()));
+  }
+  const fs::path batchDecodeDirectory = temp / "batch-decode";
+  Expect(Run({"red", "validate-batch", validSavePath.string(),
+              secondValidSavePath.string(), "--format", "json"}).code == 0 &&
+             Run({"red", "decode-batch", validSavePath.string(),
+                  secondValidSavePath.string(), "--output-dir",
+                  batchDecodeDirectory.string(), "--no-physical-image"}).code ==
+                 0 &&
+             fs::exists(batchDecodeDirectory / "batch-manifest.json"),
+         "Red batch validation and decoding should process multiple saves "
+         "transactionally");
+  const fs::path batchGenerationDirectory = temp / "batch-generation";
+  Expect(Run({"rjson", "generate-batch", includedJson.string(),
+              excludedJson.string(), "--output-dir",
+              batchGenerationDirectory.string()}).code == 0 &&
+             fs::exists(batchGenerationDirectory / "batch-manifest.json") &&
+             Run({"compare", "semantic-batch", includedJson.string(),
+                  excludedJson.string(), "--format", "json"}).code == 0,
+         "batch generation and semantic comparison should support automation");
   const auto validateRjsonJson =
       Run({"rjson", "validate", excludedJson.string(), "--format", "json"});
   Expect(validateRjsonJson.code == 0 &&
@@ -414,6 +530,8 @@ int main() {
   Expect(proofManifest.at("deterministic").get<bool>() &&
              proofManifest.at("physicalImageIsolation").get<bool>() &&
              proofManifest.at("generatedIntegrityValid").get<bool>() &&
+             proofManifest.at("artifactSha256").is_object() &&
+             proofManifest.at("artifactSha256").size() >= 18 &&
              proofManifest.at("emulatorValidation") == "required-manual-gate",
          "proof manifest should record automated gates without claiming "
          "emulator proof");
@@ -515,6 +633,18 @@ int main() {
              zipText.find("proof-manifest.json") != std::string::npos,
          "proof ZIPs should contain logical artifact names without private "
          "absolute paths");
+  Expect(Run({"proof", "verify", zippedProofA.string()}).code == 0 &&
+             Run({"proof", "verify", proofZipA.string(), "--format", "json"})
+                     .code == 0,
+         "proof verify should validate both directories and deterministic ZIPs");
+  {
+    std::ofstream tamper(zippedProofA / "summary-comparison.md",
+                         std::ios::app);
+    tamper << "tampered\n";
+  }
+  Expect(Run({"proof", "verify", zippedProofA.string()}).code ==
+             pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidInput),
+         "proof verify should reject artifact hash mismatches");
 
   const auto sourceBeforeEdit =
       pkmn::cli::red::save::RedSave::Read(validSavePath).BytesView();
@@ -542,6 +672,11 @@ int main() {
   Expect(pendingEdits.code == 0 &&
              pendingEdits.output.find("Pending edits: 3") != std::string::npos,
          "pending-edits should report every staged edit");
+  Expect(Run({"red", "edit-session", editSession.string(), "--coins", "42",
+              "--dry-run", "--format", "json"}).code == 0 &&
+             Run({"red", "pending-edits", editSession.string()})
+                     .output.find("Pending edits: 3") != std::string::npos,
+         "edit-session dry runs should validate without persisting changes");
   Expect(Run({"red", "validate-edit", editSession.string()}).code == 0,
          "validate-edit should generate and checksum-check without writing a "
          "save");
@@ -636,6 +771,8 @@ int main() {
               eventSession.string()}).code == 0 &&
              Run({"red", "edit-session", eventSession.string(), "--event",
                   "EVENT_GOT_STARTER", "on"}).code == 0 &&
+             Run({"red", "end-edit", eventSession.string(), "--dry-run",
+                  "--format", "json"}).code == 0 &&
              Run({"red", "end-edit", eventSession.string(), "--output",
                   eventOutput.string()}).code == 0,
          "named verified event flags should be editable and generatable");
@@ -655,6 +792,34 @@ int main() {
               "EVENT_NOT_A_REAL_FLAG", "on"}).code ==
              pkmn::cli::ToInt(pkmn::cli::ExitCode::EditValidationFailure),
          "unknown named events should fail closed");
+
+  const fs::path historySession = temp / "history.edit-session.json";
+  Expect(Run({"red", "begin-edit", validSavePath.string(), "--output",
+              historySession.string()}).code == 0 &&
+             Run({"red", "edit-session", historySession.string(), "--money",
+                  "100", "--coins", "20"}).code == 0 &&
+             Run({"red", "annotate-edit", historySession.string(),
+                  "automation sample"}).code == 0 &&
+             Run({"red", "undo-edit", historySession.string()}).code == 0 &&
+             Run({"red", "pending-edits", historySession.string()})
+                     .output.find("Pending edits: 1") != std::string::npos &&
+             Run({"red", "edit-history", historySession.string(), "--format",
+                  "json"}).code == 0,
+         "edit sessions should support annotations, history, and validated undo");
+  const fs::path presetSession = temp / "preset.edit-session.json";
+  Expect(Run({"red", "begin-edit", validSavePath.string(), "--output",
+              presetSession.string()}).code == 0 &&
+             Run({"red", "edit-session", presetSession.string(),
+                  "--location-preset", "reds-house-2f"}).code == 0 &&
+             Run({"red", "undo-edit", presetSession.string()}).code == 0,
+         "the verified Red's-house location preset should be editable and undoable");
+  std::string changedScripts(0x200, '0');
+  changedScripts[1] = '1';
+  Expect(Run({"red", "edit-session", presetSession.string(), "--set",
+              "/decoded/worldStateRaw/scriptsHex",
+              nlohmann::ordered_json(changedScripts).dump()}).code ==
+             pkmn::cli::ToInt(pkmn::cli::ExitCode::EditValidationFailure),
+         "unverified raw script changes should have dedicated fail-closed diagnostics");
 
   const fs::path interactiveOutput =
       temp / "synthetic-valid_generated_trainer.sav";
@@ -779,6 +944,18 @@ int main() {
   Expect(corruptDecode.code ==
              pkmn::cli::ToInt(pkmn::cli::ExitCode::ChecksumFailure),
          "red decode should reject a checksum-invalid save");
+  const fs::path repairedSave = temp / "repaired.sav";
+  const auto repair = Run({"red", "repair-checksums",
+                           corruptSavePath.string(), "--output",
+                           repairedSave.string()});
+  Expect(repair.code == 0 && fs::exists(repairedSave) &&
+             fs::exists(repairedSave.string() + ".repair-report.json") &&
+             pkmn::cli::red::validation::SaveValidator::Validate(
+                 pkmn::cli::red::save::RedSave::Read(repairedSave)).Valid() &&
+             pkmn::cli::red::save::RedSave::Read(corruptSavePath).BytesView() ==
+                 validSave,
+         "checksum repair should create a valid copy and leave the corrupt "
+         "source unchanged");
 
   const auto missingSave =
       Run({"red", "validate", (temp / "missing.sav").string()});

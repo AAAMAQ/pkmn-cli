@@ -20,11 +20,13 @@ pkmn command router
 - `src/red/editing`: semantic-only sessions, source identity checks, supported-field policy, and copy-first validated editing.
 - `src/red/validation`: structural, checksum, semantic, and policy checks.
 - `src/red/comparison`: physical range/hash comparison and field-aware semantic policy comparison.
+- `src/red/events` and `src/red/data`: verified named event and Gen I identity catalogs.
+- `src/util`: SHA-256, installed-resource discovery, transactional output publication, and deterministic ZIP handling.
 - command workflows emit deterministic portable JSON/Markdown reports beside collision-safe outputs.
 
 ## Current internal coverage
 
-`red inspect`, `red validate`, and `red decode` internally load and decode Red SRAM. All `rjson` workflows are internal. Generation uses a hash-validated bundled Red's-house template, ignores target physical bytes, rewrites supported semantics, and repairs all checksums. Physical/semantic comparison, proof orchestration, and copy-first interactive/scriptable editing are internal.
+`red inspect`, validation, repair, decode, event discovery, and batch commands are internal. All `rjson` workflows are internal. Generation uses a hash-validated bundled Red's-house template, ignores target physical bytes, rewrites supported semantics, and repairs all checksums. Physical/semantic comparison, independently verifiable proof orchestration, and copy-first interactive/scriptable editing are internal. Output sets are staged and published transactionally.
 
 ## Non-negotiable boundaries
 
