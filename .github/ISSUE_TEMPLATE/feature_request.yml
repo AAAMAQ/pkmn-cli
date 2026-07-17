@@ -1,0 +1,25 @@
+name: Feature request
+description: Propose a safe, deterministic CLI improvement.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Workflow or problem
+      description: Explain the user workflow rather than only a command name.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety and compatibility considerations
+      description: Address overwrite safety, determinism, privacy, and game support boundaries.
+    validations:
+      required: true

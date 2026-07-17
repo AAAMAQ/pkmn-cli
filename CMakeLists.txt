@@ -67,7 +67,8 @@ add_executable(pkmn src/main.cpp)
 target_link_libraries(pkmn PRIVATE pkmn_cli_core)
 
 install(TARGETS pkmn RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
-install(FILES LICENSE README.md CHANGELOG.md THIRD_PARTY_NOTICES.md
+install(FILES LICENSE README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md
+        THIRD_PARTY_NOTICES.md
         DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 install(DIRECTORY docs/ DESTINATION "${CMAKE_INSTALL_DOCDIR}/docs"
         FILES_MATCHING PATTERN "*.md")

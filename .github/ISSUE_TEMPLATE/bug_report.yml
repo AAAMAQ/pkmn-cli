@@ -1,0 +1,48 @@
+name: Bug report
+description: Report reproducible pkmn-cli behavior using public or synthetic data.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not attach private saves, ROMs, screenshots, or proof evidence.
+  - type: input
+    id: version
+    attributes:
+      label: pkmn version
+      description: Output from `pkmn --version`.
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options: [macOS, Linux, Windows, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and sanitized output
+      description: Remove private paths and filenames.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy confirmation
+      options:
+        - label: I have not included private saves, ROMs, screenshots, credentials, or proof evidence.
+          required: true
