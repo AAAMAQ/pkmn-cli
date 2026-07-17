@@ -27,11 +27,17 @@ Existing outputs are refused by default. Decode, generation, reconstruction, edi
 - `pkmn red edit <save.sav>` starts the looped interactive copy-first editor, including complex file-backed fields, pending preview, validation, save, and discard actions.
 - `pkmn red begin-edit <save.sav> [--output <session.json>]` creates a semantic-only edit session.
 - `pkmn red edit-session <session.json> <edits...>` accumulates edits. Named scalar options are `--trainer-name`, `--rival-name`, `--trainer-id`, `--money`, `--coins`, `--badges <0..255|all>`, `--selected-box`, and `--event EVENT_NAME on|off` (with story/trainer/static aliases). Complex `--*-file` options cover inventory, party, boxes/cache, Daycare, Hall of Fame, Pokédex, options, playtime, and verified world state. `--set` and `--set-file` expose supported existing semantic fields.
+- `pkmn red pokemon <session.json> party <slot> rename <name>` renames one party Pokémon. Replace `party <slot>` with `species <name>` or `nickname <name>` when the selector is unique.
+- `pkmn red pokemon <session.json> party <slot> level <1..100>` synchronizes growth-rate experience, calculated battle stats, maximum HP, and current HP. Experience is validated against the Gen I 24-bit limit.
+- `pkmn red pokemon <session.json> party <slot> move replace <move-slot> <move>` synchronizes the move ID, canonical name, base PP, PP Ups, and packed PP byte. It validates save-data structure, not species learnset legality.
+- `pkmn red bag <session.json> add <item> <quantity>` adds or merges a stack; `remove <item>` removes it and renumbers slots. Capacity and the 99-item stack limit are enforced.
+- `pkmn red progress <session.json> fly-destinations all` sets the 11 verified Fly-destination bits. It does not claim every individual map was visited.
 - `pkmn red pending-edits <session.json>` lists staged changes.
 - `pkmn red undo-edit`, `edit-history`, and `annotate-edit` manage session history.
 - `pkmn red validate-edit <session.json>` verifies source identity, generation policy, and output checksums without writing a save.
 - `pkmn red end-edit <session.json> [--output <output.sav>]` writes a new save and JSON/Markdown reports. It never overwrites an existing artifact.
 - `edit-session` and `end-edit` accept `--dry-run`; candidates are generated, re-decoded, and semantically compared without persistence.
+- `edit-session --explain-error` prints a corrective hint for common experience, move/PP, erased-storage, and collection errors.
 
 Arbitrary location edits are rejected. Generated and edited semantic saves use the verified Red's-house second-floor preset.
 

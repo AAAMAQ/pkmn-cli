@@ -16,6 +16,9 @@ Scriptable copy-first edit:
 ```sh
 pkmn red begin-edit public-synthetic.sav
 pkmn red edit-session public-synthetic.edit-session.json --trainer-name RED --money 5000
+pkmn red pokemon public-synthetic.edit-session.json party 1 level 50
+pkmn red bag public-synthetic.edit-session.json add "MASTER BALL" 1
+pkmn red progress public-synthetic.edit-session.json fly-destinations all
 pkmn red validate-edit public-synthetic.edit-session.json
 pkmn red end-edit public-synthetic.edit-session.json
 ```

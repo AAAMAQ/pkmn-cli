@@ -45,6 +45,10 @@ void PrintHelp(std::ostream& output) {
            << "  pkmn red edit <input.sav>\n"
            << "  pkmn red begin-edit <input.sav> [--output <session.json>]\n"
            << "  pkmn red edit-session <session.json> <edits...>\n"
+           << "  pkmn red pokemon <session.json> <selector> <value> "
+              "rename|level|move ...\n"
+           << "  pkmn red bag <session.json> add|remove <item> [quantity]\n"
+           << "  pkmn red progress <session.json> fly-destinations all\n"
            << "  pkmn red pending-edits <session.json> [--format json]\n"
            << "  pkmn red undo-edit <session.json> [--count <number>]\n"
            << "  pkmn red edit-history <session.json> [--format json]\n"
@@ -533,6 +537,8 @@ int Run(const std::vector<std::string>& arguments, std::ostream& output, std::os
     }
     if (arguments.front() == "edit" || arguments.front() == "begin-edit" ||
         arguments.front() == "edit-session" || arguments.front() == "pending-edits" ||
+        arguments.front() == "pokemon" || arguments.front() == "bag" ||
+        arguments.front() == "progress" ||
         arguments.front() == "undo-edit" || arguments.front() == "edit-history" ||
         arguments.front() == "annotate-edit" ||
         arguments.front() == "validate-edit" || arguments.front() == "end-edit")

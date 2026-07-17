@@ -22,6 +22,10 @@ Arbitrary location editing is not offered. Generated edits use the emulator-veri
 ```sh
 pkmn red begin-edit savefile.sav
 pkmn red edit-session savefile.edit-session.json --money 999999 --badges all
+pkmn red pokemon savefile.edit-session.json party 1 level 100
+pkmn red pokemon savefile.edit-session.json party 1 move replace 1 FLY
+pkmn red bag savefile.edit-session.json add "MASTER BALL" 99
+pkmn red progress savefile.edit-session.json fly-destinations all
 pkmn red pending-edits savefile.edit-session.json
 pkmn red annotate-edit savefile.edit-session.json "reason for this change"
 pkmn red edit-history savefile.edit-session.json
@@ -33,6 +37,23 @@ pkmn red end-edit savefile.edit-session.json
 `end-edit --auto-suffix` selects `_2`, `_3`, and later output/report names when the preferred name exists. Without it, collisions fail closed.
 
 `edit-session --dry-run` evaluates requested edits without changing the session. `end-edit --dry-run` executes generation, checksum validation, re-decode, and semantic comparison without publishing a save or reports. Use `--format json` for automation. Session history and annotations remain semantic metadata and never enter generated save bytes.
+
+Semantic commands remove the need to coordinate dependent JSON fields manually:
+
+- `pokemon ... rename` synchronizes encoded and lossless nickname values;
+- `pokemon ... level` recalculates growth-rate experience, party battle stats,
+  maximum HP, and current HP;
+- `pokemon ... move replace` synchronizes move ID, name, PP, PP Ups, and the
+  packed PP byte;
+- `bag ... add|remove` maintains item IDs, canonical names, slots, counts,
+  capacity, and stack limits;
+- `progress ... fly-destinations all` sets only the 11 verified Fly-location
+  bits. It does not fabricate arbitrary map visitation.
+
+All semantic commands accept `--dry-run`. Party Pokémon can be selected by
+one-based party slot or by a unique species or nickname. Move replacement
+validates the Gen I move and PP data but intentionally does not enforce a
+species learnset, allowing explicit test scenarios.
 
 Named scalar options are:
 
@@ -74,6 +95,6 @@ Raw `scriptsHex` mutation is rejected with a dedicated unsupported-script diagno
 
 ## Validation
 
-Edit validation covers schema identity, money/coin ranges, Gen I text encoding and length, clock values, Pokédex bitfield sizes, inventory capacities and quantities, party and box counts, Pokémon species/level/move/PP/DV/HP constraints, selected/current-box structures, Daycare, Hall of Fame, world-state byte lengths, source identity, generated write ranges, and all Red checksums.
+Edit validation covers schema identity, money/coin ranges, Gen I text encoding and length, clock values, Pokédex bitfield sizes, inventory capacities and quantities, party and box counts, Pokémon species, level/growth-rate experience, the 24-bit experience limit, move-specific PP, packed PP, DVs and HP, selected/current-box structures, Daycare, Hall of Fame, world-state byte lengths, source identity, generated write ranges, and all Red checksums. Erased `0xFF` markers in unused PC boxes, inventories, party, Daycare, and Hall of Fame state are normalized as empty rather than decoded as fake records.
 
 Validation also generates a candidate in memory, validates all checksums, re-decodes it, and compares the requested supported semantics against what was actually encoded. Output reports list every staged change and state explicitly that the source was not overwritten.

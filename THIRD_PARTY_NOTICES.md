@@ -9,7 +9,7 @@ Portions of the Pokemon Red save-format knowledge and implementation in this rep
 
 Both source projects are licensed under the MIT License. The complete MIT terms are reproduced in this repository's `LICENSE` file. Both projects and `pkmn-cli` share the same owner; this notice preserves the technical provenance of the incorporated work.
 
-The internal reader, codecs, decoder, validators, semantic serializers, checksum repair, safe-location policy, storage/current-box distinction, and generation template policy adapt the verified Gen I implementation and findings from those projects.
+The internal reader, codecs, decoder, validators, semantic serializers, checksum repair, safe-location policy, storage/current-box distinction, generation template policy, species base-stat and growth-rate data, and move PP data adapt the verified Gen I implementation and findings from those projects.
 
 The public synthetic canonical initialization resource is incorporated as `resources/pokemon-red-usa-europe-v1.template.bin`; its identity and purpose are documented in `resources/README.md`.
 
