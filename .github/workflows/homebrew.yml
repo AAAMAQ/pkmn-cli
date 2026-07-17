@@ -20,7 +20,7 @@ jobs:
   install-test:
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Formula style
         run: brew style packaging/homebrew/pkmn-cli.rb
       - name: Install from public HEAD
