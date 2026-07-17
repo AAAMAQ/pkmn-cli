@@ -84,6 +84,20 @@ int main() {
   Expect(help.code == 0, "--help should succeed");
   Expect(help.output.find("physicalImage") != std::string::npos,
          "help should state the physicalImage safety boundary");
+  Expect(help.output.find("red undo-edit") != std::string::npos &&
+             help.output.find("compare progress") != std::string::npos,
+         "top-level help should expose every available command endpoint");
+
+  const auto commandCatalog =
+      Run({"get-all-cmds", "--format", "json"});
+  Expect(commandCatalog.code == 0 &&
+             commandCatalog.output ==
+                 Run({"get-all-cmds", "--format", "json"}).output &&
+             nlohmann::ordered_json::parse(commandCatalog.output)
+                     .at("commandCount") == 38 &&
+             nlohmann::ordered_json::parse(commandCatalog.output)
+                     .at("commands").at(0).contains("usage"),
+         "get-all-cmds should expose the complete compiled command catalog");
 
   const auto version = Run({"--version"});
   Expect(version.code == 0, "--version should succeed");
@@ -224,6 +238,84 @@ int main() {
                  .at("storyProgress").at("storyFlags").is_array(),
          "decode should expose the complete verified named-event catalog and "
          "classified views");
+  const auto readableSummary =
+      Run({"red", "summary", validSavePath.string()});
+  const auto readableSummaryJson = Run(
+      {"red", "summary", validSavePath.string(), "--format", "json"});
+  const fs::path summaryPath = temp / "summary.md";
+  const auto writtenSummary = Run({"red", "summary", validSavePath.string(),
+                                   "--format", "markdown", "--output",
+                                   summaryPath.string()});
+  const auto collidedSummary = Run({"red", "summary", validSavePath.string(),
+                                    "--format", "markdown", "--output",
+                                    summaryPath.string()});
+  Expect(readableSummary.code == 0 &&
+             readableSummary.output.find("Pokemon Red save summary") !=
+                 std::string::npos &&
+             readableSummary.output.find("Pokedex:") != std::string::npos &&
+             readableSummaryJson.code == 0 &&
+             writtenSummary.code == 0 && fs::exists(summaryPath) &&
+             collidedSummary.code ==
+                 pkmn::cli::ToInt(pkmn::cli::ExitCode::OutputFailure) &&
+             nlohmann::ordered_json::parse(readableSummaryJson.output)
+                     .at("format") == "pkmn-red-readable-summary",
+         "red summary should provide readable and machine-readable save stats");
+
+  auto progressedDocument = includedDocument;
+  progressedDocument["decoded"]["moneyAndCoins"]["money"] = 1200;
+  progressedDocument["decoded"]["moneyAndCoins"]["coins"] = 50;
+  progressedDocument["decoded"]["badges"]["raw"] = 1;
+  progressedDocument["decoded"]["badges"]["mirrorRaw"] = 1;
+  for (auto &record : progressedDocument["decoded"]["events"]["flags"])
+    if (record.at("flagIndex") == 119) record["value"] = true;
+  for (auto &record :
+       progressedDocument["decoded"]["trainerBattles"]["records"])
+    if (record.at("flagIndex") == 119) record["completed"] = true;
+  const auto progressed =
+      pkmn::cli::red::generation::Generate(progressedDocument);
+  const fs::path progressedSavePath = temp / "synthetic-progressed.sav";
+  {
+    std::ofstream progressedFile(progressedSavePath, std::ios::binary);
+    progressedFile.write(
+        reinterpret_cast<const char *>(progressed.bytes.data()),
+        static_cast<std::streamsize>(progressed.bytes.size()));
+  }
+  const auto progressText = Run({"compare", "progress",
+                                 validSavePath.string(),
+                                 progressedSavePath.string()});
+  const auto progressJson = Run({"compare", "progress",
+                                 validSavePath.string(),
+                                 progressedSavePath.string(), "--format",
+                                 "json"});
+  const auto progressReport =
+      nlohmann::ordered_json::parse(progressJson.output);
+  Expect(progressText.code == 0 &&
+             progressText.output.find("Boulder Badge") != std::string::npos &&
+             progressText.output.find("Beat Brock") != std::string::npos &&
+             progressJson.code == 0 &&
+             progressReport.at("samePlaythrough") == true &&
+             progressReport.at("currency").at("money").at("delta") == 1200 &&
+             progressReport.at("badges").at("gained").at(0) == "Boulder",
+         "compare progress should explain gameplay changes between backups");
+  auto unrelatedDocument = progressedDocument;
+  unrelatedDocument["decoded"]["trainer"]["trainerId"] = 42;
+  const auto unrelated =
+      pkmn::cli::red::generation::Generate(unrelatedDocument);
+  const fs::path unrelatedSavePath = temp / "synthetic-unrelated.sav";
+  {
+    std::ofstream unrelatedFile(unrelatedSavePath, std::ios::binary);
+    unrelatedFile.write(
+        reinterpret_cast<const char *>(unrelated.bytes.data()),
+        static_cast<std::streamsize>(unrelated.bytes.size()));
+  }
+  const auto unrelatedProgress = Run({"compare", "progress",
+                                      validSavePath.string(),
+                                      unrelatedSavePath.string()});
+  Expect(unrelatedProgress.code ==
+                 pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidInput) &&
+             unrelatedProgress.error.find("trainer identity differs") !=
+                 std::string::npos,
+         "compare progress should reject unrelated trainer identities");
   const auto eventSearch =
       Run({"red", "events", "search", "articuno", "--format", "json"});
   Expect(eventSearch.code == 0 &&

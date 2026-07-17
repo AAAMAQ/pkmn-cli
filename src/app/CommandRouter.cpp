@@ -5,10 +5,13 @@
 #include <ostream>
 #include <sstream>
 #include <cstdlib>
+#include <iomanip>
 #include <string_view>
 
+#include "app/CommandCatalog.hpp"
 #include "app/ExitCode.hpp"
 #include "app/Version.hpp"
+#include "commands/catalog/CatalogCommand.hpp"
 #include "commands/completion/CompletionCommand.hpp"
 #include "commands/config/ConfigCommand.hpp"
 #include "commands/doctor/DoctorCommand.hpp"
@@ -107,6 +110,10 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
         return commands::config::Run(
             {arguments.begin() + 1, arguments.end()}, output, error);
     }
+    if (arguments.front() == "get-all-cmds") {
+        return commands::catalog::Run(
+            {arguments.begin() + 1, arguments.end()}, output, error);
+    }
     if (arguments.front() == "compare") {
         return commands::compare::Run({arguments.begin() + 1, arguments.end()}, output, error);
     }
@@ -144,33 +151,22 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  pkmn --help\n"
         << "  pkmn --version\n\n"
         << "Global controls (before the command): --quiet, --verbose, --no-color\n\n"
-        << "Available now:\n"
-        << "  doctor               Check standalone internal-engine readiness\n"
-        << "  completion           Generate bash, zsh, or fish completions\n"
-        << "  config show          Show compiled safety/default policy\n"
-        << "  red inspect          Inspect save integrity using the internal Red engine\n"
-        << "  red validate         Validate all known Red save checksums internally\n"
-        << "  red repair-checksums Write a validated checksum-repaired copy\n"
-        << "  red events           Discover verified named Red event flags\n"
-        << "  red *-batch          Validate or decode several saves\n"
-        << "  red validate-post-emulator  Validate emulator round-trip drift\n"
-        << "  red decode           Export canonical .red.json internally\n"
-        << "  red edit             Interactive validated copy editing\n"
-        << "  red begin-edit       Start a scriptable multi-edit session\n"
-        << "  rjson inspect        Inspect canonical Red JSON internally\n"
-        << "  rjson validate       Validate canonical Red JSON internally\n"
-        << "  rjson generate       Generate a Red save from semantic fields\n"
-        << "  rjson reconstruct    Restore an archival physical image\n"
-        << "  rjson migrate        Enrich compatible canonical Red JSON\n"
-        << "  rjson schema         Describe the canonical schema contract\n"
-        << "  rjson generate-batch Generate multiple semantic saves\n"
-        << "\n"
-        << "  compare physical     Compare save bytes and difference ranges\n"
-        << "  compare semantic     Compare canonical Red semantic JSON\n"
-        << "  proof red            Run the internal Red proof pipeline\n"
-        << "  proof post-emulator  Continue proof after manual emulator testing\n"
-        << "  proof verify         Verify a proof directory or deterministic ZIP\n"
-        << "\nReserved/planned command domains:\n"
+        << "Available command endpoints (" << AvailableCommands().size()
+        << "):\n";
+    std::string_view category;
+    for (const auto &command : AvailableCommands()) {
+        if (command.category != category) {
+            category = command.category;
+            output << "\n" << category << ":\n";
+        }
+        output << "  " << std::left << std::setw(28) << command.path
+               << command.description << '\n';
+    }
+    output
+        << "\nUse 'pkmn get-all-cmds' for complete usage lines and descriptions.\n"
+        << "Use 'pkmn get-all-cmds --format markdown --output commands.md' "
+           "to save them.\n\n"
+        << "Reserved/planned command domains:\n"
         << "  fred, frjson         Future FireRed workflows (not implemented)\n"
         << "  convert              Future Red-to-FireRed conversion (not implemented)\n\n"
         << "Core safety model:\n"
@@ -178,9 +174,11 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  reconstruct          Archival reconstruction; physicalImage is required\n"
         << "  edit                 Writes a validated copy; never overwrites input by default\n\n"
         << "Examples:\n"
-        << "  pkmn red decode savefile.sav\n"
-        << "  pkmn red inspect savefile.sav\n"
+        << "  pkmn red summary savefile.sav\n"
         << "  pkmn red validate savefile.sav\n"
+        << "  pkmn red decode savefile.sav\n"
+        << "  pkmn compare progress older.sav newer.sav\n"
+        << "  pkmn get-all-cmds\n"
         << "  pkmn doctor\n";
 }
 

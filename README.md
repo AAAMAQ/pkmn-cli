@@ -50,6 +50,9 @@ brew install --HEAD AAAMAQ/pkmn/pkmn-cli
 pkmn doctor --deep
 ```
 
+If command-line tools are new to you, start with the step-by-step
+[beginner's guide](docs/BEGINNERS_GUIDE.md).
+
 ## Implemented commands
 
 ```text
@@ -59,6 +62,8 @@ pkmn doctor
 pkmn doctor --deep
 pkmn completion zsh
 pkmn config show
+pkmn get-all-cmds
+pkmn red summary input.sav
 pkmn red decode input.sav
 pkmn red inspect input.sav
 pkmn red validate input.sav
@@ -70,6 +75,7 @@ pkmn rjson reconstruct input.red.json
 pkmn rjson generate input.red.json [output.sav]
 pkmn rjson generate-batch one.red.json two.red.json --output-dir generated
 pkmn compare physical first.sav second.sav
+pkmn compare progress older-backup.sav newer-backup.sav
 pkmn compare semantic first.red.json second.red.json
 pkmn proof red input.sav
 pkmn proof red input.sav --zip
@@ -104,7 +110,7 @@ Red editing is copy-first. `red edit` provides a looped interactive editor; `beg
 
 ## Command documentation
 
-See the [complete command reference](docs/COMMAND_REFERENCE.md), [Red JSON schema](docs/RED_JSON_SCHEMA.md), and focused editing, reconstruction, proof, installation, and future-FireRed documents under `docs/`. Public-data-only examples are in [examples/README.md](examples/README.md).
+See the [exhaustive command list](docs/ALL_COMMANDS.md), [complete command reference](docs/COMMAND_REFERENCE.md), [beginner's guide](docs/BEGINNERS_GUIDE.md), and [Red JSON schema](docs/RED_JSON_SCHEMA.md). Focused editing, reconstruction, proof, installation, and future-FireRed documents are under `docs/`. Public-data-only examples are in [examples/README.md](examples/README.md).
 
 ## Generation is not reconstruction
 

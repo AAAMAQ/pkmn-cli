@@ -1,8 +1,11 @@
 #include "commands/compare/CompareCommand.hpp"
 #include "app/ExitCode.hpp"
 #include "red/comparison/Comparison.hpp"
+#include "red/comparison/ProgressComparison.hpp"
+#include "red/json/RedDecoder.hpp"
 #include "red/json/RedJsonDocument.hpp"
 #include "red/save/RedSave.hpp"
+#include "red/validation/SaveValidator.hpp"
 #include "util/AtomicOutput.hpp"
 #include <filesystem>
 #include <ostream>
@@ -56,6 +59,7 @@ int Run(const std::vector<std::string> &a, std::ostream &out,
         std::ostream &err) {
   if (a.empty() || a[0] == "help" || a[0] == "--help") {
     out << "Usage:\n"
+           "  pkmn compare progress <older.sav> <newer.sav> [report options]\n"
            "  pkmn compare physical <a.sav> <b.sav> [report options]\n"
            "  pkmn compare semantic <a.red.json> <b.red.json> [report options]\n"
            "  pkmn compare semantic-batch <baseline.red.json> "
@@ -126,12 +130,38 @@ int Run(const std::vector<std::string> &a, std::ostream &out,
       return ToInt(ExitCode::InvalidInput);
     }
   }
-  if (a.size() < 3 || (a[0] != "physical" && a[0] != "semantic")) {
+  if (a.size() < 3 ||
+      (a[0] != "progress" && a[0] != "physical" && a[0] != "semantic")) {
     err << "pkmn compare: invalid arguments\n";
     return ToInt(ExitCode::InvalidArguments);
   }
   try {
     const auto options = ParseOutputOptions(a);
+    if (a[0] == "progress") {
+      const auto older = red::save::RedSave::Read(a[1]);
+      const auto newer = red::save::RedSave::Read(a[2]);
+      const auto olderIntegrity =
+          red::validation::SaveValidator::Validate(older);
+      const auto newerIntegrity =
+          red::validation::SaveValidator::Validate(newer);
+      if (!olderIntegrity.Valid() || !newerIntegrity.Valid())
+        throw std::runtime_error(
+            "both progress inputs must pass Red checksum validation");
+      const auto olderDocument = red::json::Decode(
+          older, std::filesystem::path(a[1]).filename().string(),
+          olderIntegrity, {.includePhysicalImage = false});
+      const auto newerDocument = red::json::Decode(
+          newer, std::filesystem::path(a[2]).filename().string(),
+          newerIntegrity, {.includePhysicalImage = false});
+      const auto report =
+          red::comparison::CompareProgress(olderDocument, newerDocument);
+      if (!report.at("samePlaythrough").get<bool>())
+        throw std::runtime_error(
+            "trainer identity differs; progress comparison requires matching "
+            "trainer name and ID from the same playthrough");
+      Emit(report, red::comparison::ProgressMarkdown(report), options, out);
+      return 0;
+    }
     if (a[0] == "physical") {
       const auto left = red::save::RedSave::Read(a[1]);
       const auto right = red::save::RedSave::Read(a[2]);

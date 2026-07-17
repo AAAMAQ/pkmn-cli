@@ -9,6 +9,7 @@ All currently implemented workflows are internal to `pkmn`. Save Genie and Save 
 - `pkmn doctor` checks internal readiness; `doctor --deep` runs an internal deterministic generation round trip.
 - `pkmn completion <bash|zsh|fish>` prints shell completion source.
 - `pkmn config show [--format text|json]` prints immutable compiled safety and default policy; no external engine paths are configured.
+- `pkmn get-all-cmds [--format text|json|markdown] [--output <file>]` renders the exhaustive catalog compiled into the installed executable. It automatically follows Homebrew upgrades; the checked-in overview is `docs/ALL_COMMANDS.md`.
 
 Doctor, raw Red inspect/validate, canonical JSON inspect/validate, and compare commands support machine-readable JSON output.
 
@@ -16,6 +17,7 @@ Existing outputs are refused by default. Decode, generation, reconstruction, edi
 
 ## Pokemon Red saves
 
+- `pkmn red summary <save.sav> [--format text|json|markdown] [--output <file>]` produces a readable trainer/progress report plus party, inventory, storage, Daycare, Hall of Fame, and supported world-state statistics.
 - `pkmn red inspect <save.sav>` prints size and checksum status.
 - `pkmn red validate <save.sav>` validates the main, bank, and all 12 box checksums.
 - `pkmn red repair-checksums <save.sav>` writes a validated repaired copy and JSON report without modifying the source.
@@ -48,6 +50,7 @@ See `docs/EDIT_MODE.md` for the complete editor and validation contract.
 
 ## Comparison and proof
 
+- `pkmn compare progress <older.sav> <newer.sav> [report options]` explains gameplay changes between two valid backups with the same trainer name and ID: elapsed time, currency, badges, Pokedex, location, party, items, storage, Hall of Fame, verified events, battles, encounters, and story flags. Older input comes first.
 - `pkmn compare physical <a.sav> <b.sav> [report options]` reports SHA-256, byte counts and percentages, first/last difference, and contiguous differing ranges.
 - `pkmn compare semantic <a.red.json> <b.red.json> [report options]` reports field-aware differences classified as exact, normalized, derived, synchronized mirror, permitted canonical, runtime drift, cache drift, deferred, or unexpected.
 - `pkmn compare semantic-batch <baseline> <candidates...>` summarizes several semantic comparisons.
@@ -60,6 +63,8 @@ See `docs/EDIT_MODE.md` for the complete editor and validation contract.
 Proof output is evidence, not source material. Do not commit it. Automated checks do not claim that the manual emulator gate passed.
 
 See `docs/PROOF_WORKFLOW.md` for artifact, privacy, ZIP, and emulator-gate details.
+
+New users can follow `docs/BEGINNERS_GUIDE.md`; the exhaustive endpoint table is `docs/ALL_COMMANDS.md`.
 
 ## Exit codes
 
