@@ -91,12 +91,36 @@ save::RedSave::Bytes EncodeText(const std::string &value, std::size_t length) {
     std::uint8_t byte = 0;
     std::size_t consumed = 1;
     const auto c = static_cast<unsigned char>(value[index]);
-    if (value.compare(index, 5, "<DOT>") == 0) {
+    if (value.compare(index, 4, "<PC>") == 0) {
+      byte = 0x5B;
+      consumed = 4;
+    } else if (value.compare(index, 4, "<TM>") == 0) {
+      byte = 0x5C;
+      consumed = 4;
+    } else if (value.compare(index, 9, "<TRAINER>") == 0) {
+      byte = 0x5D;
+      consumed = 9;
+    } else if (value.compare(index, 5, "<DOT>") == 0) {
       byte = 0xF2;
       consumed = 5;
     } else if (value.compare(index, 8, "<PERIOD>") == 0) {
       byte = 0xE8;
       consumed = 8;
+    } else if (value.compare(index, 3, "♂") == 0) {
+      byte = 0xEF;
+      consumed = 3;
+    } else if (value.compare(index, 3, "♀") == 0) {
+      byte = 0xF5;
+      consumed = 3;
+    } else if (value.compare(index, 2, "é") == 0) {
+      byte = 0xBA;
+      consumed = 2;
+    } else if (value.compare(index, 2, "¥") == 0) {
+      byte = 0xF0;
+      consumed = 2;
+    } else if (value.compare(index, 2, "×") == 0) {
+      byte = 0xF1;
+      consumed = 2;
     } else if (index + 6 <= value.size() &&
                value.compare(index, 3, "<0x") == 0 && value[index + 5] == '>') {
       const int high = std::isdigit(value[index + 3])
@@ -119,6 +143,18 @@ save::RedSave::Bytes EncodeText(const std::string &value, std::size_t length) {
       switch (c) {
       case ' ':
         byte = 0x7F;
+        break;
+      case '(':
+        byte = 0x9A;
+        break;
+      case ')':
+        byte = 0x9B;
+        break;
+      case ':':
+        byte = 0x9C;
+        break;
+      case ';':
+        byte = 0x9D;
         break;
       case '\'':
         byte = 0xE0;

@@ -84,6 +84,22 @@ void Differences(const Json &a, const Json &b, const std::string &path,
     return;
   }
   if (a.is_object()) {
+    // The bytes reserved for the Daycare Pokemon can retain stale data after
+    // the slot is emptied.  When both documents say the Daycare is not in use,
+    // that payload is not active semantic state and must not make an otherwise
+    // equivalent generation round-trip fail.
+    if (path == "/daycare" && a.contains("inUse") && b.contains("inUse") &&
+        a.at("inUse").is_boolean() && b.at("inUse").is_boolean() &&
+        !a.at("inUse").get<bool>() && !b.at("inUse").get<bool>()) {
+      ++exactLeaves;
+      if (a.value("pokemon", Json(nullptr)) !=
+          b.value("pokemon", Json(nullptr)))
+        rows.push_back(
+            {{"path", "/daycare/pokemon"},
+             {"classification", "unsupported_or_deferred"},
+             {"note", "ignored inactive Daycare slot residue"}});
+      return;
+    }
     for (auto it = a.begin(); it != a.end(); ++it) {
       if (!b.contains(it.key()))
         rows.push_back({{"path", path + "/" + it.key()},

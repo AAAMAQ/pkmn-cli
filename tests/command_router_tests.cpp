@@ -11,6 +11,7 @@
 
 #include "app/CommandRouter.hpp"
 #include "app/ExitCode.hpp"
+#include "red/codec/Gen1Codec.hpp"
 #include "red/json/RedDecoder.hpp"
 #include "red/generation/SemanticGenerator.hpp"
 #include "red/data/Gen1Names.hpp"
@@ -216,6 +217,14 @@ int main() {
              pkmn::cli::red::data::ItemName(1) == "MASTER BALL" &&
              !pkmn::cli::red::data::MapName(38).empty(),
          "verified Gen I species, move, item, and map names should be bundled");
+  const auto roundTripTokens = pkmn::cli::red::codec::EncodeText(
+      "<PC><TM><TRAINER>♂♀é¥×():;", 16);
+  Expect(pkmn::cli::red::codec::Hex(roundTripTokens).starts_with(
+             "5B5C5DEFF5BAF0F19A9B9C9D") &&
+             pkmn::cli::red::codec::DecodeText(
+                 pkmn::cli::red::save::RedSave(roundTripTokens), 0, 16,
+                 true) == "<PC><TM><TRAINER>♂♀é¥×():;",
+         "Gen I text codec should round-trip every decoded special token");
 
   const fs::path includedJson = temp / "included.red.json";
   const auto includedDecode =
@@ -841,6 +850,22 @@ int main() {
                      .at("derived_match") ==
                  1,
          "semantic comparison should classify derived raw-field differences");
+  auto inactiveDaycareResidue = excludedDocument;
+  inactiveDaycareResidue["decoded"]["daycare"]["pokemon"]["speciesId"] = 88;
+  inactiveDaycareResidue["decoded"]["daycare"]["pokemon"]["rawRecordHex"] =
+      "58002718001A1A2D232B5600E96400487B000000000000000000004335141E1400";
+  const fs::path inactiveDaycareJson = temp / "inactive-daycare-residue.json";
+  std::ofstream(inactiveDaycareJson) << inactiveDaycareResidue.dump(2);
+  const auto inactiveDaycareComparison =
+      Run({"compare", "semantic", excludedJson.string(),
+           inactiveDaycareJson.string(), "--format", "json"});
+  Expect(inactiveDaycareComparison.code == 0 &&
+             nlohmann::ordered_json::parse(inactiveDaycareComparison.output)
+                     .at("classificationCounts")
+                     .at("unsupported_or_deferred") ==
+                 1,
+         "semantic comparison should ignore and disclose inactive Daycare "
+         "slot residue");
   auto semanticDifference = excludedDocument;
   semanticDifference["decoded"]["moneyAndCoins"]["money"] = 123456;
   const fs::path semanticDifferenceJson = temp / "semantic-difference.json";
