@@ -1,0 +1,23 @@
+{
+  "schema": "pkmn-red-to-firered-domains/0.1.0",
+  "source": "pkmn-red-json",
+  "target": "pkmn-firered-json",
+  "domains": [
+    {"id": "identity", "treatment": "translate-and-derive", "fields": ["playerName", "rivalName", "trainerId", "secretId", "gender"]},
+    {"id": "currency", "treatment": "translate-clamp", "fields": ["money", "coins"]},
+    {"id": "playtime", "treatment": "translate-clamp", "fields": ["hours", "minutes", "seconds", "frames"]},
+    {"id": "options", "treatment": "field-map-with-target-defaults"},
+    {"id": "pokemon", "treatment": "pccs-profile", "policyDocument": "docs/bridge/POKEMON_CONVERSION_POLICY.md"},
+    {"id": "pokedex", "treatment": "semantic-union-with-converted-pokemon"},
+    {"id": "inventory", "treatment": "item-map-capacity-check-and-story-reconcile", "mapping": "data/item_bridge_red_to_firered.json"},
+    {"id": "events", "treatment": "semantic-bridge", "mapping": "data/event_bridge_red_to_firered.json"},
+    {"id": "trainers", "treatment": "conservative-crosswalk", "mapping": "data/trainer_bridge_red_to_firered.json"},
+    {"id": "location", "treatment": "safe-progression-compatible-spawn"},
+    {"id": "hallOfFame", "treatment": "derive-minimal-or-reset"},
+    {"id": "daycare", "treatment": "convert-pokemon-and-derive-service-state"},
+    {"id": "gameStats", "treatment": "selective-semantic-map"},
+    {"id": "fireredOnlySystems", "treatment": "coherent-policy-bundle-or-template", "trainerPolicy": "data/firered_trainer_target_policy.json"},
+    {"id": "runtimeAndPhysical", "treatment": "generator-owned-reset"},
+    {"id": "unknownBytes", "treatment": "approved-target-template-only"}
+  ]
+}

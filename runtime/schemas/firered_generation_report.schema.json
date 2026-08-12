@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bigmaq.studio/schema/pkmn-firered-template-generation-report-1.0.0.json",
+  "title": "FireRed Template Generation Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "status", "template", "sourcePlanSha256", "output", "changes", "warnings", "verificationRequired"],
+  "properties": {
+    "format": {"const": "pkmn-firered-template-generation-report"},
+    "version": {"const": "1.0.0"},
+    "status": {"enum": ["STATIC_VALIDATION_PASS", "CANDIDATE_REQUIRES_EMULATOR"]},
+    "template": {
+      "type": "object",
+      "required": ["fileName", "sha256", "activeSlot", "counter", "inactiveSlotAndSpecialSectorsPreserved"]
+    },
+    "sourcePlanSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "output": {
+      "type": "object",
+      "required": ["sha256", "size", "activeSlot", "mainSectionChecksumsValid", "pokemonRecordsWritten"]
+    },
+    "changes": {"type": "array", "items": {"type": "string"}},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "verificationRequired": {"type": "array", "items": {"type": "string"}}
+  }
+}

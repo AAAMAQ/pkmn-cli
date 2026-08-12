@@ -28,6 +28,9 @@ The canonical extension is `.red.json`, format identity is `pkmn-red-master-save
 - Daycare and Hall of Fame;
 - aggregate summary counts;
 - supported raw event, script, missable-object, hidden-item, hidden-coin, and visited-town byte fields;
+- saved starter evidence: `gotStarter`, player starter choice/species ID, and
+  rival starter choice/species ID, decoded from pinned `wPlayerStarter` and
+  `wRivalStarter` SRAM fields;
 - a 507-entry verified named-event catalog with synchronized trainer-battle,
   static-encounter, and story-progress views.
 

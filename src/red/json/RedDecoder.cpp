@@ -19,6 +19,21 @@ namespace {
 namespace c = pkmn::cli::red::codec;
 using pkmn::cli::red::save::RedSave;
 
+std::string StarterName(std::uint8_t species) {
+  // Pinned pret/pokered internal species constants used by wPlayerStarter and
+  // wRivalStarter. These bytes are part of wMainData and therefore SRAM.
+  switch (species) {
+  case 0x99:
+    return "bulbasaur";
+  case 0xB0:
+    return "charmander";
+  case 0xB1:
+    return "squirtle";
+  default:
+    return "unknown";
+  }
+}
+
 OrderedJson Text(const RedSave &save, std::size_t offset, std::size_t length) {
   return {{"value", c::DecodeText(save, offset, length)},
           {"losslessValue", c::DecodeText(save, offset, length, true)},
@@ -280,6 +295,23 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
   const auto namedState = events::DecodeNamedState(input.Slice(0x29F3, 0x140));
   for (const auto &[key, value] : namedState.items())
     decoded[key] = value;
+  bool gotStarter = false;
+  for (const auto &record : decoded.at("storyProgress").at("storyFlags")) {
+    if (record.value("name", "") == "EVENT_GOT_STARTER") {
+      gotStarter = record.value("completed", false);
+      break;
+    }
+  }
+  // Pinned pret/pokered lays these fields out as wRivalStarter, one reserved
+  // byte, then wPlayerStarter inside saved wMainData. Their standard SRAM file
+  // offsets are 0x29C1 and 0x29C3 respectively.
+  decoded["worldState"] = {
+      {"storyEvidence",
+       {{"gotStarter", gotStarter},
+        {"starterChoice", StarterName(input.At(0x29C3))},
+        {"rivalStarterChoice", StarterName(input.At(0x29C1))},
+        {"starterSpeciesId", input.At(0x29C3)},
+        {"rivalStarterSpeciesId", input.At(0x29C1)}}}};
   std::size_t scripts = 0;
   for (const auto byte : input.Slice(0x289C, 97))
     if (byte != 0)

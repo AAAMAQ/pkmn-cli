@@ -11,6 +11,7 @@
 #include "app/ExitCode.hpp"
 #include "commands/proof/ProofCommand.hpp"
 #include "commands/red/EditCommand.hpp"
+#include "commands/conversion/ConversionCommand.hpp"
 #include "red/json/RedDecoder.hpp"
 #include "red/events/EventCatalog.hpp"
 #include "red/generation/SemanticGenerator.hpp"
@@ -42,6 +43,9 @@ void PrintHelp(std::ostream& output) {
               "[--no-physical-image]\n"
            << "  pkmn red validate-post-emulator <before.sav> <after.sav> "
               "[--output-dir <directory>]\n"
+           << "  pkmn red convert <input.sav> [output.sav] "
+              "[--template <clean-fire-red.sav>] [--auto-suffix] "
+              "[--keep-intermediate] [--salt <value>]\n"
            << "  pkmn red edit <input.sav>\n"
            << "  pkmn red begin-edit <input.sav> [--output <session.json>]\n"
            << "  pkmn red edit-session <session.json> <edits...>\n"
@@ -516,6 +520,8 @@ int Run(const std::vector<std::string>& arguments, std::ostream& output, std::os
     }
     if (arguments.front() == "summary")
         return RunSummary(arguments, output, error);
+    if (arguments.front() == "convert")
+        return commands::conversion::RunRedConvert(arguments, output, error);
     if (arguments.front() == "decode") return RunDecode(arguments, output, error);
     if (arguments.front() == "events") return RunEvents(arguments, output, error);
     if (arguments.front() == "repair-checksums")

@@ -1,9 +1,19 @@
 # Beginner's Guide to pkmn
 
 This guide assumes you have never built or used a command-line program. `pkmn`
-works with Pokemon Red `.sav` files. It never needs a game ROM, never changes
-your input save in place, and refuses to overwrite an existing output by
-default. FireRed is not supported yet.
+works with Pokemon Red and FireRed save workflows. It never needs a game ROM,
+never changes your input save in place, and refuses to overwrite an existing
+output by default. FireRed generation passed Phase 5 and Red-to-FireRed
+conversion passed Phase 6.
+
+To convert Red directly to FireRed:
+
+```sh
+pkmn red convert backup.sav --template approved-fire-red-template.sav
+```
+
+Until a legally distributable public template is approved, use your approved local template or
+set `PKMN_FIRERED_TEMPLATE`. Keep both source files untouched.
 
 ## 1. Install on a Mac with Homebrew
 

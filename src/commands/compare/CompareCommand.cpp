@@ -7,7 +7,13 @@
 #include "red/save/RedSave.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/AtomicOutput.hpp"
+#include "commands/conversion/ConversionCommand.hpp"
+#include "FileManipulation.hpp"
+#include "FireRedMasterJson.hpp"
+#include "FireRedSectionMap.hpp"
 #include <filesystem>
+#include <chrono>
+#include <map>
 #include <ostream>
 
 namespace pkmn::cli::commands::compare {
@@ -64,11 +70,59 @@ int Run(const std::vector<std::string> &a, std::ostream &out,
            "  pkmn compare semantic <a.red.json> <b.red.json> [report options]\n"
            "  pkmn compare semantic-batch <baseline.red.json> "
            "<candidate.red.json>... [--format json]\n"
+           "  pkmn compare firered-semantic|firered-pokemon|firered-events|firered-trainers|firered-items|firered-fly|firered-hall-of-fame <a.fred.json> <b.fred.json> [--output-json <file>]\n"
+           "  pkmn compare firered-progress <older.sav> <newer.sav> [--output-json <file>]\n"
+           "  pkmn compare bridge <red.json> <fred.json> [--manifest <file>] [--output-json <file>]\n"
            "Report options:\n"
            "  --format markdown|json\n"
            "  --output-json <report.json>\n"
            "  --output-markdown <report.md>\n";
     return 0;
+  }
+  if (a[0].starts_with("firered-") && a.size() >= 3) {
+    const auto suffix = a[0].substr(std::string("firered-").size());
+    if (suffix == "progress") {
+      try {
+        const auto leftBytes = firered::ReadBinaryFile(a[1]);
+        const auto rightBytes = firered::ReadBinaryFile(a[2]);
+        const auto leftAnalysis = firered::AnalyzeSave(leftBytes);
+        const auto rightAnalysis = firered::AnalyzeSave(rightBytes);
+        if (!leftAnalysis.activeSlot || !rightAnalysis.activeSlot)
+          throw std::runtime_error("both inputs must be valid FireRed saves");
+        const auto token = std::to_string(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+        const auto leftPath = std::filesystem::temp_directory_path() / ("pkmn-left-" + token + ".fred.json");
+        const auto rightPath = std::filesystem::temp_directory_path() / ("pkmn-right-" + token + ".fred.json");
+        util::WriteTextAtomic(leftPath, firered::ExportMasterJson(a[1], leftBytes, leftAnalysis));
+        util::WriteTextAtomic(rightPath, firered::ExportMasterJson(a[2], rightBytes, rightAnalysis));
+        std::vector<std::string> runtime{"compare-frjson", "semantic", leftPath.string(), rightPath.string()};
+        if (a.size() == 5 && a[3] == "--output-json") { runtime.push_back("--output"); runtime.push_back(a[4]); }
+        else if (a.size() != 3) return ToInt(ExitCode::InvalidArguments);
+        const auto result = commands::conversion::RunRuntimeUtility(runtime, out, err);
+        std::error_code ignored; std::filesystem::remove(leftPath, ignored); std::filesystem::remove(rightPath, ignored);
+        return result;
+      } catch (const std::exception &exception) {
+        err << "pkmn compare firered-progress: " << exception.what() << '\n';
+        return ToInt(ExitCode::InvalidInput);
+      }
+    }
+    static const std::map<std::string, std::string> modes{{"semantic", "semantic"},
+      {"pokemon", "pokemon"}, {"events", "events"}, {"trainers", "trainers"},
+      {"items", "items"}, {"fly", "fly"}, {"hall-of-fame", "hall-of-fame"}};
+    if (!modes.contains(suffix)) return ToInt(ExitCode::InvalidArguments);
+    std::vector<std::string> runtime{"compare-frjson", modes.at(suffix), a[1], a[2]};
+    if (a.size() == 5 && a[3] == "--output-json") { runtime.push_back("--output"); runtime.push_back(a[4]); }
+    else if (a.size() != 3) return ToInt(ExitCode::InvalidArguments);
+    return commands::conversion::RunRuntimeUtility(runtime, out, err);
+  }
+  if (a[0] == "bridge" && a.size() >= 3) {
+    std::vector<std::string> runtime{"compare-bridge", a[1], a[2]};
+    for (std::size_t index = 3; index < a.size(); ++index) {
+      if ((a[index] == "--manifest" || a[index] == "--output-json") && index + 1 < a.size()) {
+        runtime.push_back(a[index] == "--output-json" ? "--output" : a[index]);
+        runtime.push_back(a[++index]);
+      } else return ToInt(ExitCode::InvalidArguments);
+    }
+    return commands::conversion::RunRuntimeUtility(runtime, out, err);
   }
   if (a[0] == "semantic-batch") {
     bool json = false;

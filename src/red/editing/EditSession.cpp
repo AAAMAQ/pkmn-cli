@@ -195,6 +195,8 @@ void AddNamedEventEdit(Json &session, const std::string &name, bool value) {
       decoded.at("events").at("flags").begin(),
       decoded.at("events").at("flags").end(),
       [](const Json &record) { return record.at("value").get<bool>(); });
+  if (name == "EVENT_GOT_STARTER" && decoded.contains("worldState"))
+    decoded.at("worldState").at("storyEvidence")["gotStarter"] = value;
   for (const auto &[root, records] :
        std::vector<std::pair<const char *, const char *>>{
            {"trainerBattles", "records"}, {"staticBattles", "records"},

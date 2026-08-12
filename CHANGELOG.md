@@ -1,5 +1,39 @@
 # Changelog
 
+## 2.0.0 - Unreleased
+
+- Put Red → FireRed conversion at the top of the product and help experience.
+- Added `pkmn red convert` with Pokémon Red identity/checksum validation and
+  default `<stem>_fr.sav` naming.
+- Added `pkmn rjson convert`, `convert_to_frjson`, and `update_schema`.
+- Added `pkmn frjson inspect`, `validate`, `update_schema`, and template-backed
+  `generate`, archival `reconstruct`, and schema discovery.
+- Added native FireRed save summary, inspection, checksum validation, complete
+  schema 0.4.0 decoding, narrow copy-first editing, and pinned event discovery.
+- Bundled the pinned deterministic bridge planner, Pokémon policy, event/item/
+  trainer authorities, and FireRed generator runtime.
+- Added copy-first output collision protection, conversion manifests, reports,
+  physical-image isolation, and explicit Phase 5/6 verification gating.
+- Expanded the compiled v2 catalog to 92 endpoints and preserved original
+  source-save filename/SHA-256 provenance in direct-conversion manifests.
+- Added native schema 0.4.0 FireRed generation from complete logical-block and
+  special-sector JSON authority without reading `physicalImage`.
+- Added FireRed checksum repair, transactional batch decode/validation,
+  post-emulator validation, and copy-first safe edit sessions.
+- Added top-level conversion preview/planning, bridge inspection/explanation,
+  manifest validation, batch conversion, and explicit PCCS policy selection.
+- Added FireRed semantic/domain comparisons, Red-to-FireRed bridge auditing,
+  and Phase 5/6 proof packages with deterministic and isolation checks.
+- Recorded MAQ's Phase 5 FireRed generator acceptance: complete native
+  `.fred.json` generated an emulator-verified equivalent save without using
+  the original physical image.
+- Added source-backed Red `wPlayerStarter` and `wRivalStarter` decoding so
+  Phase 6 preserves Charmander/Bulbasaur/Squirtle choice and its rival branch
+  without guessing from the current party.
+- Recorded MAQ's Phase 6 Red → FireRed converter acceptance after deterministic
+  proof, checksum validation, bridge/manifest audit, and detailed emulator
+  equivalence testing.
+
 ## Unreleased
 
 - Adopted a self-contained architecture: completed workflows use internal Red modules rather than required helper executables.

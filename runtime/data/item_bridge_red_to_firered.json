@@ -1,0 +1,3146 @@
+{
+  "schemaVersion": "1.0.0",
+  "pret": {
+    "red": "d70d99ffbd329473d96eaaf19fd97c86d2220b7f",
+    "fireRed": "df4449a27cd78dd747ce269e47d3ab4a0149d8f4"
+  },
+  "policy": {
+    "copyRawItemIds": false,
+    "mapMachinesByMove": true,
+    "keyItemsRequireStoryReconciliation": true,
+    "unsupportedMachineTreatment": "OMIT_AND_AUDIT"
+  },
+  "summary": {
+    "redNamespaceEntries": 153,
+    "baseAndPseudoEntries": 98,
+    "tmEntries": 50,
+    "hmEntries": 5,
+    "DIRECT_ITEM_EQUIVALENT": 88,
+    "RED_ONLY_UNSUPPORTED": 53,
+    "SAME_PURPOSE_DIFFERENT_ITEM": 1,
+    "STORY_RESULT_ONLY": 11,
+    "fireRedOnlyPolicies": 16
+  },
+  "mappings": [
+    {
+      "semanticId": "RED_ITEM_NO_ITEM",
+      "red": {
+        "symbol": "NO_ITEM",
+        "id": 0,
+        "hex": "0x00",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:9"
+      },
+      "fireRed": {
+        "symbol": "ITEM_NONE",
+        "id": 0,
+        "hex": "0x000",
+        "source": "include/constants/items.h:4"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "preserve-empty-sentinel",
+      "storyReconciliation": false,
+      "notes": "This is the no-item sentinel, not an inventory stack."
+    },
+    {
+      "semanticId": "RED_ITEM_MASTER_BALL",
+      "red": {
+        "symbol": "MASTER_BALL",
+        "id": 1,
+        "hex": "0x01",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:10"
+      },
+      "fireRed": {
+        "symbol": "ITEM_MASTER_BALL",
+        "id": 1,
+        "hex": "0x001",
+        "source": "include/constants/items.h:5"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_ULTRA_BALL",
+      "red": {
+        "symbol": "ULTRA_BALL",
+        "id": 2,
+        "hex": "0x02",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:11"
+      },
+      "fireRed": {
+        "symbol": "ITEM_ULTRA_BALL",
+        "id": 2,
+        "hex": "0x002",
+        "source": "include/constants/items.h:6"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_GREAT_BALL",
+      "red": {
+        "symbol": "GREAT_BALL",
+        "id": 3,
+        "hex": "0x03",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:12"
+      },
+      "fireRed": {
+        "symbol": "ITEM_GREAT_BALL",
+        "id": 3,
+        "hex": "0x003",
+        "source": "include/constants/items.h:7"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_POKE_BALL",
+      "red": {
+        "symbol": "POKE_BALL",
+        "id": 4,
+        "hex": "0x04",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:13"
+      },
+      "fireRed": {
+        "symbol": "ITEM_POKE_BALL",
+        "id": 4,
+        "hex": "0x004",
+        "source": "include/constants/items.h:8"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_TOWN_MAP",
+      "red": {
+        "symbol": "TOWN_MAP",
+        "id": 5,
+        "hex": "0x05",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:14"
+      },
+      "fireRed": {
+        "symbol": "ITEM_TOWN_MAP",
+        "id": 361,
+        "hex": "0x169",
+        "source": "include/constants/items.h:433"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_BICYCLE",
+      "red": {
+        "symbol": "BICYCLE",
+        "id": 6,
+        "hex": "0x06",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:15"
+      },
+      "fireRed": {
+        "symbol": "ITEM_BICYCLE",
+        "id": 360,
+        "hex": "0x168",
+        "source": "include/constants/items.h:432"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_SURFBOARD",
+      "red": {
+        "symbol": "SURFBOARD",
+        "id": 7,
+        "hex": "0x07",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:16"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-and-audit",
+      "storyReconciliation": false,
+      "notes": "Unused Generation I item; do not manufacture a FireRed item."
+    },
+    {
+      "semanticId": "RED_ITEM_SAFARI_BALL",
+      "red": {
+        "symbol": "SAFARI_BALL",
+        "id": 8,
+        "hex": "0x08",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:17"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "Temporary Safari Game battle resource; derive the active Safari session rather than emit persistent bag inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_POKEDEX",
+      "red": {
+        "symbol": "POKEDEX",
+        "id": 9,
+        "hex": "0x09",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:18"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "The Pokedex is a system/progression flag in FireRed, not a bag item."
+    },
+    {
+      "semanticId": "RED_ITEM_MOON_STONE",
+      "red": {
+        "symbol": "MOON_STONE",
+        "id": 10,
+        "hex": "0x0A",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:19"
+      },
+      "fireRed": {
+        "symbol": "ITEM_MOON_STONE",
+        "id": 94,
+        "hex": "0x05E",
+        "source": "include/constants/items.h:98"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_ANTIDOTE",
+      "red": {
+        "symbol": "ANTIDOTE",
+        "id": 11,
+        "hex": "0x0B",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:20"
+      },
+      "fireRed": {
+        "symbol": "ITEM_ANTIDOTE",
+        "id": 14,
+        "hex": "0x00E",
+        "source": "include/constants/items.h:18"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_BURN_HEAL",
+      "red": {
+        "symbol": "BURN_HEAL",
+        "id": 12,
+        "hex": "0x0C",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:21"
+      },
+      "fireRed": {
+        "symbol": "ITEM_BURN_HEAL",
+        "id": 15,
+        "hex": "0x00F",
+        "source": "include/constants/items.h:19"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_ICE_HEAL",
+      "red": {
+        "symbol": "ICE_HEAL",
+        "id": 13,
+        "hex": "0x0D",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:22"
+      },
+      "fireRed": {
+        "symbol": "ITEM_ICE_HEAL",
+        "id": 16,
+        "hex": "0x010",
+        "source": "include/constants/items.h:20"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_AWAKENING",
+      "red": {
+        "symbol": "AWAKENING",
+        "id": 14,
+        "hex": "0x0E",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:23"
+      },
+      "fireRed": {
+        "symbol": "ITEM_AWAKENING",
+        "id": 17,
+        "hex": "0x011",
+        "source": "include/constants/items.h:21"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_PARLYZ_HEAL",
+      "red": {
+        "symbol": "PARLYZ_HEAL",
+        "id": 15,
+        "hex": "0x0F",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:24"
+      },
+      "fireRed": {
+        "symbol": "ITEM_PARALYZE_HEAL",
+        "id": 18,
+        "hex": "0x012",
+        "source": "include/constants/items.h:22"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_FULL_RESTORE",
+      "red": {
+        "symbol": "FULL_RESTORE",
+        "id": 16,
+        "hex": "0x10",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:25"
+      },
+      "fireRed": {
+        "symbol": "ITEM_FULL_RESTORE",
+        "id": 19,
+        "hex": "0x013",
+        "source": "include/constants/items.h:23"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_MAX_POTION",
+      "red": {
+        "symbol": "MAX_POTION",
+        "id": 17,
+        "hex": "0x11",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:26"
+      },
+      "fireRed": {
+        "symbol": "ITEM_MAX_POTION",
+        "id": 20,
+        "hex": "0x014",
+        "source": "include/constants/items.h:24"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_HYPER_POTION",
+      "red": {
+        "symbol": "HYPER_POTION",
+        "id": 18,
+        "hex": "0x12",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:27"
+      },
+      "fireRed": {
+        "symbol": "ITEM_HYPER_POTION",
+        "id": 21,
+        "hex": "0x015",
+        "source": "include/constants/items.h:25"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_SUPER_POTION",
+      "red": {
+        "symbol": "SUPER_POTION",
+        "id": 19,
+        "hex": "0x13",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:28"
+      },
+      "fireRed": {
+        "symbol": "ITEM_SUPER_POTION",
+        "id": 22,
+        "hex": "0x016",
+        "source": "include/constants/items.h:26"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_POTION",
+      "red": {
+        "symbol": "POTION",
+        "id": 20,
+        "hex": "0x14",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:29"
+      },
+      "fireRed": {
+        "symbol": "ITEM_POTION",
+        "id": 13,
+        "hex": "0x00D",
+        "source": "include/constants/items.h:17"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_BOULDERBADGE",
+      "red": {
+        "symbol": "BOULDERBADGE",
+        "id": 21,
+        "hex": "0x15",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:31"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "Generate Boulder Badge and Brock companion story state."
+    },
+    {
+      "semanticId": "RED_ITEM_CASCADEBADGE",
+      "red": {
+        "symbol": "CASCADEBADGE",
+        "id": 22,
+        "hex": "0x16",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:33"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "Generate Cascade Badge and Misty companion story state."
+    },
+    {
+      "semanticId": "RED_ITEM_THUNDERBADGE",
+      "red": {
+        "symbol": "THUNDERBADGE",
+        "id": 23,
+        "hex": "0x17",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:35"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "Generate Thunder Badge and Lt. Surge companion story state."
+    },
+    {
+      "semanticId": "RED_ITEM_RAINBOWBADGE",
+      "red": {
+        "symbol": "RAINBOWBADGE",
+        "id": 24,
+        "hex": "0x18",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:36"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "Generate Rainbow Badge and Erika companion story state."
+    },
+    {
+      "semanticId": "RED_ITEM_SOULBADGE",
+      "red": {
+        "symbol": "SOULBADGE",
+        "id": 25,
+        "hex": "0x19",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:37"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "Generate Soul Badge and Koga companion story state."
+    },
+    {
+      "semanticId": "RED_ITEM_MARSHBADGE",
+      "red": {
+        "symbol": "MARSHBADGE",
+        "id": 26,
+        "hex": "0x1A",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:38"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "Generate Marsh Badge and Sabrina companion story state."
+    },
+    {
+      "semanticId": "RED_ITEM_VOLCANOBADGE",
+      "red": {
+        "symbol": "VOLCANOBADGE",
+        "id": 27,
+        "hex": "0x1B",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:39"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "Generate Volcano Badge and Blaine companion story state."
+    },
+    {
+      "semanticId": "RED_ITEM_EARTHBADGE",
+      "red": {
+        "symbol": "EARTHBADGE",
+        "id": 28,
+        "hex": "0x1C",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:40"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "Generate Earth Badge and Giovanni companion story state."
+    },
+    {
+      "semanticId": "RED_ITEM_ESCAPE_ROPE",
+      "red": {
+        "symbol": "ESCAPE_ROPE",
+        "id": 29,
+        "hex": "0x1D",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:41"
+      },
+      "fireRed": {
+        "symbol": "ITEM_ESCAPE_ROPE",
+        "id": 85,
+        "hex": "0x055",
+        "source": "include/constants/items.h:89"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_REPEL",
+      "red": {
+        "symbol": "REPEL",
+        "id": 30,
+        "hex": "0x1E",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:42"
+      },
+      "fireRed": {
+        "symbol": "ITEM_REPEL",
+        "id": 86,
+        "hex": "0x056",
+        "source": "include/constants/items.h:90"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_OLD_AMBER",
+      "red": {
+        "symbol": "OLD_AMBER",
+        "id": 31,
+        "hex": "0x1F",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:43"
+      },
+      "fireRed": {
+        "symbol": "ITEM_OLD_AMBER",
+        "id": 354,
+        "hex": "0x162",
+        "source": "include/constants/items.h:426"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_FIRE_STONE",
+      "red": {
+        "symbol": "FIRE_STONE",
+        "id": 32,
+        "hex": "0x20",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:44"
+      },
+      "fireRed": {
+        "symbol": "ITEM_FIRE_STONE",
+        "id": 95,
+        "hex": "0x05F",
+        "source": "include/constants/items.h:99"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_THUNDER_STONE",
+      "red": {
+        "symbol": "THUNDER_STONE",
+        "id": 33,
+        "hex": "0x21",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:45"
+      },
+      "fireRed": {
+        "symbol": "ITEM_THUNDER_STONE",
+        "id": 96,
+        "hex": "0x060",
+        "source": "include/constants/items.h:100"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_WATER_STONE",
+      "red": {
+        "symbol": "WATER_STONE",
+        "id": 34,
+        "hex": "0x22",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:46"
+      },
+      "fireRed": {
+        "symbol": "ITEM_WATER_STONE",
+        "id": 97,
+        "hex": "0x061",
+        "source": "include/constants/items.h:101"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_HP_UP",
+      "red": {
+        "symbol": "HP_UP",
+        "id": 35,
+        "hex": "0x23",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:47"
+      },
+      "fireRed": {
+        "symbol": "ITEM_HP_UP",
+        "id": 63,
+        "hex": "0x03F",
+        "source": "include/constants/items.h:67"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_PROTEIN",
+      "red": {
+        "symbol": "PROTEIN",
+        "id": 36,
+        "hex": "0x24",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:48"
+      },
+      "fireRed": {
+        "symbol": "ITEM_PROTEIN",
+        "id": 64,
+        "hex": "0x040",
+        "source": "include/constants/items.h:68"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_IRON",
+      "red": {
+        "symbol": "IRON",
+        "id": 37,
+        "hex": "0x25",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:49"
+      },
+      "fireRed": {
+        "symbol": "ITEM_IRON",
+        "id": 65,
+        "hex": "0x041",
+        "source": "include/constants/items.h:69"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_CARBOS",
+      "red": {
+        "symbol": "CARBOS",
+        "id": 38,
+        "hex": "0x26",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:50"
+      },
+      "fireRed": {
+        "symbol": "ITEM_CARBOS",
+        "id": 66,
+        "hex": "0x042",
+        "source": "include/constants/items.h:70"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_CALCIUM",
+      "red": {
+        "symbol": "CALCIUM",
+        "id": 39,
+        "hex": "0x27",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:51"
+      },
+      "fireRed": {
+        "symbol": "ITEM_CALCIUM",
+        "id": 67,
+        "hex": "0x043",
+        "source": "include/constants/items.h:71"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_RARE_CANDY",
+      "red": {
+        "symbol": "RARE_CANDY",
+        "id": 40,
+        "hex": "0x28",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:52"
+      },
+      "fireRed": {
+        "symbol": "ITEM_RARE_CANDY",
+        "id": 68,
+        "hex": "0x044",
+        "source": "include/constants/items.h:72"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_DOME_FOSSIL",
+      "red": {
+        "symbol": "DOME_FOSSIL",
+        "id": 41,
+        "hex": "0x29",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:53"
+      },
+      "fireRed": {
+        "symbol": "ITEM_DOME_FOSSIL",
+        "id": 358,
+        "hex": "0x166",
+        "source": "include/constants/items.h:430"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_HELIX_FOSSIL",
+      "red": {
+        "symbol": "HELIX_FOSSIL",
+        "id": 42,
+        "hex": "0x2A",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:54"
+      },
+      "fireRed": {
+        "symbol": "ITEM_HELIX_FOSSIL",
+        "id": 357,
+        "hex": "0x165",
+        "source": "include/constants/items.h:429"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_SECRET_KEY",
+      "red": {
+        "symbol": "SECRET_KEY",
+        "id": 43,
+        "hex": "0x2B",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:55"
+      },
+      "fireRed": {
+        "symbol": "ITEM_SECRET_KEY",
+        "id": 351,
+        "hex": "0x15F",
+        "source": "include/constants/items.h:423"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_ITEM_2C",
+      "red": {
+        "symbol": "ITEM_2C",
+        "id": 44,
+        "hex": "0x2C",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:56"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-and-audit",
+      "storyReconciliation": false,
+      "notes": "Unused Generation I item."
+    },
+    {
+      "semanticId": "RED_ITEM_BIKE_VOUCHER",
+      "red": {
+        "symbol": "BIKE_VOUCHER",
+        "id": 45,
+        "hex": "0x2D",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:57"
+      },
+      "fireRed": {
+        "symbol": "ITEM_BIKE_VOUCHER",
+        "id": 352,
+        "hex": "0x160",
+        "source": "include/constants/items.h:424"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_X_ACCURACY",
+      "red": {
+        "symbol": "X_ACCURACY",
+        "id": 46,
+        "hex": "0x2E",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:58"
+      },
+      "fireRed": {
+        "symbol": "ITEM_X_ACCURACY",
+        "id": 78,
+        "hex": "0x04E",
+        "source": "include/constants/items.h:82"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_LEAF_STONE",
+      "red": {
+        "symbol": "LEAF_STONE",
+        "id": 47,
+        "hex": "0x2F",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:59"
+      },
+      "fireRed": {
+        "symbol": "ITEM_LEAF_STONE",
+        "id": 98,
+        "hex": "0x062",
+        "source": "include/constants/items.h:102"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_CARD_KEY",
+      "red": {
+        "symbol": "CARD_KEY",
+        "id": 48,
+        "hex": "0x30",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:60"
+      },
+      "fireRed": {
+        "symbol": "ITEM_CARD_KEY",
+        "id": 355,
+        "hex": "0x163",
+        "source": "include/constants/items.h:427"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_NUGGET",
+      "red": {
+        "symbol": "NUGGET",
+        "id": 49,
+        "hex": "0x31",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:61"
+      },
+      "fireRed": {
+        "symbol": "ITEM_NUGGET",
+        "id": 110,
+        "hex": "0x06E",
+        "source": "include/constants/items.h:114"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_ITEM_32",
+      "red": {
+        "symbol": "ITEM_32",
+        "id": 50,
+        "hex": "0x32",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:62"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-and-audit",
+      "storyReconciliation": false,
+      "notes": "Unused Generation I item."
+    },
+    {
+      "semanticId": "RED_ITEM_POKE_DOLL",
+      "red": {
+        "symbol": "POKE_DOLL",
+        "id": 51,
+        "hex": "0x33",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:63"
+      },
+      "fireRed": {
+        "symbol": "ITEM_POKE_DOLL",
+        "id": 80,
+        "hex": "0x050",
+        "source": "include/constants/items.h:84"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_FULL_HEAL",
+      "red": {
+        "symbol": "FULL_HEAL",
+        "id": 52,
+        "hex": "0x34",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:64"
+      },
+      "fireRed": {
+        "symbol": "ITEM_FULL_HEAL",
+        "id": 23,
+        "hex": "0x017",
+        "source": "include/constants/items.h:27"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_REVIVE",
+      "red": {
+        "symbol": "REVIVE",
+        "id": 53,
+        "hex": "0x35",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:65"
+      },
+      "fireRed": {
+        "symbol": "ITEM_REVIVE",
+        "id": 24,
+        "hex": "0x018",
+        "source": "include/constants/items.h:28"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_MAX_REVIVE",
+      "red": {
+        "symbol": "MAX_REVIVE",
+        "id": 54,
+        "hex": "0x36",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:66"
+      },
+      "fireRed": {
+        "symbol": "ITEM_MAX_REVIVE",
+        "id": 25,
+        "hex": "0x019",
+        "source": "include/constants/items.h:29"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_GUARD_SPEC",
+      "red": {
+        "symbol": "GUARD_SPEC",
+        "id": 55,
+        "hex": "0x37",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:67"
+      },
+      "fireRed": {
+        "symbol": "ITEM_GUARD_SPEC",
+        "id": 73,
+        "hex": "0x049",
+        "source": "include/constants/items.h:77"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_SUPER_REPEL",
+      "red": {
+        "symbol": "SUPER_REPEL",
+        "id": 56,
+        "hex": "0x38",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:68"
+      },
+      "fireRed": {
+        "symbol": "ITEM_SUPER_REPEL",
+        "id": 83,
+        "hex": "0x053",
+        "source": "include/constants/items.h:87"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_MAX_REPEL",
+      "red": {
+        "symbol": "MAX_REPEL",
+        "id": 57,
+        "hex": "0x39",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:69"
+      },
+      "fireRed": {
+        "symbol": "ITEM_MAX_REPEL",
+        "id": 84,
+        "hex": "0x054",
+        "source": "include/constants/items.h:88"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_DIRE_HIT",
+      "red": {
+        "symbol": "DIRE_HIT",
+        "id": 58,
+        "hex": "0x3A",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:70"
+      },
+      "fireRed": {
+        "symbol": "ITEM_DIRE_HIT",
+        "id": 74,
+        "hex": "0x04A",
+        "source": "include/constants/items.h:78"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_COIN",
+      "red": {
+        "symbol": "COIN",
+        "id": 59,
+        "hex": "0x3B",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:71"
+      },
+      "fireRed": null,
+      "classification": "STORY_RESULT_ONLY",
+      "confidence": "confirmed-source",
+      "conversionAction": "derive-from-semantic-event",
+      "storyReconciliation": true,
+      "notes": "This overloaded pseudo-item represents a single Game Corner coin, not a bag item."
+    },
+    {
+      "semanticId": "RED_ITEM_FRESH_WATER",
+      "red": {
+        "symbol": "FRESH_WATER",
+        "id": 60,
+        "hex": "0x3C",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:72"
+      },
+      "fireRed": {
+        "symbol": "ITEM_FRESH_WATER",
+        "id": 26,
+        "hex": "0x01A",
+        "source": "include/constants/items.h:30"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": true,
+      "notes": "Inventory transfers directly; Saffron access is translated separately to FireRed Tea/guard state."
+    },
+    {
+      "semanticId": "RED_ITEM_SODA_POP",
+      "red": {
+        "symbol": "SODA_POP",
+        "id": 61,
+        "hex": "0x3D",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:73"
+      },
+      "fireRed": {
+        "symbol": "ITEM_SODA_POP",
+        "id": 27,
+        "hex": "0x01B",
+        "source": "include/constants/items.h:31"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": true,
+      "notes": "Inventory transfers directly; Saffron access is translated separately to FireRed Tea/guard state."
+    },
+    {
+      "semanticId": "RED_ITEM_LEMONADE",
+      "red": {
+        "symbol": "LEMONADE",
+        "id": 62,
+        "hex": "0x3E",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:74"
+      },
+      "fireRed": {
+        "symbol": "ITEM_LEMONADE",
+        "id": 28,
+        "hex": "0x01C",
+        "source": "include/constants/items.h:32"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": true,
+      "notes": "Inventory transfers directly; Saffron access is translated separately to FireRed Tea/guard state."
+    },
+    {
+      "semanticId": "RED_ITEM_S_S_TICKET",
+      "red": {
+        "symbol": "S_S_TICKET",
+        "id": 63,
+        "hex": "0x3F",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:75"
+      },
+      "fireRed": {
+        "symbol": "ITEM_SS_TICKET",
+        "id": 265,
+        "hex": "0x109",
+        "source": "include/constants/items.h:276"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_GOLD_TEETH",
+      "red": {
+        "symbol": "GOLD_TEETH",
+        "id": 64,
+        "hex": "0x40",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:76"
+      },
+      "fireRed": {
+        "symbol": "ITEM_GOLD_TEETH",
+        "id": 353,
+        "hex": "0x161",
+        "source": "include/constants/items.h:425"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_X_ATTACK",
+      "red": {
+        "symbol": "X_ATTACK",
+        "id": 65,
+        "hex": "0x41",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:77"
+      },
+      "fireRed": {
+        "symbol": "ITEM_X_ATTACK",
+        "id": 75,
+        "hex": "0x04B",
+        "source": "include/constants/items.h:79"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_X_DEFEND",
+      "red": {
+        "symbol": "X_DEFEND",
+        "id": 66,
+        "hex": "0x42",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:78"
+      },
+      "fireRed": {
+        "symbol": "ITEM_X_DEFEND",
+        "id": 76,
+        "hex": "0x04C",
+        "source": "include/constants/items.h:80"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_X_SPEED",
+      "red": {
+        "symbol": "X_SPEED",
+        "id": 67,
+        "hex": "0x43",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:79"
+      },
+      "fireRed": {
+        "symbol": "ITEM_X_SPEED",
+        "id": 77,
+        "hex": "0x04D",
+        "source": "include/constants/items.h:81"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_X_SPECIAL",
+      "red": {
+        "symbol": "X_SPECIAL",
+        "id": 68,
+        "hex": "0x44",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:80"
+      },
+      "fireRed": {
+        "symbol": "ITEM_X_SPECIAL",
+        "id": 79,
+        "hex": "0x04F",
+        "source": "include/constants/items.h:83"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_COIN_CASE",
+      "red": {
+        "symbol": "COIN_CASE",
+        "id": 69,
+        "hex": "0x45",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:81"
+      },
+      "fireRed": {
+        "symbol": "ITEM_COIN_CASE",
+        "id": 260,
+        "hex": "0x104",
+        "source": "include/constants/items.h:271"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_OAKS_PARCEL",
+      "red": {
+        "symbol": "OAKS_PARCEL",
+        "id": 70,
+        "hex": "0x46",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:82"
+      },
+      "fireRed": {
+        "symbol": "ITEM_OAKS_PARCEL",
+        "id": 349,
+        "hex": "0x15D",
+        "source": "include/constants/items.h:421"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_ITEMFINDER",
+      "red": {
+        "symbol": "ITEMFINDER",
+        "id": 71,
+        "hex": "0x47",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:83"
+      },
+      "fireRed": {
+        "symbol": "ITEM_ITEMFINDER",
+        "id": 261,
+        "hex": "0x105",
+        "source": "include/constants/items.h:272"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_SILPH_SCOPE",
+      "red": {
+        "symbol": "SILPH_SCOPE",
+        "id": 72,
+        "hex": "0x48",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:84"
+      },
+      "fireRed": {
+        "symbol": "ITEM_SILPH_SCOPE",
+        "id": 359,
+        "hex": "0x167",
+        "source": "include/constants/items.h:431"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_POKE_FLUTE",
+      "red": {
+        "symbol": "POKE_FLUTE",
+        "id": 73,
+        "hex": "0x49",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:85"
+      },
+      "fireRed": {
+        "symbol": "ITEM_POKE_FLUTE",
+        "id": 350,
+        "hex": "0x15E",
+        "source": "include/constants/items.h:422"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_LIFT_KEY",
+      "red": {
+        "symbol": "LIFT_KEY",
+        "id": 74,
+        "hex": "0x4A",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:86"
+      },
+      "fireRed": {
+        "symbol": "ITEM_LIFT_KEY",
+        "id": 356,
+        "hex": "0x164",
+        "source": "include/constants/items.h:428"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-and-reconcile-story",
+      "storyReconciliation": true,
+      "notes": "Possession is secondary to the corresponding received/used/exchanged progression state."
+    },
+    {
+      "semanticId": "RED_ITEM_EXP_ALL",
+      "red": {
+        "symbol": "EXP_ALL",
+        "id": 75,
+        "hex": "0x4B",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:87"
+      },
+      "fireRed": {
+        "symbol": "ITEM_EXP_SHARE",
+        "id": 182,
+        "hex": "0x0B6",
+        "source": "include/constants/items.h:193"
+      },
+      "classification": "SAME_PURPOSE_DIFFERENT_ITEM",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-with-user-policy",
+      "storyReconciliation": false,
+      "notes": "Exp. Share is mechanically different from the Generation I Exp. All."
+    },
+    {
+      "semanticId": "RED_ITEM_OLD_ROD",
+      "red": {
+        "symbol": "OLD_ROD",
+        "id": 76,
+        "hex": "0x4C",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:88"
+      },
+      "fireRed": {
+        "symbol": "ITEM_OLD_ROD",
+        "id": 262,
+        "hex": "0x106",
+        "source": "include/constants/items.h:273"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_GOOD_ROD",
+      "red": {
+        "symbol": "GOOD_ROD",
+        "id": 77,
+        "hex": "0x4D",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:89"
+      },
+      "fireRed": {
+        "symbol": "ITEM_GOOD_ROD",
+        "id": 263,
+        "hex": "0x107",
+        "source": "include/constants/items.h:274"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_SUPER_ROD",
+      "red": {
+        "symbol": "SUPER_ROD",
+        "id": 78,
+        "hex": "0x4E",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:90"
+      },
+      "fireRed": {
+        "symbol": "ITEM_SUPER_ROD",
+        "id": 264,
+        "hex": "0x108",
+        "source": "include/constants/items.h:275"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_PP_UP",
+      "red": {
+        "symbol": "PP_UP",
+        "id": 79,
+        "hex": "0x4F",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:91"
+      },
+      "fireRed": {
+        "symbol": "ITEM_PP_UP",
+        "id": 69,
+        "hex": "0x045",
+        "source": "include/constants/items.h:73"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_ETHER",
+      "red": {
+        "symbol": "ETHER",
+        "id": 80,
+        "hex": "0x50",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:92"
+      },
+      "fireRed": {
+        "symbol": "ITEM_ETHER",
+        "id": 34,
+        "hex": "0x022",
+        "source": "include/constants/items.h:38"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_MAX_ETHER",
+      "red": {
+        "symbol": "MAX_ETHER",
+        "id": 81,
+        "hex": "0x51",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:93"
+      },
+      "fireRed": {
+        "symbol": "ITEM_MAX_ETHER",
+        "id": 35,
+        "hex": "0x023",
+        "source": "include/constants/items.h:39"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_ELIXER",
+      "red": {
+        "symbol": "ELIXER",
+        "id": 82,
+        "hex": "0x52",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:94"
+      },
+      "fireRed": {
+        "symbol": "ITEM_ELIXIR",
+        "id": 36,
+        "hex": "0x024",
+        "source": "include/constants/items.h:40"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_MAX_ELIXER",
+      "red": {
+        "symbol": "MAX_ELIXER",
+        "id": 83,
+        "hex": "0x53",
+        "kind": "base-item",
+        "source": "constants/item_constants.asm:95"
+      },
+      "fireRed": {
+        "symbol": "ITEM_MAX_ELIXIR",
+        "id": 37,
+        "hex": "0x025",
+        "source": "include/constants/items.h:41"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-quantity",
+      "storyReconciliation": false,
+      "notes": ""
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_B2F",
+      "red": {
+        "symbol": "FLOOR_B2F",
+        "id": 84,
+        "hex": "0x54",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:99"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_B1F",
+      "red": {
+        "symbol": "FLOOR_B1F",
+        "id": 85,
+        "hex": "0x55",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:100"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_1F",
+      "red": {
+        "symbol": "FLOOR_1F",
+        "id": 86,
+        "hex": "0x56",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:101"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_2F",
+      "red": {
+        "symbol": "FLOOR_2F",
+        "id": 87,
+        "hex": "0x57",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:102"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_3F",
+      "red": {
+        "symbol": "FLOOR_3F",
+        "id": 88,
+        "hex": "0x58",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:103"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_4F",
+      "red": {
+        "symbol": "FLOOR_4F",
+        "id": 89,
+        "hex": "0x59",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:104"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_5F",
+      "red": {
+        "symbol": "FLOOR_5F",
+        "id": 90,
+        "hex": "0x5A",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:105"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_6F",
+      "red": {
+        "symbol": "FLOOR_6F",
+        "id": 91,
+        "hex": "0x5B",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:106"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_7F",
+      "red": {
+        "symbol": "FLOOR_7F",
+        "id": 92,
+        "hex": "0x5C",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:107"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_8F",
+      "red": {
+        "symbol": "FLOOR_8F",
+        "id": 93,
+        "hex": "0x5D",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:108"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_9F",
+      "red": {
+        "symbol": "FLOOR_9F",
+        "id": 94,
+        "hex": "0x5E",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:109"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_10F",
+      "red": {
+        "symbol": "FLOOR_10F",
+        "id": 95,
+        "hex": "0x5F",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:110"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_11F",
+      "red": {
+        "symbol": "FLOOR_11F",
+        "id": 96,
+        "hex": "0x60",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:111"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_FLOOR_B4F",
+      "red": {
+        "symbol": "FLOOR_B4F",
+        "id": 97,
+        "hex": "0x61",
+        "kind": "floor-pseudo",
+        "source": "constants/item_constants.asm:112"
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-runtime-pseudo-item",
+      "storyReconciliation": false,
+      "notes": "Elevator menu selector overloaded onto the item ID namespace; it is not inventory."
+    },
+    {
+      "semanticId": "RED_ITEM_HM_CUT",
+      "red": {
+        "symbol": "HM_CUT",
+        "id": 196,
+        "hex": "0xC4",
+        "kind": "hm",
+        "source": "constants/item_constants.asm:141",
+        "move": "CUT",
+        "machineNumber": 1
+      },
+      "fireRed": {
+        "symbol": "ITEM_HM01",
+        "id": 339,
+        "hex": "0x153",
+        "move": "CUT",
+        "source": "include/constants/items.h:350"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_HM_FLY",
+      "red": {
+        "symbol": "HM_FLY",
+        "id": 197,
+        "hex": "0xC5",
+        "kind": "hm",
+        "source": "constants/item_constants.asm:142",
+        "move": "FLY",
+        "machineNumber": 2
+      },
+      "fireRed": {
+        "symbol": "ITEM_HM02",
+        "id": 340,
+        "hex": "0x154",
+        "move": "FLY",
+        "source": "include/constants/items.h:351"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_HM_SURF",
+      "red": {
+        "symbol": "HM_SURF",
+        "id": 198,
+        "hex": "0xC6",
+        "kind": "hm",
+        "source": "constants/item_constants.asm:143",
+        "move": "SURF",
+        "machineNumber": 3
+      },
+      "fireRed": {
+        "symbol": "ITEM_HM03",
+        "id": 341,
+        "hex": "0x155",
+        "move": "SURF",
+        "source": "include/constants/items.h:352"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_HM_STRENGTH",
+      "red": {
+        "symbol": "HM_STRENGTH",
+        "id": 199,
+        "hex": "0xC7",
+        "kind": "hm",
+        "source": "constants/item_constants.asm:144",
+        "move": "STRENGTH",
+        "machineNumber": 4
+      },
+      "fireRed": {
+        "symbol": "ITEM_HM04",
+        "id": 342,
+        "hex": "0x156",
+        "move": "STRENGTH",
+        "source": "include/constants/items.h:353"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_HM_FLASH",
+      "red": {
+        "symbol": "HM_FLASH",
+        "id": 200,
+        "hex": "0xC8",
+        "kind": "hm",
+        "source": "constants/item_constants.asm:145",
+        "move": "FLASH",
+        "machineNumber": 5
+      },
+      "fireRed": {
+        "symbol": "ITEM_HM05",
+        "id": 343,
+        "hex": "0x157",
+        "move": "FLASH",
+        "source": "include/constants/items.h:354"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_MEGA_PUNCH",
+      "red": {
+        "symbol": "TM_MEGA_PUNCH",
+        "id": 201,
+        "hex": "0xC9",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:161",
+        "move": "MEGA_PUNCH",
+        "machineNumber": 1
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_RAZOR_WIND",
+      "red": {
+        "symbol": "TM_RAZOR_WIND",
+        "id": 202,
+        "hex": "0xCA",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:162",
+        "move": "RAZOR_WIND",
+        "machineNumber": 2
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_SWORDS_DANCE",
+      "red": {
+        "symbol": "TM_SWORDS_DANCE",
+        "id": 203,
+        "hex": "0xCB",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:163",
+        "move": "SWORDS_DANCE",
+        "machineNumber": 3
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_WHIRLWIND",
+      "red": {
+        "symbol": "TM_WHIRLWIND",
+        "id": 204,
+        "hex": "0xCC",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:164",
+        "move": "WHIRLWIND",
+        "machineNumber": 4
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_MEGA_KICK",
+      "red": {
+        "symbol": "TM_MEGA_KICK",
+        "id": 205,
+        "hex": "0xCD",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:165",
+        "move": "MEGA_KICK",
+        "machineNumber": 5
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_TOXIC",
+      "red": {
+        "symbol": "TM_TOXIC",
+        "id": 206,
+        "hex": "0xCE",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:166",
+        "move": "TOXIC",
+        "machineNumber": 6
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM06",
+        "id": 294,
+        "hex": "0x126",
+        "move": "TOXIC",
+        "source": "include/constants/items.h:305"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_HORN_DRILL",
+      "red": {
+        "symbol": "TM_HORN_DRILL",
+        "id": 207,
+        "hex": "0xCF",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:167",
+        "move": "HORN_DRILL",
+        "machineNumber": 7
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_BODY_SLAM",
+      "red": {
+        "symbol": "TM_BODY_SLAM",
+        "id": 208,
+        "hex": "0xD0",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:168",
+        "move": "BODY_SLAM",
+        "machineNumber": 8
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_TAKE_DOWN",
+      "red": {
+        "symbol": "TM_TAKE_DOWN",
+        "id": 209,
+        "hex": "0xD1",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:169",
+        "move": "TAKE_DOWN",
+        "machineNumber": 9
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_DOUBLE_EDGE",
+      "red": {
+        "symbol": "TM_DOUBLE_EDGE",
+        "id": 210,
+        "hex": "0xD2",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:170",
+        "move": "DOUBLE_EDGE",
+        "machineNumber": 10
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_BUBBLEBEAM",
+      "red": {
+        "symbol": "TM_BUBBLEBEAM",
+        "id": 211,
+        "hex": "0xD3",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:171",
+        "move": "BUBBLEBEAM",
+        "machineNumber": 11
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_WATER_GUN",
+      "red": {
+        "symbol": "TM_WATER_GUN",
+        "id": 212,
+        "hex": "0xD4",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:172",
+        "move": "WATER_GUN",
+        "machineNumber": 12
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_ICE_BEAM",
+      "red": {
+        "symbol": "TM_ICE_BEAM",
+        "id": 213,
+        "hex": "0xD5",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:173",
+        "move": "ICE_BEAM",
+        "machineNumber": 13
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM13",
+        "id": 301,
+        "hex": "0x12D",
+        "move": "ICE_BEAM",
+        "source": "include/constants/items.h:312"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_BLIZZARD",
+      "red": {
+        "symbol": "TM_BLIZZARD",
+        "id": 214,
+        "hex": "0xD6",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:174",
+        "move": "BLIZZARD",
+        "machineNumber": 14
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM14",
+        "id": 302,
+        "hex": "0x12E",
+        "move": "BLIZZARD",
+        "source": "include/constants/items.h:313"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_HYPER_BEAM",
+      "red": {
+        "symbol": "TM_HYPER_BEAM",
+        "id": 215,
+        "hex": "0xD7",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:175",
+        "move": "HYPER_BEAM",
+        "machineNumber": 15
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM15",
+        "id": 303,
+        "hex": "0x12F",
+        "move": "HYPER_BEAM",
+        "source": "include/constants/items.h:314"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_PAY_DAY",
+      "red": {
+        "symbol": "TM_PAY_DAY",
+        "id": 216,
+        "hex": "0xD8",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:176",
+        "move": "PAY_DAY",
+        "machineNumber": 16
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_SUBMISSION",
+      "red": {
+        "symbol": "TM_SUBMISSION",
+        "id": 217,
+        "hex": "0xD9",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:177",
+        "move": "SUBMISSION",
+        "machineNumber": 17
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_COUNTER",
+      "red": {
+        "symbol": "TM_COUNTER",
+        "id": 218,
+        "hex": "0xDA",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:178",
+        "move": "COUNTER",
+        "machineNumber": 18
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_SEISMIC_TOSS",
+      "red": {
+        "symbol": "TM_SEISMIC_TOSS",
+        "id": 219,
+        "hex": "0xDB",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:179",
+        "move": "SEISMIC_TOSS",
+        "machineNumber": 19
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_RAGE",
+      "red": {
+        "symbol": "TM_RAGE",
+        "id": 220,
+        "hex": "0xDC",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:180",
+        "move": "RAGE",
+        "machineNumber": 20
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_MEGA_DRAIN",
+      "red": {
+        "symbol": "TM_MEGA_DRAIN",
+        "id": 221,
+        "hex": "0xDD",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:181",
+        "move": "MEGA_DRAIN",
+        "machineNumber": 21
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_SOLARBEAM",
+      "red": {
+        "symbol": "TM_SOLARBEAM",
+        "id": 222,
+        "hex": "0xDE",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:182",
+        "move": "SOLARBEAM",
+        "machineNumber": 22
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM22",
+        "id": 310,
+        "hex": "0x136",
+        "move": "SOLAR_BEAM",
+        "source": "include/constants/items.h:321"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_DRAGON_RAGE",
+      "red": {
+        "symbol": "TM_DRAGON_RAGE",
+        "id": 223,
+        "hex": "0xDF",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:183",
+        "move": "DRAGON_RAGE",
+        "machineNumber": 23
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_THUNDERBOLT",
+      "red": {
+        "symbol": "TM_THUNDERBOLT",
+        "id": 224,
+        "hex": "0xE0",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:184",
+        "move": "THUNDERBOLT",
+        "machineNumber": 24
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM24",
+        "id": 312,
+        "hex": "0x138",
+        "move": "THUNDERBOLT",
+        "source": "include/constants/items.h:323"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_THUNDER",
+      "red": {
+        "symbol": "TM_THUNDER",
+        "id": 225,
+        "hex": "0xE1",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:185",
+        "move": "THUNDER",
+        "machineNumber": 25
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM25",
+        "id": 313,
+        "hex": "0x139",
+        "move": "THUNDER",
+        "source": "include/constants/items.h:324"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_EARTHQUAKE",
+      "red": {
+        "symbol": "TM_EARTHQUAKE",
+        "id": 226,
+        "hex": "0xE2",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:186",
+        "move": "EARTHQUAKE",
+        "machineNumber": 26
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM26",
+        "id": 314,
+        "hex": "0x13A",
+        "move": "EARTHQUAKE",
+        "source": "include/constants/items.h:325"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_FISSURE",
+      "red": {
+        "symbol": "TM_FISSURE",
+        "id": 227,
+        "hex": "0xE3",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:187",
+        "move": "FISSURE",
+        "machineNumber": 27
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_DIG",
+      "red": {
+        "symbol": "TM_DIG",
+        "id": 228,
+        "hex": "0xE4",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:188",
+        "move": "DIG",
+        "machineNumber": 28
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM28",
+        "id": 316,
+        "hex": "0x13C",
+        "move": "DIG",
+        "source": "include/constants/items.h:327"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_PSYCHIC_M",
+      "red": {
+        "symbol": "TM_PSYCHIC_M",
+        "id": 229,
+        "hex": "0xE5",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:189",
+        "move": "PSYCHIC_M",
+        "machineNumber": 29
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM29",
+        "id": 317,
+        "hex": "0x13D",
+        "move": "PSYCHIC",
+        "source": "include/constants/items.h:328"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_TELEPORT",
+      "red": {
+        "symbol": "TM_TELEPORT",
+        "id": 230,
+        "hex": "0xE6",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:190",
+        "move": "TELEPORT",
+        "machineNumber": 30
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_MIMIC",
+      "red": {
+        "symbol": "TM_MIMIC",
+        "id": 231,
+        "hex": "0xE7",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:191",
+        "move": "MIMIC",
+        "machineNumber": 31
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_DOUBLE_TEAM",
+      "red": {
+        "symbol": "TM_DOUBLE_TEAM",
+        "id": 232,
+        "hex": "0xE8",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:192",
+        "move": "DOUBLE_TEAM",
+        "machineNumber": 32
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM32",
+        "id": 320,
+        "hex": "0x140",
+        "move": "DOUBLE_TEAM",
+        "source": "include/constants/items.h:331"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_REFLECT",
+      "red": {
+        "symbol": "TM_REFLECT",
+        "id": 233,
+        "hex": "0xE9",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:193",
+        "move": "REFLECT",
+        "machineNumber": 33
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM33",
+        "id": 321,
+        "hex": "0x141",
+        "move": "REFLECT",
+        "source": "include/constants/items.h:332"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_BIDE",
+      "red": {
+        "symbol": "TM_BIDE",
+        "id": 234,
+        "hex": "0xEA",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:194",
+        "move": "BIDE",
+        "machineNumber": 34
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_METRONOME",
+      "red": {
+        "symbol": "TM_METRONOME",
+        "id": 235,
+        "hex": "0xEB",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:195",
+        "move": "METRONOME",
+        "machineNumber": 35
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_SELFDESTRUCT",
+      "red": {
+        "symbol": "TM_SELFDESTRUCT",
+        "id": 236,
+        "hex": "0xEC",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:196",
+        "move": "SELFDESTRUCT",
+        "machineNumber": 36
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_EGG_BOMB",
+      "red": {
+        "symbol": "TM_EGG_BOMB",
+        "id": 237,
+        "hex": "0xED",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:197",
+        "move": "EGG_BOMB",
+        "machineNumber": 37
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_FIRE_BLAST",
+      "red": {
+        "symbol": "TM_FIRE_BLAST",
+        "id": 238,
+        "hex": "0xEE",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:198",
+        "move": "FIRE_BLAST",
+        "machineNumber": 38
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM38",
+        "id": 326,
+        "hex": "0x146",
+        "move": "FIRE_BLAST",
+        "source": "include/constants/items.h:337"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_SWIFT",
+      "red": {
+        "symbol": "TM_SWIFT",
+        "id": 239,
+        "hex": "0xEF",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:199",
+        "move": "SWIFT",
+        "machineNumber": 39
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_SKULL_BASH",
+      "red": {
+        "symbol": "TM_SKULL_BASH",
+        "id": 240,
+        "hex": "0xF0",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:200",
+        "move": "SKULL_BASH",
+        "machineNumber": 40
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_SOFTBOILED",
+      "red": {
+        "symbol": "TM_SOFTBOILED",
+        "id": 241,
+        "hex": "0xF1",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:201",
+        "move": "SOFTBOILED",
+        "machineNumber": 41
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_DREAM_EATER",
+      "red": {
+        "symbol": "TM_DREAM_EATER",
+        "id": 242,
+        "hex": "0xF2",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:202",
+        "move": "DREAM_EATER",
+        "machineNumber": 42
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_SKY_ATTACK",
+      "red": {
+        "symbol": "TM_SKY_ATTACK",
+        "id": 243,
+        "hex": "0xF3",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:203",
+        "move": "SKY_ATTACK",
+        "machineNumber": 43
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_REST",
+      "red": {
+        "symbol": "TM_REST",
+        "id": 244,
+        "hex": "0xF4",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:204",
+        "move": "REST",
+        "machineNumber": 44
+      },
+      "fireRed": {
+        "symbol": "ITEM_TM44",
+        "id": 332,
+        "hex": "0x14C",
+        "move": "REST",
+        "source": "include/constants/items.h:343"
+      },
+      "classification": "DIRECT_ITEM_EQUIVALENT",
+      "confidence": "confirmed-source",
+      "conversionAction": "translate-by-move-and-reconcile-story-reward",
+      "storyReconciliation": true,
+      "notes": "Machine mapping is based on the taught move, never the numeric TM/HM ID."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_THUNDER_WAVE",
+      "red": {
+        "symbol": "TM_THUNDER_WAVE",
+        "id": 245,
+        "hex": "0xF5",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:205",
+        "move": "THUNDER_WAVE",
+        "machineNumber": 45
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_PSYWAVE",
+      "red": {
+        "symbol": "TM_PSYWAVE",
+        "id": 246,
+        "hex": "0xF6",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:206",
+        "move": "PSYWAVE",
+        "machineNumber": 46
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_EXPLOSION",
+      "red": {
+        "symbol": "TM_EXPLOSION",
+        "id": 247,
+        "hex": "0xF7",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:207",
+        "move": "EXPLOSION",
+        "machineNumber": 47
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_ROCK_SLIDE",
+      "red": {
+        "symbol": "TM_ROCK_SLIDE",
+        "id": 248,
+        "hex": "0xF8",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:208",
+        "move": "ROCK_SLIDE",
+        "machineNumber": 48
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_TRI_ATTACK",
+      "red": {
+        "symbol": "TM_TRI_ATTACK",
+        "id": 249,
+        "hex": "0xF9",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:209",
+        "move": "TRI_ATTACK",
+        "machineNumber": 49
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    },
+    {
+      "semanticId": "RED_ITEM_TM_SUBSTITUTE",
+      "red": {
+        "symbol": "TM_SUBSTITUTE",
+        "id": 250,
+        "hex": "0xFA",
+        "kind": "tm",
+        "source": "constants/item_constants.asm:210",
+        "move": "SUBSTITUTE",
+        "machineNumber": 50
+      },
+      "fireRed": null,
+      "classification": "RED_ONLY_UNSUPPORTED",
+      "confidence": "confirmed-source",
+      "conversionAction": "omit-machine-and-audit",
+      "storyReconciliation": false,
+      "notes": "FireRed has no same-move machine. Do not substitute a tutor or a same-numbered machine."
+    }
+  ],
+  "fireRedOnly": [
+    {
+      "symbol": "ITEM_VS_SEEKER",
+      "id": 362,
+      "treatment": "safe-default-absent",
+      "reason": "FireRed-only trainer/rematch system"
+    },
+    {
+      "symbol": "ITEM_FAME_CHECKER",
+      "id": 363,
+      "treatment": "derive-from-target-story-or-default",
+      "reason": "FireRed-only story reference system"
+    },
+    {
+      "symbol": "ITEM_TM_CASE",
+      "id": 364,
+      "treatment": "generator-companion",
+      "reason": "Required FireRed container for TM/HM inventory"
+    },
+    {
+      "symbol": "ITEM_BERRY_POUCH",
+      "id": 365,
+      "treatment": "generator-companion",
+      "reason": "FireRed-only container; default consistently with target story"
+    },
+    {
+      "symbol": "ITEM_TEACHY_TV",
+      "id": 366,
+      "treatment": "safe-default-or-target-story",
+      "reason": "FireRed-only tutorial key item"
+    },
+    {
+      "symbol": "ITEM_TRI_PASS",
+      "id": 367,
+      "treatment": "safe-default-absent",
+      "reason": "Sevii progression; never infer from Red"
+    },
+    {
+      "symbol": "ITEM_RAINBOW_PASS",
+      "id": 368,
+      "treatment": "safe-default-absent",
+      "reason": "Sevii postgame progression; never infer from Red"
+    },
+    {
+      "symbol": "ITEM_TEA",
+      "id": 369,
+      "treatment": "derive-from-saffron-access-policy",
+      "reason": "FireRed replacement for the thirsty-guard drink milestone"
+    },
+    {
+      "symbol": "ITEM_MYSTIC_TICKET",
+      "id": 370,
+      "treatment": "omit-without-entitlement",
+      "reason": "External event entitlement"
+    },
+    {
+      "symbol": "ITEM_AURORA_TICKET",
+      "id": 371,
+      "treatment": "omit-without-entitlement",
+      "reason": "External event entitlement"
+    },
+    {
+      "symbol": "ITEM_POWDER_JAR",
+      "id": 372,
+      "treatment": "safe-default-absent",
+      "reason": "FireRed-only Berry Crush system"
+    },
+    {
+      "symbol": "ITEM_RUBY",
+      "id": 373,
+      "treatment": "safe-default-absent",
+      "reason": "Celio quest state; never infer from Red"
+    },
+    {
+      "symbol": "ITEM_SAPPHIRE",
+      "id": 374,
+      "treatment": "safe-default-absent",
+      "reason": "Celio quest state; never infer from Red"
+    },
+    {
+      "symbol": "ITEM_HM06_ROCK_SMASH",
+      "id": 344,
+      "treatment": "target-policy",
+      "reason": "FireRed/Sevii field progression"
+    },
+    {
+      "symbol": "ITEM_HM07_WATERFALL",
+      "id": 345,
+      "treatment": "target-policy",
+      "reason": "FireRed/Sevii field progression"
+    },
+    {
+      "symbol": "ITEM_HM08_DIVE",
+      "id": 346,
+      "treatment": "omit-unused",
+      "reason": "Defined by the shared engine but unavailable in normal FireRed play"
+    }
+  ]
+}

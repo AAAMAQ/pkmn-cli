@@ -1,0 +1,6055 @@
+{
+  "schemaVersion": "1.0.0",
+  "pret": {
+    "red": "d70d99ffbd329473d96eaaf19fd97c86d2220b7f",
+    "fireRed": "df4449a27cd78dd747ce269e47d3ab4a0149d8f4"
+  },
+  "species": {
+    "1": {
+      "nationalDexNumber": 1,
+      "speciesName": "BULBASAUR",
+      "fireRedSpeciesId": 1,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 45,
+        "attack": 49,
+        "defense": 49,
+        "speed": 45,
+        "specialAttack": 65,
+        "specialDefense": 65
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_OVERGROW",
+          "id": 65
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "2": {
+      "nationalDexNumber": 2,
+      "speciesName": "IVYSAUR",
+      "fireRedSpeciesId": 2,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 62,
+        "defense": 63,
+        "speed": 60,
+        "specialAttack": 80,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_OVERGROW",
+          "id": 65
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "3": {
+      "nationalDexNumber": 3,
+      "speciesName": "VENUSAUR",
+      "fireRedSpeciesId": 3,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 80,
+        "attack": 82,
+        "defense": 83,
+        "speed": 80,
+        "specialAttack": 100,
+        "specialDefense": 100
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_OVERGROW",
+          "id": 65
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "4": {
+      "nationalDexNumber": 4,
+      "speciesName": "CHARMANDER",
+      "fireRedSpeciesId": 4,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 39,
+        "attack": 52,
+        "defense": 43,
+        "speed": 65,
+        "specialAttack": 60,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_BLAZE",
+          "id": 66
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "5": {
+      "nationalDexNumber": 5,
+      "speciesName": "CHARMELEON",
+      "fireRedSpeciesId": 5,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 58,
+        "attack": 64,
+        "defense": 58,
+        "speed": 80,
+        "specialAttack": 80,
+        "specialDefense": 65
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_BLAZE",
+          "id": 66
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "6": {
+      "nationalDexNumber": 6,
+      "speciesName": "CHARIZARD",
+      "fireRedSpeciesId": 6,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 78,
+        "attack": 84,
+        "defense": 78,
+        "speed": 100,
+        "specialAttack": 109,
+        "specialDefense": 85
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_BLAZE",
+          "id": 66
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "7": {
+      "nationalDexNumber": 7,
+      "speciesName": "SQUIRTLE",
+      "fireRedSpeciesId": 7,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 44,
+        "attack": 48,
+        "defense": 65,
+        "speed": 43,
+        "specialAttack": 50,
+        "specialDefense": 64
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_TORRENT",
+          "id": 67
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "8": {
+      "nationalDexNumber": 8,
+      "speciesName": "WARTORTLE",
+      "fireRedSpeciesId": 8,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 59,
+        "attack": 63,
+        "defense": 80,
+        "speed": 58,
+        "specialAttack": 65,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_TORRENT",
+          "id": 67
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "9": {
+      "nationalDexNumber": 9,
+      "speciesName": "BLASTOISE",
+      "fireRedSpeciesId": 9,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 79,
+        "attack": 83,
+        "defense": 100,
+        "speed": 78,
+        "specialAttack": 85,
+        "specialDefense": 105
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_TORRENT",
+          "id": 67
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "10": {
+      "nationalDexNumber": 10,
+      "speciesName": "CATERPIE",
+      "fireRedSpeciesId": 10,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 45,
+        "attack": 30,
+        "defense": 35,
+        "speed": 45,
+        "specialAttack": 20,
+        "specialDefense": 20
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SHIELD_DUST",
+          "id": 19
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "11": {
+      "nationalDexNumber": 11,
+      "speciesName": "METAPOD",
+      "fireRedSpeciesId": 11,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 50,
+        "attack": 20,
+        "defense": 55,
+        "speed": 30,
+        "specialAttack": 25,
+        "specialDefense": 25
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SHED_SKIN",
+          "id": 61
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "12": {
+      "nationalDexNumber": 12,
+      "speciesName": "BUTTERFREE",
+      "fireRedSpeciesId": 12,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 45,
+        "defense": 50,
+        "speed": 70,
+        "specialAttack": 80,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_COMPOUND_EYES",
+          "id": 14
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "13": {
+      "nationalDexNumber": 13,
+      "speciesName": "WEEDLE",
+      "fireRedSpeciesId": 13,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 35,
+        "defense": 30,
+        "speed": 50,
+        "specialAttack": 20,
+        "specialDefense": 20
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SHIELD_DUST",
+          "id": 19
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "14": {
+      "nationalDexNumber": 14,
+      "speciesName": "KAKUNA",
+      "fireRedSpeciesId": 14,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 45,
+        "attack": 25,
+        "defense": 50,
+        "speed": 35,
+        "specialAttack": 25,
+        "specialDefense": 25
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SHED_SKIN",
+          "id": 61
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "15": {
+      "nationalDexNumber": 15,
+      "speciesName": "BEEDRILL",
+      "fireRedSpeciesId": 15,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 80,
+        "defense": 40,
+        "speed": 75,
+        "specialAttack": 45,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SWARM",
+          "id": 68
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "16": {
+      "nationalDexNumber": 16,
+      "speciesName": "PIDGEY",
+      "fireRedSpeciesId": 16,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 45,
+        "defense": 40,
+        "speed": 56,
+        "specialAttack": 35,
+        "specialDefense": 35
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_KEEN_EYE",
+          "id": 51
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "17": {
+      "nationalDexNumber": 17,
+      "speciesName": "PIDGEOTTO",
+      "fireRedSpeciesId": 17,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 63,
+        "attack": 60,
+        "defense": 55,
+        "speed": 71,
+        "specialAttack": 50,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_KEEN_EYE",
+          "id": 51
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "18": {
+      "nationalDexNumber": 18,
+      "speciesName": "PIDGEOT",
+      "fireRedSpeciesId": 18,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 83,
+        "attack": 80,
+        "defense": 75,
+        "speed": 91,
+        "specialAttack": 70,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_KEEN_EYE",
+          "id": 51
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "19": {
+      "nationalDexNumber": 19,
+      "speciesName": "RATTATA",
+      "fireRedSpeciesId": 19,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 30,
+        "attack": 56,
+        "defense": 35,
+        "speed": 72,
+        "specialAttack": 25,
+        "specialDefense": 35
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_RUN_AWAY",
+          "id": 50
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_GUTS",
+          "id": 62
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "20": {
+      "nationalDexNumber": 20,
+      "speciesName": "RATICATE",
+      "fireRedSpeciesId": 20,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 55,
+        "attack": 81,
+        "defense": 60,
+        "speed": 97,
+        "specialAttack": 50,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_RUN_AWAY",
+          "id": 50
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_GUTS",
+          "id": 62
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "21": {
+      "nationalDexNumber": 21,
+      "speciesName": "SPEAROW",
+      "fireRedSpeciesId": 21,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 60,
+        "defense": 30,
+        "speed": 70,
+        "specialAttack": 31,
+        "specialDefense": 31
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_KEEN_EYE",
+          "id": 51
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "22": {
+      "nationalDexNumber": 22,
+      "speciesName": "FEAROW",
+      "fireRedSpeciesId": 22,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 90,
+        "defense": 65,
+        "speed": 100,
+        "specialAttack": 61,
+        "specialDefense": 61
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_KEEN_EYE",
+          "id": 51
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "23": {
+      "nationalDexNumber": 23,
+      "speciesName": "EKANS",
+      "fireRedSpeciesId": 23,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 35,
+        "attack": 60,
+        "defense": 44,
+        "speed": 55,
+        "specialAttack": 40,
+        "specialDefense": 54
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INTIMIDATE",
+          "id": 22
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_SHED_SKIN",
+          "id": 61
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "24": {
+      "nationalDexNumber": 24,
+      "speciesName": "ARBOK",
+      "fireRedSpeciesId": 24,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 85,
+        "defense": 69,
+        "speed": 80,
+        "specialAttack": 65,
+        "specialDefense": 79
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INTIMIDATE",
+          "id": 22
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_SHED_SKIN",
+          "id": 61
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "25": {
+      "nationalDexNumber": 25,
+      "speciesName": "PIKACHU",
+      "fireRedSpeciesId": 25,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 35,
+        "attack": 55,
+        "defense": 30,
+        "speed": 90,
+        "specialAttack": 50,
+        "specialDefense": 40
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_STATIC",
+          "id": 9
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "26": {
+      "nationalDexNumber": 26,
+      "speciesName": "RAICHU",
+      "fireRedSpeciesId": 26,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 90,
+        "defense": 55,
+        "speed": 100,
+        "specialAttack": 90,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_STATIC",
+          "id": 9
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "27": {
+      "nationalDexNumber": 27,
+      "speciesName": "SANDSHREW",
+      "fireRedSpeciesId": 27,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 50,
+        "attack": 75,
+        "defense": 85,
+        "speed": 40,
+        "specialAttack": 20,
+        "specialDefense": 30
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SAND_VEIL",
+          "id": 8
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "28": {
+      "nationalDexNumber": 28,
+      "speciesName": "SANDSLASH",
+      "fireRedSpeciesId": 28,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 75,
+        "attack": 100,
+        "defense": 110,
+        "speed": 65,
+        "specialAttack": 45,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SAND_VEIL",
+          "id": 8
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "29": {
+      "nationalDexNumber": 29,
+      "speciesName": "NIDORAN_F",
+      "fireRedSpeciesId": 29,
+      "genderRatio": 254,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 55,
+        "attack": 47,
+        "defense": 52,
+        "speed": 41,
+        "specialAttack": 40,
+        "specialDefense": 40
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_POISON_POINT",
+          "id": 38
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "30": {
+      "nationalDexNumber": 30,
+      "speciesName": "NIDORINA",
+      "fireRedSpeciesId": 30,
+      "genderRatio": 254,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 70,
+        "attack": 62,
+        "defense": 67,
+        "speed": 56,
+        "specialAttack": 55,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_POISON_POINT",
+          "id": 38
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "31": {
+      "nationalDexNumber": 31,
+      "speciesName": "NIDOQUEEN",
+      "fireRedSpeciesId": 31,
+      "genderRatio": 254,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 90,
+        "attack": 82,
+        "defense": 87,
+        "speed": 76,
+        "specialAttack": 75,
+        "specialDefense": 85
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_POISON_POINT",
+          "id": 38
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "32": {
+      "nationalDexNumber": 32,
+      "speciesName": "NIDORAN_M",
+      "fireRedSpeciesId": 32,
+      "genderRatio": 0,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 46,
+        "attack": 57,
+        "defense": 40,
+        "speed": 50,
+        "specialAttack": 40,
+        "specialDefense": 40
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_POISON_POINT",
+          "id": 38
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "33": {
+      "nationalDexNumber": 33,
+      "speciesName": "NIDORINO",
+      "fireRedSpeciesId": 33,
+      "genderRatio": 0,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 61,
+        "attack": 72,
+        "defense": 57,
+        "speed": 65,
+        "specialAttack": 55,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_POISON_POINT",
+          "id": 38
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "34": {
+      "nationalDexNumber": 34,
+      "speciesName": "NIDOKING",
+      "fireRedSpeciesId": 34,
+      "genderRatio": 0,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 81,
+        "attack": 92,
+        "defense": 77,
+        "speed": 85,
+        "specialAttack": 85,
+        "specialDefense": 75
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_POISON_POINT",
+          "id": 38
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "35": {
+      "nationalDexNumber": 35,
+      "speciesName": "CLEFAIRY",
+      "fireRedSpeciesId": 35,
+      "genderRatio": 191,
+      "baseFriendship": 140,
+      "baseStats": {
+        "hp": 70,
+        "attack": 45,
+        "defense": 48,
+        "speed": 35,
+        "specialAttack": 60,
+        "specialDefense": 65
+      },
+      "growthRate": "GROWTH_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CUTE_CHARM",
+          "id": 56
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "36": {
+      "nationalDexNumber": 36,
+      "speciesName": "CLEFABLE",
+      "fireRedSpeciesId": 36,
+      "genderRatio": 191,
+      "baseFriendship": 140,
+      "baseStats": {
+        "hp": 95,
+        "attack": 70,
+        "defense": 73,
+        "speed": 60,
+        "specialAttack": 85,
+        "specialDefense": 90
+      },
+      "growthRate": "GROWTH_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CUTE_CHARM",
+          "id": 56
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "37": {
+      "nationalDexNumber": 37,
+      "speciesName": "VULPIX",
+      "fireRedSpeciesId": 37,
+      "genderRatio": 191,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 38,
+        "attack": 41,
+        "defense": 40,
+        "speed": 65,
+        "specialAttack": 50,
+        "specialDefense": 65
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_FLASH_FIRE",
+          "id": 18
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "38": {
+      "nationalDexNumber": 38,
+      "speciesName": "NINETALES",
+      "fireRedSpeciesId": 38,
+      "genderRatio": 191,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 73,
+        "attack": 76,
+        "defense": 75,
+        "speed": 100,
+        "specialAttack": 81,
+        "specialDefense": 100
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_FLASH_FIRE",
+          "id": 18
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "39": {
+      "nationalDexNumber": 39,
+      "speciesName": "JIGGLYPUFF",
+      "fireRedSpeciesId": 39,
+      "genderRatio": 191,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 115,
+        "attack": 45,
+        "defense": 20,
+        "speed": 20,
+        "specialAttack": 45,
+        "specialDefense": 25
+      },
+      "growthRate": "GROWTH_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CUTE_CHARM",
+          "id": 56
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "40": {
+      "nationalDexNumber": 40,
+      "speciesName": "WIGGLYTUFF",
+      "fireRedSpeciesId": 40,
+      "genderRatio": 191,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 140,
+        "attack": 70,
+        "defense": 45,
+        "speed": 45,
+        "specialAttack": 75,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CUTE_CHARM",
+          "id": 56
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "41": {
+      "nationalDexNumber": 41,
+      "speciesName": "ZUBAT",
+      "fireRedSpeciesId": 41,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 45,
+        "defense": 35,
+        "speed": 55,
+        "specialAttack": 30,
+        "specialDefense": 40
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INNER_FOCUS",
+          "id": 39
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "42": {
+      "nationalDexNumber": 42,
+      "speciesName": "GOLBAT",
+      "fireRedSpeciesId": 42,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 75,
+        "attack": 80,
+        "defense": 70,
+        "speed": 90,
+        "specialAttack": 65,
+        "specialDefense": 75
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INNER_FOCUS",
+          "id": 39
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "43": {
+      "nationalDexNumber": 43,
+      "speciesName": "ODDISH",
+      "fireRedSpeciesId": 43,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 45,
+        "attack": 50,
+        "defense": 55,
+        "speed": 30,
+        "specialAttack": 75,
+        "specialDefense": 65
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CHLOROPHYLL",
+          "id": 34
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "44": {
+      "nationalDexNumber": 44,
+      "speciesName": "GLOOM",
+      "fireRedSpeciesId": 44,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 65,
+        "defense": 70,
+        "speed": 40,
+        "specialAttack": 85,
+        "specialDefense": 75
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CHLOROPHYLL",
+          "id": 34
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "45": {
+      "nationalDexNumber": 45,
+      "speciesName": "VILEPLUME",
+      "fireRedSpeciesId": 45,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 75,
+        "attack": 80,
+        "defense": 85,
+        "speed": 50,
+        "specialAttack": 100,
+        "specialDefense": 90
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CHLOROPHYLL",
+          "id": 34
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "46": {
+      "nationalDexNumber": 46,
+      "speciesName": "PARAS",
+      "fireRedSpeciesId": 46,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 35,
+        "attack": 70,
+        "defense": 55,
+        "speed": 25,
+        "specialAttack": 45,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_EFFECT_SPORE",
+          "id": 27
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "47": {
+      "nationalDexNumber": 47,
+      "speciesName": "PARASECT",
+      "fireRedSpeciesId": 47,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 95,
+        "defense": 80,
+        "speed": 30,
+        "specialAttack": 60,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_EFFECT_SPORE",
+          "id": 27
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "48": {
+      "nationalDexNumber": 48,
+      "speciesName": "VENONAT",
+      "fireRedSpeciesId": 48,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 55,
+        "defense": 50,
+        "speed": 45,
+        "specialAttack": 40,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_COMPOUND_EYES",
+          "id": 14
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "49": {
+      "nationalDexNumber": 49,
+      "speciesName": "VENOMOTH",
+      "fireRedSpeciesId": 49,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 70,
+        "attack": 65,
+        "defense": 60,
+        "speed": 90,
+        "specialAttack": 90,
+        "specialDefense": 75
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SHIELD_DUST",
+          "id": 19
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "50": {
+      "nationalDexNumber": 50,
+      "speciesName": "DIGLETT",
+      "fireRedSpeciesId": 50,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 10,
+        "attack": 55,
+        "defense": 25,
+        "speed": 95,
+        "specialAttack": 35,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SAND_VEIL",
+          "id": 8
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_ARENA_TRAP",
+          "id": 71
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "51": {
+      "nationalDexNumber": 51,
+      "speciesName": "DUGTRIO",
+      "fireRedSpeciesId": 51,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 35,
+        "attack": 80,
+        "defense": 50,
+        "speed": 120,
+        "specialAttack": 50,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SAND_VEIL",
+          "id": 8
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_ARENA_TRAP",
+          "id": 71
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "52": {
+      "nationalDexNumber": 52,
+      "speciesName": "MEOWTH",
+      "fireRedSpeciesId": 52,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 45,
+        "defense": 35,
+        "speed": 90,
+        "specialAttack": 40,
+        "specialDefense": 40
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_PICKUP",
+          "id": 53
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "53": {
+      "nationalDexNumber": 53,
+      "speciesName": "PERSIAN",
+      "fireRedSpeciesId": 53,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 70,
+        "defense": 60,
+        "speed": 115,
+        "specialAttack": 65,
+        "specialDefense": 65
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_LIMBER",
+          "id": 7
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "54": {
+      "nationalDexNumber": 54,
+      "speciesName": "PSYDUCK",
+      "fireRedSpeciesId": 54,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 50,
+        "attack": 52,
+        "defense": 48,
+        "speed": 55,
+        "specialAttack": 65,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_DAMP",
+          "id": 6
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_CLOUD_NINE",
+          "id": 13
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "55": {
+      "nationalDexNumber": 55,
+      "speciesName": "GOLDUCK",
+      "fireRedSpeciesId": 55,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 80,
+        "attack": 82,
+        "defense": 78,
+        "speed": 85,
+        "specialAttack": 95,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_DAMP",
+          "id": 6
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_CLOUD_NINE",
+          "id": 13
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "56": {
+      "nationalDexNumber": 56,
+      "speciesName": "MANKEY",
+      "fireRedSpeciesId": 56,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 80,
+        "defense": 35,
+        "speed": 70,
+        "specialAttack": 35,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_VITAL_SPIRIT",
+          "id": 72
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "57": {
+      "nationalDexNumber": 57,
+      "speciesName": "PRIMEAPE",
+      "fireRedSpeciesId": 57,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 105,
+        "defense": 60,
+        "speed": 95,
+        "specialAttack": 60,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_VITAL_SPIRIT",
+          "id": 72
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "58": {
+      "nationalDexNumber": 58,
+      "speciesName": "GROWLITHE",
+      "fireRedSpeciesId": 58,
+      "genderRatio": 63,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 55,
+        "attack": 70,
+        "defense": 45,
+        "speed": 60,
+        "specialAttack": 70,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INTIMIDATE",
+          "id": 22
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_FLASH_FIRE",
+          "id": 18
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "59": {
+      "nationalDexNumber": 59,
+      "speciesName": "ARCANINE",
+      "fireRedSpeciesId": 59,
+      "genderRatio": 63,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 90,
+        "attack": 110,
+        "defense": 80,
+        "speed": 95,
+        "specialAttack": 100,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INTIMIDATE",
+          "id": 22
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_FLASH_FIRE",
+          "id": 18
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "60": {
+      "nationalDexNumber": 60,
+      "speciesName": "POLIWAG",
+      "fireRedSpeciesId": 60,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 50,
+        "defense": 40,
+        "speed": 90,
+        "specialAttack": 40,
+        "specialDefense": 40
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_WATER_ABSORB",
+          "id": 11
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_DAMP",
+          "id": 6
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "61": {
+      "nationalDexNumber": 61,
+      "speciesName": "POLIWHIRL",
+      "fireRedSpeciesId": 61,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 65,
+        "defense": 65,
+        "speed": 90,
+        "specialAttack": 50,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_WATER_ABSORB",
+          "id": 11
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_DAMP",
+          "id": 6
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "62": {
+      "nationalDexNumber": 62,
+      "speciesName": "POLIWRATH",
+      "fireRedSpeciesId": 62,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 90,
+        "attack": 85,
+        "defense": 95,
+        "speed": 70,
+        "specialAttack": 70,
+        "specialDefense": 90
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_WATER_ABSORB",
+          "id": 11
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_DAMP",
+          "id": 6
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "63": {
+      "nationalDexNumber": 63,
+      "speciesName": "ABRA",
+      "fireRedSpeciesId": 63,
+      "genderRatio": 63,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 25,
+        "attack": 20,
+        "defense": 15,
+        "speed": 90,
+        "specialAttack": 105,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SYNCHRONIZE",
+          "id": 28
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_INNER_FOCUS",
+          "id": 39
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "64": {
+      "nationalDexNumber": 64,
+      "speciesName": "KADABRA",
+      "fireRedSpeciesId": 64,
+      "genderRatio": 63,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 35,
+        "defense": 30,
+        "speed": 105,
+        "specialAttack": 120,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SYNCHRONIZE",
+          "id": 28
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_INNER_FOCUS",
+          "id": 39
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "65": {
+      "nationalDexNumber": 65,
+      "speciesName": "ALAKAZAM",
+      "fireRedSpeciesId": 65,
+      "genderRatio": 63,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 55,
+        "attack": 50,
+        "defense": 45,
+        "speed": 120,
+        "specialAttack": 135,
+        "specialDefense": 85
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SYNCHRONIZE",
+          "id": 28
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_INNER_FOCUS",
+          "id": 39
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "66": {
+      "nationalDexNumber": 66,
+      "speciesName": "MACHOP",
+      "fireRedSpeciesId": 66,
+      "genderRatio": 63,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 70,
+        "attack": 80,
+        "defense": 50,
+        "speed": 35,
+        "specialAttack": 35,
+        "specialDefense": 35
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_GUTS",
+          "id": 62
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "67": {
+      "nationalDexNumber": 67,
+      "speciesName": "MACHOKE",
+      "fireRedSpeciesId": 67,
+      "genderRatio": 63,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 80,
+        "attack": 100,
+        "defense": 70,
+        "speed": 45,
+        "specialAttack": 50,
+        "specialDefense": 60
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_GUTS",
+          "id": 62
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "68": {
+      "nationalDexNumber": 68,
+      "speciesName": "MACHAMP",
+      "fireRedSpeciesId": 68,
+      "genderRatio": 63,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 90,
+        "attack": 130,
+        "defense": 80,
+        "speed": 55,
+        "specialAttack": 65,
+        "specialDefense": 85
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_GUTS",
+          "id": 62
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "69": {
+      "nationalDexNumber": 69,
+      "speciesName": "BELLSPROUT",
+      "fireRedSpeciesId": 69,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 50,
+        "attack": 75,
+        "defense": 35,
+        "speed": 40,
+        "specialAttack": 70,
+        "specialDefense": 30
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CHLOROPHYLL",
+          "id": 34
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "70": {
+      "nationalDexNumber": 70,
+      "speciesName": "WEEPINBELL",
+      "fireRedSpeciesId": 70,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 90,
+        "defense": 50,
+        "speed": 55,
+        "specialAttack": 85,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CHLOROPHYLL",
+          "id": 34
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "71": {
+      "nationalDexNumber": 71,
+      "speciesName": "VICTREEBEL",
+      "fireRedSpeciesId": 71,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 80,
+        "attack": 105,
+        "defense": 65,
+        "speed": 70,
+        "specialAttack": 100,
+        "specialDefense": 60
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CHLOROPHYLL",
+          "id": 34
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "72": {
+      "nationalDexNumber": 72,
+      "speciesName": "TENTACOOL",
+      "fireRedSpeciesId": 72,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 40,
+        "defense": 35,
+        "speed": 70,
+        "specialAttack": 50,
+        "specialDefense": 100
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CLEAR_BODY",
+          "id": 29
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_LIQUID_OOZE",
+          "id": 64
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "73": {
+      "nationalDexNumber": 73,
+      "speciesName": "TENTACRUEL",
+      "fireRedSpeciesId": 73,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 80,
+        "attack": 70,
+        "defense": 65,
+        "speed": 100,
+        "specialAttack": 80,
+        "specialDefense": 120
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CLEAR_BODY",
+          "id": 29
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_LIQUID_OOZE",
+          "id": 64
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "74": {
+      "nationalDexNumber": 74,
+      "speciesName": "GEODUDE",
+      "fireRedSpeciesId": 74,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 80,
+        "defense": 100,
+        "speed": 20,
+        "specialAttack": 30,
+        "specialDefense": 30
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_ROCK_HEAD",
+          "id": 69
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_STURDY",
+          "id": 5
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "75": {
+      "nationalDexNumber": 75,
+      "speciesName": "GRAVELER",
+      "fireRedSpeciesId": 75,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 55,
+        "attack": 95,
+        "defense": 115,
+        "speed": 35,
+        "specialAttack": 45,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_ROCK_HEAD",
+          "id": 69
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_STURDY",
+          "id": 5
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "76": {
+      "nationalDexNumber": 76,
+      "speciesName": "GOLEM",
+      "fireRedSpeciesId": 76,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 80,
+        "attack": 110,
+        "defense": 130,
+        "speed": 45,
+        "specialAttack": 55,
+        "specialDefense": 65
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_ROCK_HEAD",
+          "id": 69
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_STURDY",
+          "id": 5
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "77": {
+      "nationalDexNumber": 77,
+      "speciesName": "PONYTA",
+      "fireRedSpeciesId": 77,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 50,
+        "attack": 85,
+        "defense": 55,
+        "speed": 90,
+        "specialAttack": 65,
+        "specialDefense": 65
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_RUN_AWAY",
+          "id": 50
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_FLASH_FIRE",
+          "id": 18
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "78": {
+      "nationalDexNumber": 78,
+      "speciesName": "RAPIDASH",
+      "fireRedSpeciesId": 78,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 100,
+        "defense": 70,
+        "speed": 105,
+        "specialAttack": 80,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_RUN_AWAY",
+          "id": 50
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_FLASH_FIRE",
+          "id": 18
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "79": {
+      "nationalDexNumber": 79,
+      "speciesName": "SLOWPOKE",
+      "fireRedSpeciesId": 79,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 90,
+        "attack": 65,
+        "defense": 65,
+        "speed": 15,
+        "specialAttack": 40,
+        "specialDefense": 40
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_OBLIVIOUS",
+          "id": 12
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_OWN_TEMPO",
+          "id": 20
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "80": {
+      "nationalDexNumber": 80,
+      "speciesName": "SLOWBRO",
+      "fireRedSpeciesId": 80,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 95,
+        "attack": 75,
+        "defense": 110,
+        "speed": 30,
+        "specialAttack": 100,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_OBLIVIOUS",
+          "id": 12
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_OWN_TEMPO",
+          "id": 20
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "81": {
+      "nationalDexNumber": 81,
+      "speciesName": "MAGNEMITE",
+      "fireRedSpeciesId": 81,
+      "genderRatio": 255,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 25,
+        "attack": 35,
+        "defense": 70,
+        "speed": 45,
+        "specialAttack": 95,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_MAGNET_PULL",
+          "id": 42
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_STURDY",
+          "id": 5
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "82": {
+      "nationalDexNumber": 82,
+      "speciesName": "MAGNETON",
+      "fireRedSpeciesId": 82,
+      "genderRatio": 255,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 50,
+        "attack": 60,
+        "defense": 95,
+        "speed": 70,
+        "specialAttack": 120,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_MAGNET_PULL",
+          "id": 42
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_STURDY",
+          "id": 5
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "83": {
+      "nationalDexNumber": 83,
+      "speciesName": "FARFETCHD",
+      "fireRedSpeciesId": 83,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 52,
+        "attack": 65,
+        "defense": 55,
+        "speed": 60,
+        "specialAttack": 58,
+        "specialDefense": 62
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_KEEN_EYE",
+          "id": 51
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_INNER_FOCUS",
+          "id": 39
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "84": {
+      "nationalDexNumber": 84,
+      "speciesName": "DODUO",
+      "fireRedSpeciesId": 84,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 35,
+        "attack": 85,
+        "defense": 45,
+        "speed": 75,
+        "specialAttack": 35,
+        "specialDefense": 35
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_RUN_AWAY",
+          "id": 50
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_EARLY_BIRD",
+          "id": 48
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "85": {
+      "nationalDexNumber": 85,
+      "speciesName": "DODRIO",
+      "fireRedSpeciesId": 85,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 110,
+        "defense": 70,
+        "speed": 100,
+        "specialAttack": 60,
+        "specialDefense": 60
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_RUN_AWAY",
+          "id": 50
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_EARLY_BIRD",
+          "id": 48
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "86": {
+      "nationalDexNumber": 86,
+      "speciesName": "SEEL",
+      "fireRedSpeciesId": 86,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 45,
+        "defense": 55,
+        "speed": 45,
+        "specialAttack": 45,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_THICK_FAT",
+          "id": 47
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "87": {
+      "nationalDexNumber": 87,
+      "speciesName": "DEWGONG",
+      "fireRedSpeciesId": 87,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 90,
+        "attack": 70,
+        "defense": 80,
+        "speed": 70,
+        "specialAttack": 70,
+        "specialDefense": 95
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_THICK_FAT",
+          "id": 47
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "88": {
+      "nationalDexNumber": 88,
+      "speciesName": "GRIMER",
+      "fireRedSpeciesId": 88,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 80,
+        "attack": 80,
+        "defense": 50,
+        "speed": 25,
+        "specialAttack": 40,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_STENCH",
+          "id": 1
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_STICKY_HOLD",
+          "id": 60
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "89": {
+      "nationalDexNumber": 89,
+      "speciesName": "MUK",
+      "fireRedSpeciesId": 89,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 105,
+        "attack": 105,
+        "defense": 75,
+        "speed": 50,
+        "specialAttack": 65,
+        "specialDefense": 100
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_STENCH",
+          "id": 1
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_STICKY_HOLD",
+          "id": 60
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "90": {
+      "nationalDexNumber": 90,
+      "speciesName": "SHELLDER",
+      "fireRedSpeciesId": 90,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 30,
+        "attack": 65,
+        "defense": 100,
+        "speed": 40,
+        "specialAttack": 45,
+        "specialDefense": 25
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SHELL_ARMOR",
+          "id": 75
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "91": {
+      "nationalDexNumber": 91,
+      "speciesName": "CLOYSTER",
+      "fireRedSpeciesId": 91,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 50,
+        "attack": 95,
+        "defense": 180,
+        "speed": 70,
+        "specialAttack": 85,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SHELL_ARMOR",
+          "id": 75
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "92": {
+      "nationalDexNumber": 92,
+      "speciesName": "GASTLY",
+      "fireRedSpeciesId": 92,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 30,
+        "attack": 35,
+        "defense": 30,
+        "speed": 80,
+        "specialAttack": 100,
+        "specialDefense": 35
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_LEVITATE",
+          "id": 26
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "93": {
+      "nationalDexNumber": 93,
+      "speciesName": "HAUNTER",
+      "fireRedSpeciesId": 93,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 45,
+        "attack": 50,
+        "defense": 45,
+        "speed": 95,
+        "specialAttack": 115,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_LEVITATE",
+          "id": 26
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "94": {
+      "nationalDexNumber": 94,
+      "speciesName": "GENGAR",
+      "fireRedSpeciesId": 94,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 65,
+        "defense": 60,
+        "speed": 110,
+        "specialAttack": 130,
+        "specialDefense": 75
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_LEVITATE",
+          "id": 26
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "95": {
+      "nationalDexNumber": 95,
+      "speciesName": "ONIX",
+      "fireRedSpeciesId": 95,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 35,
+        "attack": 45,
+        "defense": 160,
+        "speed": 70,
+        "specialAttack": 30,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_ROCK_HEAD",
+          "id": 69
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_STURDY",
+          "id": 5
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "96": {
+      "nationalDexNumber": 96,
+      "speciesName": "DROWZEE",
+      "fireRedSpeciesId": 96,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 48,
+        "defense": 45,
+        "speed": 42,
+        "specialAttack": 43,
+        "specialDefense": 90
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INSOMNIA",
+          "id": 15
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "97": {
+      "nationalDexNumber": 97,
+      "speciesName": "HYPNO",
+      "fireRedSpeciesId": 97,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 85,
+        "attack": 73,
+        "defense": 70,
+        "speed": 67,
+        "specialAttack": 73,
+        "specialDefense": 115
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INSOMNIA",
+          "id": 15
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "98": {
+      "nationalDexNumber": 98,
+      "speciesName": "KRABBY",
+      "fireRedSpeciesId": 98,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 30,
+        "attack": 105,
+        "defense": 90,
+        "speed": 50,
+        "specialAttack": 25,
+        "specialDefense": 25
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_HYPER_CUTTER",
+          "id": 52
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_SHELL_ARMOR",
+          "id": 75
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "99": {
+      "nationalDexNumber": 99,
+      "speciesName": "KINGLER",
+      "fireRedSpeciesId": 99,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 55,
+        "attack": 130,
+        "defense": 115,
+        "speed": 75,
+        "specialAttack": 50,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_HYPER_CUTTER",
+          "id": 52
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_SHELL_ARMOR",
+          "id": 75
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "100": {
+      "nationalDexNumber": 100,
+      "speciesName": "VOLTORB",
+      "fireRedSpeciesId": 100,
+      "genderRatio": 255,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 30,
+        "defense": 50,
+        "speed": 100,
+        "specialAttack": 55,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SOUNDPROOF",
+          "id": 43
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_STATIC",
+          "id": 9
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "101": {
+      "nationalDexNumber": 101,
+      "speciesName": "ELECTRODE",
+      "fireRedSpeciesId": 101,
+      "genderRatio": 255,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 50,
+        "defense": 70,
+        "speed": 140,
+        "specialAttack": 80,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SOUNDPROOF",
+          "id": 43
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_STATIC",
+          "id": 9
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "102": {
+      "nationalDexNumber": 102,
+      "speciesName": "EXEGGCUTE",
+      "fireRedSpeciesId": 102,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 40,
+        "defense": 80,
+        "speed": 40,
+        "specialAttack": 60,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CHLOROPHYLL",
+          "id": 34
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "103": {
+      "nationalDexNumber": 103,
+      "speciesName": "EXEGGUTOR",
+      "fireRedSpeciesId": 103,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 95,
+        "attack": 95,
+        "defense": 85,
+        "speed": 55,
+        "specialAttack": 125,
+        "specialDefense": 65
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CHLOROPHYLL",
+          "id": 34
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "104": {
+      "nationalDexNumber": 104,
+      "speciesName": "CUBONE",
+      "fireRedSpeciesId": 104,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 50,
+        "attack": 50,
+        "defense": 95,
+        "speed": 35,
+        "specialAttack": 40,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_ROCK_HEAD",
+          "id": 69
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_LIGHTNING_ROD",
+          "id": 31
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "105": {
+      "nationalDexNumber": 105,
+      "speciesName": "MAROWAK",
+      "fireRedSpeciesId": 105,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 80,
+        "defense": 110,
+        "speed": 45,
+        "specialAttack": 50,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_ROCK_HEAD",
+          "id": 69
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_LIGHTNING_ROD",
+          "id": 31
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "106": {
+      "nationalDexNumber": 106,
+      "speciesName": "HITMONLEE",
+      "fireRedSpeciesId": 106,
+      "genderRatio": 0,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 50,
+        "attack": 120,
+        "defense": 53,
+        "speed": 87,
+        "specialAttack": 35,
+        "specialDefense": 110
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_LIMBER",
+          "id": 7
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "107": {
+      "nationalDexNumber": 107,
+      "speciesName": "HITMONCHAN",
+      "fireRedSpeciesId": 107,
+      "genderRatio": 0,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 50,
+        "attack": 105,
+        "defense": 79,
+        "speed": 76,
+        "specialAttack": 35,
+        "specialDefense": 110
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_KEEN_EYE",
+          "id": 51
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "108": {
+      "nationalDexNumber": 108,
+      "speciesName": "LICKITUNG",
+      "fireRedSpeciesId": 108,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 90,
+        "attack": 55,
+        "defense": 75,
+        "speed": 30,
+        "specialAttack": 60,
+        "specialDefense": 75
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_OWN_TEMPO",
+          "id": 20
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_OBLIVIOUS",
+          "id": 12
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "109": {
+      "nationalDexNumber": 109,
+      "speciesName": "KOFFING",
+      "fireRedSpeciesId": 109,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 65,
+        "defense": 95,
+        "speed": 35,
+        "specialAttack": 60,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_LEVITATE",
+          "id": 26
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "110": {
+      "nationalDexNumber": 110,
+      "speciesName": "WEEZING",
+      "fireRedSpeciesId": 110,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 90,
+        "defense": 120,
+        "speed": 60,
+        "specialAttack": 85,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_LEVITATE",
+          "id": 26
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "111": {
+      "nationalDexNumber": 111,
+      "speciesName": "RHYHORN",
+      "fireRedSpeciesId": 111,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 80,
+        "attack": 85,
+        "defense": 95,
+        "speed": 25,
+        "specialAttack": 30,
+        "specialDefense": 30
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_LIGHTNING_ROD",
+          "id": 31
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_ROCK_HEAD",
+          "id": 69
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "112": {
+      "nationalDexNumber": 112,
+      "speciesName": "RHYDON",
+      "fireRedSpeciesId": 112,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 105,
+        "attack": 130,
+        "defense": 120,
+        "speed": 40,
+        "specialAttack": 45,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_LIGHTNING_ROD",
+          "id": 31
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_ROCK_HEAD",
+          "id": 69
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "113": {
+      "nationalDexNumber": 113,
+      "speciesName": "CHANSEY",
+      "fireRedSpeciesId": 113,
+      "genderRatio": 254,
+      "baseFriendship": 140,
+      "baseStats": {
+        "hp": 250,
+        "attack": 5,
+        "defense": 5,
+        "speed": 50,
+        "specialAttack": 35,
+        "specialDefense": 105
+      },
+      "growthRate": "GROWTH_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_NATURAL_CURE",
+          "id": 30
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_SERENE_GRACE",
+          "id": 32
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "114": {
+      "nationalDexNumber": 114,
+      "speciesName": "TANGELA",
+      "fireRedSpeciesId": 114,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 55,
+        "defense": 115,
+        "speed": 60,
+        "specialAttack": 100,
+        "specialDefense": 40
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_CHLOROPHYLL",
+          "id": 34
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "115": {
+      "nationalDexNumber": 115,
+      "speciesName": "KANGASKHAN",
+      "fireRedSpeciesId": 115,
+      "genderRatio": 254,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 105,
+        "attack": 95,
+        "defense": 80,
+        "speed": 90,
+        "specialAttack": 40,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_EARLY_BIRD",
+          "id": 48
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "116": {
+      "nationalDexNumber": 116,
+      "speciesName": "HORSEA",
+      "fireRedSpeciesId": 116,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 30,
+        "attack": 40,
+        "defense": 70,
+        "speed": 60,
+        "specialAttack": 70,
+        "specialDefense": 25
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SWIFT_SWIM",
+          "id": 33
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "117": {
+      "nationalDexNumber": 117,
+      "speciesName": "SEADRA",
+      "fireRedSpeciesId": 117,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 55,
+        "attack": 65,
+        "defense": 95,
+        "speed": 85,
+        "specialAttack": 95,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_POISON_POINT",
+          "id": 38
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "118": {
+      "nationalDexNumber": 118,
+      "speciesName": "GOLDEEN",
+      "fireRedSpeciesId": 118,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 45,
+        "attack": 67,
+        "defense": 60,
+        "speed": 63,
+        "specialAttack": 35,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SWIFT_SWIM",
+          "id": 33
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_WATER_VEIL",
+          "id": 41
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "119": {
+      "nationalDexNumber": 119,
+      "speciesName": "SEAKING",
+      "fireRedSpeciesId": 119,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 80,
+        "attack": 92,
+        "defense": 65,
+        "speed": 68,
+        "specialAttack": 65,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SWIFT_SWIM",
+          "id": 33
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_WATER_VEIL",
+          "id": 41
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "120": {
+      "nationalDexNumber": 120,
+      "speciesName": "STARYU",
+      "fireRedSpeciesId": 120,
+      "genderRatio": 255,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 30,
+        "attack": 45,
+        "defense": 55,
+        "speed": 85,
+        "specialAttack": 70,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_ILLUMINATE",
+          "id": 35
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NATURAL_CURE",
+          "id": 30
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "121": {
+      "nationalDexNumber": 121,
+      "speciesName": "STARMIE",
+      "fireRedSpeciesId": 121,
+      "genderRatio": 255,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 75,
+        "defense": 85,
+        "speed": 115,
+        "specialAttack": 100,
+        "specialDefense": 85
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_ILLUMINATE",
+          "id": 35
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NATURAL_CURE",
+          "id": 30
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "122": {
+      "nationalDexNumber": 122,
+      "speciesName": "MR_MIME",
+      "fireRedSpeciesId": 122,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 40,
+        "attack": 45,
+        "defense": 65,
+        "speed": 90,
+        "specialAttack": 100,
+        "specialDefense": 120
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SOUNDPROOF",
+          "id": 43
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "123": {
+      "nationalDexNumber": 123,
+      "speciesName": "SCYTHER",
+      "fireRedSpeciesId": 123,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 70,
+        "attack": 110,
+        "defense": 80,
+        "speed": 105,
+        "specialAttack": 55,
+        "specialDefense": 80
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SWARM",
+          "id": 68
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "124": {
+      "nationalDexNumber": 124,
+      "speciesName": "JYNX",
+      "fireRedSpeciesId": 124,
+      "genderRatio": 254,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 50,
+        "defense": 35,
+        "speed": 95,
+        "specialAttack": 115,
+        "specialDefense": 95
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_OBLIVIOUS",
+          "id": 12
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "125": {
+      "nationalDexNumber": 125,
+      "speciesName": "ELECTABUZZ",
+      "fireRedSpeciesId": 125,
+      "genderRatio": 63,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 83,
+        "defense": 57,
+        "speed": 105,
+        "specialAttack": 95,
+        "specialDefense": 85
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_STATIC",
+          "id": 9
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "126": {
+      "nationalDexNumber": 126,
+      "speciesName": "MAGMAR",
+      "fireRedSpeciesId": 126,
+      "genderRatio": 63,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 95,
+        "defense": 57,
+        "speed": 93,
+        "specialAttack": 100,
+        "specialDefense": 85
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_FLAME_BODY",
+          "id": 49
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "127": {
+      "nationalDexNumber": 127,
+      "speciesName": "PINSIR",
+      "fireRedSpeciesId": 127,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 125,
+        "defense": 100,
+        "speed": 85,
+        "specialAttack": 55,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_HYPER_CUTTER",
+          "id": 52
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "128": {
+      "nationalDexNumber": 128,
+      "speciesName": "TAUROS",
+      "fireRedSpeciesId": 128,
+      "genderRatio": 0,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 75,
+        "attack": 100,
+        "defense": 95,
+        "speed": 110,
+        "specialAttack": 40,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INTIMIDATE",
+          "id": 22
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "129": {
+      "nationalDexNumber": 129,
+      "speciesName": "MAGIKARP",
+      "fireRedSpeciesId": 129,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 20,
+        "attack": 10,
+        "defense": 55,
+        "speed": 80,
+        "specialAttack": 15,
+        "specialDefense": 20
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SWIFT_SWIM",
+          "id": 33
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "130": {
+      "nationalDexNumber": 130,
+      "speciesName": "GYARADOS",
+      "fireRedSpeciesId": 130,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 95,
+        "attack": 125,
+        "defense": 79,
+        "speed": 81,
+        "specialAttack": 60,
+        "specialDefense": 100
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INTIMIDATE",
+          "id": 22
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "131": {
+      "nationalDexNumber": 131,
+      "speciesName": "LAPRAS",
+      "fireRedSpeciesId": 131,
+      "genderRatio": 127,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 130,
+        "attack": 85,
+        "defense": 80,
+        "speed": 60,
+        "specialAttack": 85,
+        "specialDefense": 95
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_WATER_ABSORB",
+          "id": 11
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_SHELL_ARMOR",
+          "id": 75
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "132": {
+      "nationalDexNumber": 132,
+      "speciesName": "DITTO",
+      "fireRedSpeciesId": 132,
+      "genderRatio": 255,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 48,
+        "attack": 48,
+        "defense": 48,
+        "speed": 48,
+        "specialAttack": 48,
+        "specialDefense": 48
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_LIMBER",
+          "id": 7
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "133": {
+      "nationalDexNumber": 133,
+      "speciesName": "EEVEE",
+      "fireRedSpeciesId": 133,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 55,
+        "attack": 55,
+        "defense": 50,
+        "speed": 55,
+        "specialAttack": 45,
+        "specialDefense": 65
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_RUN_AWAY",
+          "id": 50
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "134": {
+      "nationalDexNumber": 134,
+      "speciesName": "VAPOREON",
+      "fireRedSpeciesId": 134,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 130,
+        "attack": 65,
+        "defense": 60,
+        "speed": 65,
+        "specialAttack": 110,
+        "specialDefense": 95
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_WATER_ABSORB",
+          "id": 11
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "135": {
+      "nationalDexNumber": 135,
+      "speciesName": "JOLTEON",
+      "fireRedSpeciesId": 135,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 65,
+        "defense": 60,
+        "speed": 130,
+        "specialAttack": 110,
+        "specialDefense": 95
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_VOLT_ABSORB",
+          "id": 10
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "136": {
+      "nationalDexNumber": 136,
+      "speciesName": "FLAREON",
+      "fireRedSpeciesId": 136,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 130,
+        "defense": 60,
+        "speed": 65,
+        "specialAttack": 95,
+        "specialDefense": 110
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_FLASH_FIRE",
+          "id": 18
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "137": {
+      "nationalDexNumber": 137,
+      "speciesName": "PORYGON",
+      "fireRedSpeciesId": 137,
+      "genderRatio": 255,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 65,
+        "attack": 60,
+        "defense": 70,
+        "speed": 40,
+        "specialAttack": 85,
+        "specialDefense": 75
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_TRACE",
+          "id": 36
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "138": {
+      "nationalDexNumber": 138,
+      "speciesName": "OMANYTE",
+      "fireRedSpeciesId": 138,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 35,
+        "attack": 40,
+        "defense": 100,
+        "speed": 35,
+        "specialAttack": 90,
+        "specialDefense": 55
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SWIFT_SWIM",
+          "id": 33
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_SHELL_ARMOR",
+          "id": 75
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "139": {
+      "nationalDexNumber": 139,
+      "speciesName": "OMASTAR",
+      "fireRedSpeciesId": 139,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 70,
+        "attack": 60,
+        "defense": 125,
+        "speed": 55,
+        "specialAttack": 115,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SWIFT_SWIM",
+          "id": 33
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_SHELL_ARMOR",
+          "id": 75
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "140": {
+      "nationalDexNumber": 140,
+      "speciesName": "KABUTO",
+      "fireRedSpeciesId": 140,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 30,
+        "attack": 80,
+        "defense": 90,
+        "speed": 55,
+        "specialAttack": 55,
+        "specialDefense": 45
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SWIFT_SWIM",
+          "id": 33
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_BATTLE_ARMOR",
+          "id": 4
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "141": {
+      "nationalDexNumber": 141,
+      "speciesName": "KABUTOPS",
+      "fireRedSpeciesId": 141,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 60,
+        "attack": 115,
+        "defense": 105,
+        "speed": 80,
+        "specialAttack": 65,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_MEDIUM_FAST",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SWIFT_SWIM",
+          "id": 33
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_BATTLE_ARMOR",
+          "id": 4
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "142": {
+      "nationalDexNumber": 142,
+      "speciesName": "AERODACTYL",
+      "fireRedSpeciesId": 142,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 80,
+        "attack": 105,
+        "defense": 65,
+        "speed": 130,
+        "specialAttack": 60,
+        "specialDefense": 75
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_ROCK_HEAD",
+          "id": 69
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_PRESSURE",
+          "id": 46
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "143": {
+      "nationalDexNumber": 143,
+      "speciesName": "SNORLAX",
+      "fireRedSpeciesId": 143,
+      "genderRatio": 31,
+      "baseFriendship": 70,
+      "baseStats": {
+        "hp": 160,
+        "attack": 110,
+        "defense": 65,
+        "speed": 30,
+        "specialAttack": 65,
+        "specialDefense": 110
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_IMMUNITY",
+          "id": 17
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_THICK_FAT",
+          "id": 47
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "144": {
+      "nationalDexNumber": 144,
+      "speciesName": "ARTICUNO",
+      "fireRedSpeciesId": 144,
+      "genderRatio": 255,
+      "baseFriendship": 35,
+      "baseStats": {
+        "hp": 90,
+        "attack": 85,
+        "defense": 100,
+        "speed": 85,
+        "specialAttack": 95,
+        "specialDefense": 125
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_PRESSURE",
+          "id": 46
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "145": {
+      "nationalDexNumber": 145,
+      "speciesName": "ZAPDOS",
+      "fireRedSpeciesId": 145,
+      "genderRatio": 255,
+      "baseFriendship": 35,
+      "baseStats": {
+        "hp": 90,
+        "attack": 90,
+        "defense": 85,
+        "speed": 100,
+        "specialAttack": 125,
+        "specialDefense": 90
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_PRESSURE",
+          "id": 46
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "146": {
+      "nationalDexNumber": 146,
+      "speciesName": "MOLTRES",
+      "fireRedSpeciesId": 146,
+      "genderRatio": 255,
+      "baseFriendship": 35,
+      "baseStats": {
+        "hp": 90,
+        "attack": 100,
+        "defense": 90,
+        "speed": 90,
+        "specialAttack": 125,
+        "specialDefense": 85
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_PRESSURE",
+          "id": 46
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "147": {
+      "nationalDexNumber": 147,
+      "speciesName": "DRATINI",
+      "fireRedSpeciesId": 147,
+      "genderRatio": 127,
+      "baseFriendship": 35,
+      "baseStats": {
+        "hp": 41,
+        "attack": 64,
+        "defense": 45,
+        "speed": 50,
+        "specialAttack": 50,
+        "specialDefense": 50
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SHED_SKIN",
+          "id": 61
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "148": {
+      "nationalDexNumber": 148,
+      "speciesName": "DRAGONAIR",
+      "fireRedSpeciesId": 148,
+      "genderRatio": 127,
+      "baseFriendship": 35,
+      "baseStats": {
+        "hp": 61,
+        "attack": 84,
+        "defense": 65,
+        "speed": 70,
+        "specialAttack": 70,
+        "specialDefense": 70
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SHED_SKIN",
+          "id": 61
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "149": {
+      "nationalDexNumber": 149,
+      "speciesName": "DRAGONITE",
+      "fireRedSpeciesId": 149,
+      "genderRatio": 127,
+      "baseFriendship": 35,
+      "baseStats": {
+        "hp": 91,
+        "attack": 134,
+        "defense": 95,
+        "speed": 80,
+        "specialAttack": 100,
+        "specialDefense": 100
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_INNER_FOCUS",
+          "id": 39
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "150": {
+      "nationalDexNumber": 150,
+      "speciesName": "MEWTWO",
+      "fireRedSpeciesId": 150,
+      "genderRatio": 255,
+      "baseFriendship": 0,
+      "baseStats": {
+        "hp": 106,
+        "attack": 110,
+        "defense": 90,
+        "speed": 130,
+        "specialAttack": 154,
+        "specialDefense": 90
+      },
+      "growthRate": "GROWTH_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_PRESSURE",
+          "id": 46
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    },
+    "151": {
+      "nationalDexNumber": 151,
+      "speciesName": "MEW",
+      "fireRedSpeciesId": 151,
+      "genderRatio": 255,
+      "baseFriendship": 100,
+      "baseStats": {
+        "hp": 100,
+        "attack": 100,
+        "defense": 100,
+        "speed": 100,
+        "specialAttack": 100,
+        "specialDefense": 100
+      },
+      "growthRate": "GROWTH_MEDIUM_SLOW",
+      "abilities": [
+        {
+          "slot": 0,
+          "symbol": "ABILITY_SYNCHRONIZE",
+          "id": 28
+        },
+        {
+          "slot": 1,
+          "symbol": "ABILITY_NONE",
+          "id": 0
+        }
+      ],
+      "source": "src/data/pokemon/species_info.h"
+    }
+  },
+  "moves": [
+    {
+      "redName": "NO_MOVE",
+      "redId": 0,
+      "fireRedName": "NONE",
+      "fireRedId": 0,
+      "fireRedBasePp": 0,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:8",
+      "fireRedSource": "moves.h:4"
+    },
+    {
+      "redName": "POUND",
+      "redId": 1,
+      "fireRedName": "POUND",
+      "fireRedId": 1,
+      "fireRedBasePp": 35,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:9",
+      "fireRedSource": "moves.h:5"
+    },
+    {
+      "redName": "KARATE_CHOP",
+      "redId": 2,
+      "fireRedName": "KARATE_CHOP",
+      "fireRedId": 2,
+      "fireRedBasePp": 25,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:10",
+      "fireRedSource": "moves.h:6"
+    },
+    {
+      "redName": "DOUBLESLAP",
+      "redId": 3,
+      "fireRedName": "DOUBLE_SLAP",
+      "fireRedId": 3,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:11",
+      "fireRedSource": "moves.h:7"
+    },
+    {
+      "redName": "COMET_PUNCH",
+      "redId": 4,
+      "fireRedName": "COMET_PUNCH",
+      "fireRedId": 4,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:12",
+      "fireRedSource": "moves.h:8"
+    },
+    {
+      "redName": "MEGA_PUNCH",
+      "redId": 5,
+      "fireRedName": "MEGA_PUNCH",
+      "fireRedId": 5,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:13",
+      "fireRedSource": "moves.h:9"
+    },
+    {
+      "redName": "PAY_DAY",
+      "redId": 6,
+      "fireRedName": "PAY_DAY",
+      "fireRedId": 6,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:14",
+      "fireRedSource": "moves.h:10"
+    },
+    {
+      "redName": "FIRE_PUNCH",
+      "redId": 7,
+      "fireRedName": "FIRE_PUNCH",
+      "fireRedId": 7,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:15",
+      "fireRedSource": "moves.h:11"
+    },
+    {
+      "redName": "ICE_PUNCH",
+      "redId": 8,
+      "fireRedName": "ICE_PUNCH",
+      "fireRedId": 8,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:16",
+      "fireRedSource": "moves.h:12"
+    },
+    {
+      "redName": "THUNDERPUNCH",
+      "redId": 9,
+      "fireRedName": "THUNDER_PUNCH",
+      "fireRedId": 9,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:17",
+      "fireRedSource": "moves.h:13"
+    },
+    {
+      "redName": "SCRATCH",
+      "redId": 10,
+      "fireRedName": "SCRATCH",
+      "fireRedId": 10,
+      "fireRedBasePp": 35,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:18",
+      "fireRedSource": "moves.h:14"
+    },
+    {
+      "redName": "VICEGRIP",
+      "redId": 11,
+      "fireRedName": "VICE_GRIP",
+      "fireRedId": 11,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:19",
+      "fireRedSource": "moves.h:15"
+    },
+    {
+      "redName": "GUILLOTINE",
+      "redId": 12,
+      "fireRedName": "GUILLOTINE",
+      "fireRedId": 12,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:20",
+      "fireRedSource": "moves.h:16"
+    },
+    {
+      "redName": "RAZOR_WIND",
+      "redId": 13,
+      "fireRedName": "RAZOR_WIND",
+      "fireRedId": 13,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:21",
+      "fireRedSource": "moves.h:17"
+    },
+    {
+      "redName": "SWORDS_DANCE",
+      "redId": 14,
+      "fireRedName": "SWORDS_DANCE",
+      "fireRedId": 14,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:22",
+      "fireRedSource": "moves.h:18"
+    },
+    {
+      "redName": "CUT",
+      "redId": 15,
+      "fireRedName": "CUT",
+      "fireRedId": 15,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:23",
+      "fireRedSource": "moves.h:19"
+    },
+    {
+      "redName": "GUST",
+      "redId": 16,
+      "fireRedName": "GUST",
+      "fireRedId": 16,
+      "fireRedBasePp": 35,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:24",
+      "fireRedSource": "moves.h:20"
+    },
+    {
+      "redName": "WING_ATTACK",
+      "redId": 17,
+      "fireRedName": "WING_ATTACK",
+      "fireRedId": 17,
+      "fireRedBasePp": 35,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:25",
+      "fireRedSource": "moves.h:21"
+    },
+    {
+      "redName": "WHIRLWIND",
+      "redId": 18,
+      "fireRedName": "WHIRLWIND",
+      "fireRedId": 18,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:26",
+      "fireRedSource": "moves.h:22"
+    },
+    {
+      "redName": "FLY",
+      "redId": 19,
+      "fireRedName": "FLY",
+      "fireRedId": 19,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:27",
+      "fireRedSource": "moves.h:23"
+    },
+    {
+      "redName": "BIND",
+      "redId": 20,
+      "fireRedName": "BIND",
+      "fireRedId": 20,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:28",
+      "fireRedSource": "moves.h:24"
+    },
+    {
+      "redName": "SLAM",
+      "redId": 21,
+      "fireRedName": "SLAM",
+      "fireRedId": 21,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:29",
+      "fireRedSource": "moves.h:25"
+    },
+    {
+      "redName": "VINE_WHIP",
+      "redId": 22,
+      "fireRedName": "VINE_WHIP",
+      "fireRedId": 22,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:30",
+      "fireRedSource": "moves.h:26"
+    },
+    {
+      "redName": "STOMP",
+      "redId": 23,
+      "fireRedName": "STOMP",
+      "fireRedId": 23,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:31",
+      "fireRedSource": "moves.h:27"
+    },
+    {
+      "redName": "DOUBLE_KICK",
+      "redId": 24,
+      "fireRedName": "DOUBLE_KICK",
+      "fireRedId": 24,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:32",
+      "fireRedSource": "moves.h:28"
+    },
+    {
+      "redName": "MEGA_KICK",
+      "redId": 25,
+      "fireRedName": "MEGA_KICK",
+      "fireRedId": 25,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:33",
+      "fireRedSource": "moves.h:29"
+    },
+    {
+      "redName": "JUMP_KICK",
+      "redId": 26,
+      "fireRedName": "JUMP_KICK",
+      "fireRedId": 26,
+      "fireRedBasePp": 25,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:34",
+      "fireRedSource": "moves.h:30"
+    },
+    {
+      "redName": "ROLLING_KICK",
+      "redId": 27,
+      "fireRedName": "ROLLING_KICK",
+      "fireRedId": 27,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:35",
+      "fireRedSource": "moves.h:31"
+    },
+    {
+      "redName": "SAND_ATTACK",
+      "redId": 28,
+      "fireRedName": "SAND_ATTACK",
+      "fireRedId": 28,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:36",
+      "fireRedSource": "moves.h:32"
+    },
+    {
+      "redName": "HEADBUTT",
+      "redId": 29,
+      "fireRedName": "HEADBUTT",
+      "fireRedId": 29,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:37",
+      "fireRedSource": "moves.h:33"
+    },
+    {
+      "redName": "HORN_ATTACK",
+      "redId": 30,
+      "fireRedName": "HORN_ATTACK",
+      "fireRedId": 30,
+      "fireRedBasePp": 25,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:38",
+      "fireRedSource": "moves.h:34"
+    },
+    {
+      "redName": "FURY_ATTACK",
+      "redId": 31,
+      "fireRedName": "FURY_ATTACK",
+      "fireRedId": 31,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:39",
+      "fireRedSource": "moves.h:35"
+    },
+    {
+      "redName": "HORN_DRILL",
+      "redId": 32,
+      "fireRedName": "HORN_DRILL",
+      "fireRedId": 32,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:40",
+      "fireRedSource": "moves.h:36"
+    },
+    {
+      "redName": "TACKLE",
+      "redId": 33,
+      "fireRedName": "TACKLE",
+      "fireRedId": 33,
+      "fireRedBasePp": 35,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:41",
+      "fireRedSource": "moves.h:37"
+    },
+    {
+      "redName": "BODY_SLAM",
+      "redId": 34,
+      "fireRedName": "BODY_SLAM",
+      "fireRedId": 34,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:42",
+      "fireRedSource": "moves.h:38"
+    },
+    {
+      "redName": "WRAP",
+      "redId": 35,
+      "fireRedName": "WRAP",
+      "fireRedId": 35,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:43",
+      "fireRedSource": "moves.h:39"
+    },
+    {
+      "redName": "TAKE_DOWN",
+      "redId": 36,
+      "fireRedName": "TAKE_DOWN",
+      "fireRedId": 36,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:44",
+      "fireRedSource": "moves.h:40"
+    },
+    {
+      "redName": "THRASH",
+      "redId": 37,
+      "fireRedName": "THRASH",
+      "fireRedId": 37,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:45",
+      "fireRedSource": "moves.h:41"
+    },
+    {
+      "redName": "DOUBLE_EDGE",
+      "redId": 38,
+      "fireRedName": "DOUBLE_EDGE",
+      "fireRedId": 38,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:46",
+      "fireRedSource": "moves.h:42"
+    },
+    {
+      "redName": "TAIL_WHIP",
+      "redId": 39,
+      "fireRedName": "TAIL_WHIP",
+      "fireRedId": 39,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:47",
+      "fireRedSource": "moves.h:43"
+    },
+    {
+      "redName": "POISON_STING",
+      "redId": 40,
+      "fireRedName": "POISON_STING",
+      "fireRedId": 40,
+      "fireRedBasePp": 35,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:48",
+      "fireRedSource": "moves.h:44"
+    },
+    {
+      "redName": "TWINEEDLE",
+      "redId": 41,
+      "fireRedName": "TWINEEDLE",
+      "fireRedId": 41,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:49",
+      "fireRedSource": "moves.h:45"
+    },
+    {
+      "redName": "PIN_MISSILE",
+      "redId": 42,
+      "fireRedName": "PIN_MISSILE",
+      "fireRedId": 42,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:50",
+      "fireRedSource": "moves.h:46"
+    },
+    {
+      "redName": "LEER",
+      "redId": 43,
+      "fireRedName": "LEER",
+      "fireRedId": 43,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:51",
+      "fireRedSource": "moves.h:47"
+    },
+    {
+      "redName": "BITE",
+      "redId": 44,
+      "fireRedName": "BITE",
+      "fireRedId": 44,
+      "fireRedBasePp": 25,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:52",
+      "fireRedSource": "moves.h:48"
+    },
+    {
+      "redName": "GROWL",
+      "redId": 45,
+      "fireRedName": "GROWL",
+      "fireRedId": 45,
+      "fireRedBasePp": 40,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:53",
+      "fireRedSource": "moves.h:49"
+    },
+    {
+      "redName": "ROAR",
+      "redId": 46,
+      "fireRedName": "ROAR",
+      "fireRedId": 46,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:54",
+      "fireRedSource": "moves.h:50"
+    },
+    {
+      "redName": "SING",
+      "redId": 47,
+      "fireRedName": "SING",
+      "fireRedId": 47,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:55",
+      "fireRedSource": "moves.h:51"
+    },
+    {
+      "redName": "SUPERSONIC",
+      "redId": 48,
+      "fireRedName": "SUPERSONIC",
+      "fireRedId": 48,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:56",
+      "fireRedSource": "moves.h:52"
+    },
+    {
+      "redName": "SONICBOOM",
+      "redId": 49,
+      "fireRedName": "SONIC_BOOM",
+      "fireRedId": 49,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:57",
+      "fireRedSource": "moves.h:53"
+    },
+    {
+      "redName": "DISABLE",
+      "redId": 50,
+      "fireRedName": "DISABLE",
+      "fireRedId": 50,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:58",
+      "fireRedSource": "moves.h:54"
+    },
+    {
+      "redName": "ACID",
+      "redId": 51,
+      "fireRedName": "ACID",
+      "fireRedId": 51,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:59",
+      "fireRedSource": "moves.h:55"
+    },
+    {
+      "redName": "EMBER",
+      "redId": 52,
+      "fireRedName": "EMBER",
+      "fireRedId": 52,
+      "fireRedBasePp": 25,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:60",
+      "fireRedSource": "moves.h:56"
+    },
+    {
+      "redName": "FLAMETHROWER",
+      "redId": 53,
+      "fireRedName": "FLAMETHROWER",
+      "fireRedId": 53,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:61",
+      "fireRedSource": "moves.h:57"
+    },
+    {
+      "redName": "MIST",
+      "redId": 54,
+      "fireRedName": "MIST",
+      "fireRedId": 54,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:62",
+      "fireRedSource": "moves.h:58"
+    },
+    {
+      "redName": "WATER_GUN",
+      "redId": 55,
+      "fireRedName": "WATER_GUN",
+      "fireRedId": 55,
+      "fireRedBasePp": 25,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:63",
+      "fireRedSource": "moves.h:59"
+    },
+    {
+      "redName": "HYDRO_PUMP",
+      "redId": 56,
+      "fireRedName": "HYDRO_PUMP",
+      "fireRedId": 56,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:64",
+      "fireRedSource": "moves.h:60"
+    },
+    {
+      "redName": "SURF",
+      "redId": 57,
+      "fireRedName": "SURF",
+      "fireRedId": 57,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:65",
+      "fireRedSource": "moves.h:61"
+    },
+    {
+      "redName": "ICE_BEAM",
+      "redId": 58,
+      "fireRedName": "ICE_BEAM",
+      "fireRedId": 58,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:66",
+      "fireRedSource": "moves.h:62"
+    },
+    {
+      "redName": "BLIZZARD",
+      "redId": 59,
+      "fireRedName": "BLIZZARD",
+      "fireRedId": 59,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:67",
+      "fireRedSource": "moves.h:63"
+    },
+    {
+      "redName": "PSYBEAM",
+      "redId": 60,
+      "fireRedName": "PSYBEAM",
+      "fireRedId": 60,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:68",
+      "fireRedSource": "moves.h:64"
+    },
+    {
+      "redName": "BUBBLEBEAM",
+      "redId": 61,
+      "fireRedName": "BUBBLE_BEAM",
+      "fireRedId": 61,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:69",
+      "fireRedSource": "moves.h:65"
+    },
+    {
+      "redName": "AURORA_BEAM",
+      "redId": 62,
+      "fireRedName": "AURORA_BEAM",
+      "fireRedId": 62,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:70",
+      "fireRedSource": "moves.h:66"
+    },
+    {
+      "redName": "HYPER_BEAM",
+      "redId": 63,
+      "fireRedName": "HYPER_BEAM",
+      "fireRedId": 63,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:71",
+      "fireRedSource": "moves.h:67"
+    },
+    {
+      "redName": "PECK",
+      "redId": 64,
+      "fireRedName": "PECK",
+      "fireRedId": 64,
+      "fireRedBasePp": 35,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:72",
+      "fireRedSource": "moves.h:68"
+    },
+    {
+      "redName": "DRILL_PECK",
+      "redId": 65,
+      "fireRedName": "DRILL_PECK",
+      "fireRedId": 65,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:73",
+      "fireRedSource": "moves.h:69"
+    },
+    {
+      "redName": "SUBMISSION",
+      "redId": 66,
+      "fireRedName": "SUBMISSION",
+      "fireRedId": 66,
+      "fireRedBasePp": 25,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:74",
+      "fireRedSource": "moves.h:70"
+    },
+    {
+      "redName": "LOW_KICK",
+      "redId": 67,
+      "fireRedName": "LOW_KICK",
+      "fireRedId": 67,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:75",
+      "fireRedSource": "moves.h:71"
+    },
+    {
+      "redName": "COUNTER",
+      "redId": 68,
+      "fireRedName": "COUNTER",
+      "fireRedId": 68,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:76",
+      "fireRedSource": "moves.h:72"
+    },
+    {
+      "redName": "SEISMIC_TOSS",
+      "redId": 69,
+      "fireRedName": "SEISMIC_TOSS",
+      "fireRedId": 69,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:77",
+      "fireRedSource": "moves.h:73"
+    },
+    {
+      "redName": "STRENGTH",
+      "redId": 70,
+      "fireRedName": "STRENGTH",
+      "fireRedId": 70,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:78",
+      "fireRedSource": "moves.h:74"
+    },
+    {
+      "redName": "ABSORB",
+      "redId": 71,
+      "fireRedName": "ABSORB",
+      "fireRedId": 71,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:79",
+      "fireRedSource": "moves.h:75"
+    },
+    {
+      "redName": "MEGA_DRAIN",
+      "redId": 72,
+      "fireRedName": "MEGA_DRAIN",
+      "fireRedId": 72,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:80",
+      "fireRedSource": "moves.h:76"
+    },
+    {
+      "redName": "LEECH_SEED",
+      "redId": 73,
+      "fireRedName": "LEECH_SEED",
+      "fireRedId": 73,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:81",
+      "fireRedSource": "moves.h:77"
+    },
+    {
+      "redName": "GROWTH",
+      "redId": 74,
+      "fireRedName": "GROWTH",
+      "fireRedId": 74,
+      "fireRedBasePp": 40,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:82",
+      "fireRedSource": "moves.h:78"
+    },
+    {
+      "redName": "RAZOR_LEAF",
+      "redId": 75,
+      "fireRedName": "RAZOR_LEAF",
+      "fireRedId": 75,
+      "fireRedBasePp": 25,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:83",
+      "fireRedSource": "moves.h:79"
+    },
+    {
+      "redName": "SOLARBEAM",
+      "redId": 76,
+      "fireRedName": "SOLAR_BEAM",
+      "fireRedId": 76,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:84",
+      "fireRedSource": "moves.h:80"
+    },
+    {
+      "redName": "POISONPOWDER",
+      "redId": 77,
+      "fireRedName": "POISON_POWDER",
+      "fireRedId": 77,
+      "fireRedBasePp": 35,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:85",
+      "fireRedSource": "moves.h:81"
+    },
+    {
+      "redName": "STUN_SPORE",
+      "redId": 78,
+      "fireRedName": "STUN_SPORE",
+      "fireRedId": 78,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:86",
+      "fireRedSource": "moves.h:82"
+    },
+    {
+      "redName": "SLEEP_POWDER",
+      "redId": 79,
+      "fireRedName": "SLEEP_POWDER",
+      "fireRedId": 79,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:87",
+      "fireRedSource": "moves.h:83"
+    },
+    {
+      "redName": "PETAL_DANCE",
+      "redId": 80,
+      "fireRedName": "PETAL_DANCE",
+      "fireRedId": 80,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:88",
+      "fireRedSource": "moves.h:84"
+    },
+    {
+      "redName": "STRING_SHOT",
+      "redId": 81,
+      "fireRedName": "STRING_SHOT",
+      "fireRedId": 81,
+      "fireRedBasePp": 40,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:89",
+      "fireRedSource": "moves.h:85"
+    },
+    {
+      "redName": "DRAGON_RAGE",
+      "redId": 82,
+      "fireRedName": "DRAGON_RAGE",
+      "fireRedId": 82,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:90",
+      "fireRedSource": "moves.h:86"
+    },
+    {
+      "redName": "FIRE_SPIN",
+      "redId": 83,
+      "fireRedName": "FIRE_SPIN",
+      "fireRedId": 83,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:91",
+      "fireRedSource": "moves.h:87"
+    },
+    {
+      "redName": "THUNDERSHOCK",
+      "redId": 84,
+      "fireRedName": "THUNDER_SHOCK",
+      "fireRedId": 84,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:92",
+      "fireRedSource": "moves.h:88"
+    },
+    {
+      "redName": "THUNDERBOLT",
+      "redId": 85,
+      "fireRedName": "THUNDERBOLT",
+      "fireRedId": 85,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:93",
+      "fireRedSource": "moves.h:89"
+    },
+    {
+      "redName": "THUNDER_WAVE",
+      "redId": 86,
+      "fireRedName": "THUNDER_WAVE",
+      "fireRedId": 86,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:94",
+      "fireRedSource": "moves.h:90"
+    },
+    {
+      "redName": "THUNDER",
+      "redId": 87,
+      "fireRedName": "THUNDER",
+      "fireRedId": 87,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:95",
+      "fireRedSource": "moves.h:91"
+    },
+    {
+      "redName": "ROCK_THROW",
+      "redId": 88,
+      "fireRedName": "ROCK_THROW",
+      "fireRedId": 88,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:96",
+      "fireRedSource": "moves.h:92"
+    },
+    {
+      "redName": "EARTHQUAKE",
+      "redId": 89,
+      "fireRedName": "EARTHQUAKE",
+      "fireRedId": 89,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:97",
+      "fireRedSource": "moves.h:93"
+    },
+    {
+      "redName": "FISSURE",
+      "redId": 90,
+      "fireRedName": "FISSURE",
+      "fireRedId": 90,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:98",
+      "fireRedSource": "moves.h:94"
+    },
+    {
+      "redName": "DIG",
+      "redId": 91,
+      "fireRedName": "DIG",
+      "fireRedId": 91,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:99",
+      "fireRedSource": "moves.h:95"
+    },
+    {
+      "redName": "TOXIC",
+      "redId": 92,
+      "fireRedName": "TOXIC",
+      "fireRedId": 92,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:100",
+      "fireRedSource": "moves.h:96"
+    },
+    {
+      "redName": "CONFUSION",
+      "redId": 93,
+      "fireRedName": "CONFUSION",
+      "fireRedId": 93,
+      "fireRedBasePp": 25,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:101",
+      "fireRedSource": "moves.h:97"
+    },
+    {
+      "redName": "PSYCHIC_M",
+      "redId": 94,
+      "fireRedName": "PSYCHIC",
+      "fireRedId": 94,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:102",
+      "fireRedSource": "moves.h:98"
+    },
+    {
+      "redName": "HYPNOSIS",
+      "redId": 95,
+      "fireRedName": "HYPNOSIS",
+      "fireRedId": 95,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:103",
+      "fireRedSource": "moves.h:99"
+    },
+    {
+      "redName": "MEDITATE",
+      "redId": 96,
+      "fireRedName": "MEDITATE",
+      "fireRedId": 96,
+      "fireRedBasePp": 40,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:104",
+      "fireRedSource": "moves.h:100"
+    },
+    {
+      "redName": "AGILITY",
+      "redId": 97,
+      "fireRedName": "AGILITY",
+      "fireRedId": 97,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:105",
+      "fireRedSource": "moves.h:101"
+    },
+    {
+      "redName": "QUICK_ATTACK",
+      "redId": 98,
+      "fireRedName": "QUICK_ATTACK",
+      "fireRedId": 98,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:106",
+      "fireRedSource": "moves.h:102"
+    },
+    {
+      "redName": "RAGE",
+      "redId": 99,
+      "fireRedName": "RAGE",
+      "fireRedId": 99,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:107",
+      "fireRedSource": "moves.h:103"
+    },
+    {
+      "redName": "TELEPORT",
+      "redId": 100,
+      "fireRedName": "TELEPORT",
+      "fireRedId": 100,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:108",
+      "fireRedSource": "moves.h:104"
+    },
+    {
+      "redName": "NIGHT_SHADE",
+      "redId": 101,
+      "fireRedName": "NIGHT_SHADE",
+      "fireRedId": 101,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:109",
+      "fireRedSource": "moves.h:105"
+    },
+    {
+      "redName": "MIMIC",
+      "redId": 102,
+      "fireRedName": "MIMIC",
+      "fireRedId": 102,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:110",
+      "fireRedSource": "moves.h:106"
+    },
+    {
+      "redName": "SCREECH",
+      "redId": 103,
+      "fireRedName": "SCREECH",
+      "fireRedId": 103,
+      "fireRedBasePp": 40,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:111",
+      "fireRedSource": "moves.h:107"
+    },
+    {
+      "redName": "DOUBLE_TEAM",
+      "redId": 104,
+      "fireRedName": "DOUBLE_TEAM",
+      "fireRedId": 104,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:112",
+      "fireRedSource": "moves.h:108"
+    },
+    {
+      "redName": "RECOVER",
+      "redId": 105,
+      "fireRedName": "RECOVER",
+      "fireRedId": 105,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:113",
+      "fireRedSource": "moves.h:109"
+    },
+    {
+      "redName": "HARDEN",
+      "redId": 106,
+      "fireRedName": "HARDEN",
+      "fireRedId": 106,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:114",
+      "fireRedSource": "moves.h:110"
+    },
+    {
+      "redName": "MINIMIZE",
+      "redId": 107,
+      "fireRedName": "MINIMIZE",
+      "fireRedId": 107,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:115",
+      "fireRedSource": "moves.h:111"
+    },
+    {
+      "redName": "SMOKESCREEN",
+      "redId": 108,
+      "fireRedName": "SMOKESCREEN",
+      "fireRedId": 108,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:116",
+      "fireRedSource": "moves.h:112"
+    },
+    {
+      "redName": "CONFUSE_RAY",
+      "redId": 109,
+      "fireRedName": "CONFUSE_RAY",
+      "fireRedId": 109,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:117",
+      "fireRedSource": "moves.h:113"
+    },
+    {
+      "redName": "WITHDRAW",
+      "redId": 110,
+      "fireRedName": "WITHDRAW",
+      "fireRedId": 110,
+      "fireRedBasePp": 40,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:118",
+      "fireRedSource": "moves.h:114"
+    },
+    {
+      "redName": "DEFENSE_CURL",
+      "redId": 111,
+      "fireRedName": "DEFENSE_CURL",
+      "fireRedId": 111,
+      "fireRedBasePp": 40,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:119",
+      "fireRedSource": "moves.h:115"
+    },
+    {
+      "redName": "BARRIER",
+      "redId": 112,
+      "fireRedName": "BARRIER",
+      "fireRedId": 112,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:120",
+      "fireRedSource": "moves.h:116"
+    },
+    {
+      "redName": "LIGHT_SCREEN",
+      "redId": 113,
+      "fireRedName": "LIGHT_SCREEN",
+      "fireRedId": 113,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:121",
+      "fireRedSource": "moves.h:117"
+    },
+    {
+      "redName": "HAZE",
+      "redId": 114,
+      "fireRedName": "HAZE",
+      "fireRedId": 114,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:122",
+      "fireRedSource": "moves.h:118"
+    },
+    {
+      "redName": "REFLECT",
+      "redId": 115,
+      "fireRedName": "REFLECT",
+      "fireRedId": 115,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:123",
+      "fireRedSource": "moves.h:119"
+    },
+    {
+      "redName": "FOCUS_ENERGY",
+      "redId": 116,
+      "fireRedName": "FOCUS_ENERGY",
+      "fireRedId": 116,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:124",
+      "fireRedSource": "moves.h:120"
+    },
+    {
+      "redName": "BIDE",
+      "redId": 117,
+      "fireRedName": "BIDE",
+      "fireRedId": 117,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:125",
+      "fireRedSource": "moves.h:121"
+    },
+    {
+      "redName": "METRONOME",
+      "redId": 118,
+      "fireRedName": "METRONOME",
+      "fireRedId": 118,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:126",
+      "fireRedSource": "moves.h:122"
+    },
+    {
+      "redName": "MIRROR_MOVE",
+      "redId": 119,
+      "fireRedName": "MIRROR_MOVE",
+      "fireRedId": 119,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:127",
+      "fireRedSource": "moves.h:123"
+    },
+    {
+      "redName": "SELFDESTRUCT",
+      "redId": 120,
+      "fireRedName": "SELF_DESTRUCT",
+      "fireRedId": 120,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:128",
+      "fireRedSource": "moves.h:124"
+    },
+    {
+      "redName": "EGG_BOMB",
+      "redId": 121,
+      "fireRedName": "EGG_BOMB",
+      "fireRedId": 121,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:129",
+      "fireRedSource": "moves.h:125"
+    },
+    {
+      "redName": "LICK",
+      "redId": 122,
+      "fireRedName": "LICK",
+      "fireRedId": 122,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:130",
+      "fireRedSource": "moves.h:126"
+    },
+    {
+      "redName": "SMOG",
+      "redId": 123,
+      "fireRedName": "SMOG",
+      "fireRedId": 123,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:131",
+      "fireRedSource": "moves.h:127"
+    },
+    {
+      "redName": "SLUDGE",
+      "redId": 124,
+      "fireRedName": "SLUDGE",
+      "fireRedId": 124,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:132",
+      "fireRedSource": "moves.h:128"
+    },
+    {
+      "redName": "BONE_CLUB",
+      "redId": 125,
+      "fireRedName": "BONE_CLUB",
+      "fireRedId": 125,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:133",
+      "fireRedSource": "moves.h:129"
+    },
+    {
+      "redName": "FIRE_BLAST",
+      "redId": 126,
+      "fireRedName": "FIRE_BLAST",
+      "fireRedId": 126,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:134",
+      "fireRedSource": "moves.h:130"
+    },
+    {
+      "redName": "WATERFALL",
+      "redId": 127,
+      "fireRedName": "WATERFALL",
+      "fireRedId": 127,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:135",
+      "fireRedSource": "moves.h:131"
+    },
+    {
+      "redName": "CLAMP",
+      "redId": 128,
+      "fireRedName": "CLAMP",
+      "fireRedId": 128,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:136",
+      "fireRedSource": "moves.h:132"
+    },
+    {
+      "redName": "SWIFT",
+      "redId": 129,
+      "fireRedName": "SWIFT",
+      "fireRedId": 129,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:137",
+      "fireRedSource": "moves.h:133"
+    },
+    {
+      "redName": "SKULL_BASH",
+      "redId": 130,
+      "fireRedName": "SKULL_BASH",
+      "fireRedId": 130,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:138",
+      "fireRedSource": "moves.h:134"
+    },
+    {
+      "redName": "SPIKE_CANNON",
+      "redId": 131,
+      "fireRedName": "SPIKE_CANNON",
+      "fireRedId": 131,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:139",
+      "fireRedSource": "moves.h:135"
+    },
+    {
+      "redName": "CONSTRICT",
+      "redId": 132,
+      "fireRedName": "CONSTRICT",
+      "fireRedId": 132,
+      "fireRedBasePp": 35,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:140",
+      "fireRedSource": "moves.h:136"
+    },
+    {
+      "redName": "AMNESIA",
+      "redId": 133,
+      "fireRedName": "AMNESIA",
+      "fireRedId": 133,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:141",
+      "fireRedSource": "moves.h:137"
+    },
+    {
+      "redName": "KINESIS",
+      "redId": 134,
+      "fireRedName": "KINESIS",
+      "fireRedId": 134,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:142",
+      "fireRedSource": "moves.h:138"
+    },
+    {
+      "redName": "SOFTBOILED",
+      "redId": 135,
+      "fireRedName": "SOFT_BOILED",
+      "fireRedId": 135,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:143",
+      "fireRedSource": "moves.h:139"
+    },
+    {
+      "redName": "HI_JUMP_KICK",
+      "redId": 136,
+      "fireRedName": "HI_JUMP_KICK",
+      "fireRedId": 136,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:144",
+      "fireRedSource": "moves.h:140"
+    },
+    {
+      "redName": "GLARE",
+      "redId": 137,
+      "fireRedName": "GLARE",
+      "fireRedId": 137,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:145",
+      "fireRedSource": "moves.h:141"
+    },
+    {
+      "redName": "DREAM_EATER",
+      "redId": 138,
+      "fireRedName": "DREAM_EATER",
+      "fireRedId": 138,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:146",
+      "fireRedSource": "moves.h:142"
+    },
+    {
+      "redName": "POISON_GAS",
+      "redId": 139,
+      "fireRedName": "POISON_GAS",
+      "fireRedId": 139,
+      "fireRedBasePp": 40,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:147",
+      "fireRedSource": "moves.h:143"
+    },
+    {
+      "redName": "BARRAGE",
+      "redId": 140,
+      "fireRedName": "BARRAGE",
+      "fireRedId": 140,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:148",
+      "fireRedSource": "moves.h:144"
+    },
+    {
+      "redName": "LEECH_LIFE",
+      "redId": 141,
+      "fireRedName": "LEECH_LIFE",
+      "fireRedId": 141,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:149",
+      "fireRedSource": "moves.h:145"
+    },
+    {
+      "redName": "LOVELY_KISS",
+      "redId": 142,
+      "fireRedName": "LOVELY_KISS",
+      "fireRedId": 142,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:150",
+      "fireRedSource": "moves.h:146"
+    },
+    {
+      "redName": "SKY_ATTACK",
+      "redId": 143,
+      "fireRedName": "SKY_ATTACK",
+      "fireRedId": 143,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:151",
+      "fireRedSource": "moves.h:147"
+    },
+    {
+      "redName": "TRANSFORM",
+      "redId": 144,
+      "fireRedName": "TRANSFORM",
+      "fireRedId": 144,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:152",
+      "fireRedSource": "moves.h:148"
+    },
+    {
+      "redName": "BUBBLE",
+      "redId": 145,
+      "fireRedName": "BUBBLE",
+      "fireRedId": 145,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:153",
+      "fireRedSource": "moves.h:149"
+    },
+    {
+      "redName": "DIZZY_PUNCH",
+      "redId": 146,
+      "fireRedName": "DIZZY_PUNCH",
+      "fireRedId": 146,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:154",
+      "fireRedSource": "moves.h:150"
+    },
+    {
+      "redName": "SPORE",
+      "redId": 147,
+      "fireRedName": "SPORE",
+      "fireRedId": 147,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:155",
+      "fireRedSource": "moves.h:151"
+    },
+    {
+      "redName": "FLASH",
+      "redId": 148,
+      "fireRedName": "FLASH",
+      "fireRedId": 148,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:156",
+      "fireRedSource": "moves.h:152"
+    },
+    {
+      "redName": "PSYWAVE",
+      "redId": 149,
+      "fireRedName": "PSYWAVE",
+      "fireRedId": 149,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:157",
+      "fireRedSource": "moves.h:153"
+    },
+    {
+      "redName": "SPLASH",
+      "redId": 150,
+      "fireRedName": "SPLASH",
+      "fireRedId": 150,
+      "fireRedBasePp": 40,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:158",
+      "fireRedSource": "moves.h:154"
+    },
+    {
+      "redName": "ACID_ARMOR",
+      "redId": 151,
+      "fireRedName": "ACID_ARMOR",
+      "fireRedId": 151,
+      "fireRedBasePp": 40,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:159",
+      "fireRedSource": "moves.h:155"
+    },
+    {
+      "redName": "CRABHAMMER",
+      "redId": 152,
+      "fireRedName": "CRABHAMMER",
+      "fireRedId": 152,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:160",
+      "fireRedSource": "moves.h:156"
+    },
+    {
+      "redName": "EXPLOSION",
+      "redId": 153,
+      "fireRedName": "EXPLOSION",
+      "fireRedId": 153,
+      "fireRedBasePp": 5,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:161",
+      "fireRedSource": "moves.h:157"
+    },
+    {
+      "redName": "FURY_SWIPES",
+      "redId": 154,
+      "fireRedName": "FURY_SWIPES",
+      "fireRedId": 154,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:162",
+      "fireRedSource": "moves.h:158"
+    },
+    {
+      "redName": "BONEMERANG",
+      "redId": 155,
+      "fireRedName": "BONEMERANG",
+      "fireRedId": 155,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:163",
+      "fireRedSource": "moves.h:159"
+    },
+    {
+      "redName": "REST",
+      "redId": 156,
+      "fireRedName": "REST",
+      "fireRedId": 156,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:164",
+      "fireRedSource": "moves.h:160"
+    },
+    {
+      "redName": "ROCK_SLIDE",
+      "redId": 157,
+      "fireRedName": "ROCK_SLIDE",
+      "fireRedId": 157,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:165",
+      "fireRedSource": "moves.h:161"
+    },
+    {
+      "redName": "HYPER_FANG",
+      "redId": 158,
+      "fireRedName": "HYPER_FANG",
+      "fireRedId": 158,
+      "fireRedBasePp": 15,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:166",
+      "fireRedSource": "moves.h:162"
+    },
+    {
+      "redName": "SHARPEN",
+      "redId": 159,
+      "fireRedName": "SHARPEN",
+      "fireRedId": 159,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:167",
+      "fireRedSource": "moves.h:163"
+    },
+    {
+      "redName": "CONVERSION",
+      "redId": 160,
+      "fireRedName": "CONVERSION",
+      "fireRedId": 160,
+      "fireRedBasePp": 30,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:168",
+      "fireRedSource": "moves.h:164"
+    },
+    {
+      "redName": "TRI_ATTACK",
+      "redId": 161,
+      "fireRedName": "TRI_ATTACK",
+      "fireRedId": 161,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:169",
+      "fireRedSource": "moves.h:165"
+    },
+    {
+      "redName": "SUPER_FANG",
+      "redId": 162,
+      "fireRedName": "SUPER_FANG",
+      "fireRedId": 162,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:170",
+      "fireRedSource": "moves.h:166"
+    },
+    {
+      "redName": "SLASH",
+      "redId": 163,
+      "fireRedName": "SLASH",
+      "fireRedId": 163,
+      "fireRedBasePp": 20,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:171",
+      "fireRedSource": "moves.h:167"
+    },
+    {
+      "redName": "SUBSTITUTE",
+      "redId": 164,
+      "fireRedName": "SUBSTITUTE",
+      "fireRedId": 164,
+      "fireRedBasePp": 10,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:172",
+      "fireRedSource": "moves.h:168"
+    },
+    {
+      "redName": "STRUGGLE",
+      "redId": 165,
+      "fireRedName": "STRUGGLE",
+      "fireRedId": 165,
+      "fireRedBasePp": 1,
+      "classification": "DIRECT_MOVE_EQUIVALENT",
+      "redSource": "constants/move_constants.asm:173",
+      "fireRedSource": "moves.h:169"
+    }
+  ],
+  "summary": {
+    "kantoSpecies": 151,
+    "redMoves": 166,
+    "directMoveEquivalents": 166
+  }
+}

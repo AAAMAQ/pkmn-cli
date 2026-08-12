@@ -1,8 +1,76 @@
 # pkmn-cli
 
-`pkmn-cli` is the standalone home of `pkmn`, a unified command-line interface for Pokemon save research, preservation, validation, editing, generation, reconstruction, comparison, and proof workflows.
+`pkmn-cli` 2.0 is the unified command-line tool for continuing a Pokémon Red
+journey in Pokémon FireRed, with auditable save research, preservation,
+validation, editing, generation, reconstruction, comparison, and proof
+workflows by **MAQ / BiG MAQ Studios**.
 
-The project provides its C++20/CMake foundation, command router, and the first internal Pokemon Red save reader/validator. FireRed and Red-to-FireRed features are future work and will not be advertised as supported until their research engines are verified and emulator-tested.
+## Convert Pokémon Red to FireRed
+
+Convert a physical Red save:
+
+```sh
+pkmn red convert game.sav
+# writes game_fr.sav plus an audit manifest and report
+```
+
+Convert canonical Red JSON directly to a FireRed save:
+
+```sh
+pkmn rjson convert game.red.json
+# writes game_fr.sav
+```
+
+Create FireRed JSON without writing a physical save:
+
+```sh
+pkmn rjson convert_to_frjson game.red.json
+# writes game.fred.json
+```
+
+The unified conversion form adds preview, plan-only, custom output, manifest,
+policy, and batch workflows:
+
+```sh
+pkmn convert red-to-firered game.sav --template clean-fr.sav
+pkmn convert red-to-firered game.sav --plan-only --output-json game.fred.json
+pkmn convert inspect trainer EVENT_BEAT_VIRIDIAN_GYM_TRAINER_0
+pkmn convert validate-manifest game_fr.conversion-manifest.json
+```
+
+The converter validates Pokémon Red before translating semantic progression,
+Pokémon, trainers, events, items, visited Fly destinations, and explicit
+FireRed-only defaults. It never copies raw Red event IDs into FireRed. Every
+transfer, translation, derivation, default, omission, warning, and rejection is
+recorded in sidecar reports.
+
+FireRed physical generation currently requires the approved clean template to
+be supplied with `--template` or `PKMN_FIRERED_TEMPLATE`. The template is a save
+container, not a ROM. Native `.fred.json` generation passed Phase 5: MAQ
+confirmed that the generated save was equivalent in the emulator without using
+the original physical image. Red → FireRed conversion also passed Phase 6:
+MAQ accepted the detailed converted-save emulator comparison as equivalent for
+the converter's supported and documented policies.
+
+## The unified home for future updates
+
+From version 2.0 onward, `pkmn-cli` is the unified maintained tool for Pokémon
+Red and Pokémon FireRed save analysis, validation, editing, JSON schema
+migration, generation, comparison, proof, and conversion. Future schema
+updates and bug fixes will be made here instead of being released separately
+through the earlier Save Genie and Save Generator research repositories.
+
+Planned later support includes Pokémon Blue, Pokémon LeafGreen, Blue → FireRed,
+Red → LeafGreen, Generation II, and the corresponding remake/conversion paths.
+The first bridge deliberately focuses on Red and FireRed: Charizard is the
+shared version mascot, while Blue and LeafGreen center Blastoise and Venusaur.
+There was no international Pokémon Green or official AquaBlue counterpart to
+form an equivalent three-version bridge.
+
+Community help is welcome. Save samples that can be shared legally, carefully
+documented emulator observations, bug reports, schema review, research, and
+testing can help MAQ / BiG MAQ Studios extend the unified CLI responsibly to
+more generations and remakes.
 
 ## Relationship to the verified Red projects
 
@@ -13,12 +81,26 @@ The project provides its C++20/CMake foundation, command router, and the first i
 
 The completed engines remain independent research/source-reference projects. `pkmn-cli` adapts the necessary MIT-licensed logic into clean internal modules and will not require their executables after installation. See [the self-contained Red engine plan](docs/SELF_CONTAINED_RED_ENGINE_PLAN.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
 
-## Build
+## Installation requirements
 
-Requirements:
+To build and install from source, you need:
 
-- CMake 3.20 or newer;
-- a C++20 compiler.
+- **CMake 3.20 or newer**;
+- a **C++20 compiler**: Apple Clang/Xcode Command Line Tools on macOS, GCC or
+  Clang on Linux, or a modern Visual Studio/MSVC toolchain on Windows;
+- **Python 3.9 or newer** for the bundled FireRed bridge and generator runtime;
+- **Git** when cloning or updating the source repository;
+- enough permission to install to the chosen prefix, or a user-local prefix
+  such as `$HOME/.local`;
+- an approved clean FireRed `.sav` template for physical FireRed generation
+  until a legally distributable template is bundled. A ROM is never required
+  by the CLI itself and is not included.
+
+No separate Save Genie or Save Generator executable is required. CMake installs
+the Python runtime, bridge data, schemas, documentation, and command-line binary
+together.
+
+## Build and install from source
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -63,6 +145,30 @@ pkmn doctor --deep
 pkmn completion zsh
 pkmn config show
 pkmn get-all-cmds
+pkmn red convert input.sav --template clean-fire-red.sav
+pkmn rjson convert input.red.json --template clean-fire-red.sav
+pkmn rjson convert_to_frjson input.red.json
+pkmn rjson update_schema input.red.json
+pkmn frjson update_schema input.fred.json
+pkmn frjson validate input.fred.json
+pkmn frjson schema --format json
+pkmn frjson generate input.fred.json --template clean-fire-red.sav
+pkmn frjson generate-batch one.fred.json two.fred.json --output-dir generated --template clean-fire-red.sav
+pkmn frjson reconstruct input.fred.json
+pkmn fred summary input.sav
+pkmn fred inspect input.sav
+pkmn fred validate input.sav
+pkmn fred decode input.sav
+pkmn fred repair-checksums input.sav
+pkmn fred validate-batch one.sav two.sav
+pkmn fred decode-batch one.sav two.sav --output-dir decoded
+pkmn fred validate-post-emulator before.sav after.sav
+pkmn fred events search brock
+pkmn fred edit input.sav --money 999999
+pkmn fred begin-edit input.sav
+pkmn fred edit-session input.fred-edit-session.json --money 999999 --badge 1:on
+pkmn fred validate-edit input.fred-edit-session.json
+pkmn fred end-edit input.fred-edit-session.json
 pkmn red summary input.sav
 pkmn red decode input.sav
 pkmn red inspect input.sav
@@ -77,7 +183,12 @@ pkmn rjson generate-batch one.red.json two.red.json --output-dir generated
 pkmn compare physical first.sav second.sav
 pkmn compare progress older-backup.sav newer-backup.sav
 pkmn compare semantic first.red.json second.red.json
+pkmn compare firered-semantic first.fred.json second.fred.json
+pkmn compare firered-pokemon first.fred.json second.fred.json
+pkmn compare bridge game.red.json game.fred.json --manifest conversion-manifest.json
 pkmn proof red input.sav
+pkmn proof fred complete.fred.json --template clean-fire-red.sav
+pkmn proof red-to-firered input.red.json --template clean-fire-red.sav
 pkmn proof red input.sav --zip
 pkmn red validate-post-emulator before.sav after.sav
 pkmn proof post-emulator --before before.sav --after after.sav
@@ -114,7 +225,19 @@ Red editing is copy-first. `red edit` provides a looped interactive editor; `beg
 
 ## Command documentation
 
-See the copy-and-paste [complete usage guide](docs/COMPLETE_USAGE_GUIDE.md), [exhaustive command list](docs/ALL_COMMANDS.md), [command reference](docs/COMMAND_REFERENCE.md), [beginner's guide](docs/BEGINNERS_GUIDE.md), and [Red JSON schema](docs/RED_JSON_SCHEMA.md). Focused editing, reconstruction, proof, installation, and future-FireRed documents are under `docs/`. Public-data-only examples are in [examples/README.md](examples/README.md).
+See the [v2 implementation status](docs/PKMN_V2_IMPLEMENTATION_STATUS.md),
+copy-and-paste [complete usage guide](docs/COMPLETE_USAGE_GUIDE.md),
+[exhaustive command list](docs/ALL_COMMANDS.md),
+[command reference](docs/COMMAND_REFERENCE.md),
+[beginner's guide](docs/BEGINNERS_GUIDE.md), and
+[Red JSON schema](docs/RED_JSON_SCHEMA.md). Focused editing, reconstruction,
+proof, installation, and FireRed verification-gate documents are under `docs/`.
+Public-data-only examples are in [examples/README.md](examples/README.md).
+
+Release evidence summaries are public in the
+[Phase 5 generator acceptance](docs/PHASE_5_GENERATOR_ACCEPTANCE.md) and
+[Phase 6 conversion acceptance](docs/PHASE_6_CONVERSION_ACCEPTANCE.md). Private
+saves, ROMs, screenshots, and proof packages are deliberately excluded.
 
 ## Generation is not reconstruction
 

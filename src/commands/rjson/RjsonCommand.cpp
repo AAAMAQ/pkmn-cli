@@ -15,6 +15,7 @@
 #include "util/OutputPath.hpp"
 #include "util/AtomicOutput.hpp"
 #include "app/Version.hpp"
+#include "commands/conversion/ConversionCommand.hpp"
 
 namespace pkmn::cli::commands::rjson {
 namespace {
@@ -32,7 +33,14 @@ void Help(std::ostream &output) {
          "[--auto-suffix]\n"
       << "  pkmn rjson schema [--format json]\n"
       << "  pkmn rjson generate-batch <file.red.json>... --output-dir "
-         "<directory>\n";
+         "<directory>\n"
+      << "  pkmn rjson convert <file.red.json> [output.sav] "
+         "[--template <clean-fire-red.sav>] [--auto-suffix] "
+         "[--keep-intermediate] [--salt <value>]\n"
+      << "  pkmn rjson convert_to_frjson <file.red.json> "
+         "[output.fred.json] [--auto-suffix] [--salt <value>]\n"
+      << "  pkmn rjson update_schema <file.red.json> "
+         "[--output <updated.red.json>] [--auto-suffix]\n";
 }
 
 int RunSchema(const std::vector<std::string> &arguments,
@@ -290,6 +298,10 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
   }
   if (arguments.front() == "migrate")
     return RunMigration(arguments, output, error);
+  if (arguments.front() == "convert" ||
+      arguments.front() == "convert_to_frjson" ||
+      arguments.front() == "update_schema")
+    return commands::conversion::RunRjsonExtension(arguments, output, error);
   if (arguments.front() == "schema")
     return RunSchema(arguments, output, error);
   if (arguments.front() == "generate-batch")

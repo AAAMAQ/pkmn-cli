@@ -1,0 +1,446 @@
+{
+  "schemaVersion": "1.0.0",
+  "authority": {
+    "pret": "pokefirered@df4449a27cd78dd747ce269e47d3ab4a0149d8f4",
+    "rule": "These are semantic generator assignments. They are never raw Red-to-FireRed ID copies."
+  },
+  "progressionModel": {
+    "kind": "two-sided-semantic-dependency-graph",
+    "redPrerequisites": "Source-side milestones whose completion is proven by the later Red state.",
+    "fireRedPrerequisites": "Target-side semantic bundles required for a consistent visible FireRed world.",
+    "rule": "The planner closes redPrerequisites while interpreting Red. The generator independently closes fireRedPrerequisites before writing FireRed flags, variables and objects."
+  },
+  "implications": [
+    {"when": "POKEDEX_RECEIVED", "redPrerequisites": ["OAK_PARCEL_OBTAINED", "OAK_PARCEL_DELIVERED", "RIVAL_LAB_BATTLE"], "fireRedPrerequisites": ["OAK_PARCEL_OBTAINED", "OAK_PARCEL_DELIVERED", "RIVAL_LAB_BATTLE"]},
+    {"when": "SS_TICKET_RECEIVED", "redPrerequisites": ["BILL_RESCUED"], "fireRedPrerequisites": ["BILL_RESCUED"]},
+    {"when": "HM01_RECEIVED", "redPrerequisites": ["BILL_RESCUED", "SS_TICKET_RECEIVED", "SS_ANNE_RIVAL_DEFEATED"], "fireRedPrerequisites": ["BILL_RESCUED", "SS_TICKET_RECEIVED", "SS_ANNE_RIVAL_DEFEATED"]},
+    {"when": "LT_SURGE_DEFEATED", "redPrerequisites": ["HM01_RECEIVED", "SS_ANNE_DEPARTED"], "fireRedPrerequisites": ["HM01_RECEIVED", "SS_ANNE_DEPARTED"]},
+    {"when": "HIDEOUT_GIOVANNI_DEFEATED", "redPrerequisites": ["ROCKET_HIDEOUT_OPENED", "LIFT_KEY_OBTAINED"], "fireRedPrerequisites": ["ROCKET_HIDEOUT_OPENED", "LIFT_KEY_OBTAINED"]},
+    {"when": "SILPH_SCOPE_OBTAINED", "redPrerequisites": ["ROCKET_HIDEOUT_OPENED", "HIDEOUT_GIOVANNI_DEFEATED"], "fireRedPrerequisites": ["ROCKET_HIDEOUT_OPENED", "HIDEOUT_GIOVANNI_DEFEATED"]},
+    {"when": "MAROWAK_SPIRIT_RESTED", "redPrerequisites": ["SILPH_SCOPE_OBTAINED"], "fireRedPrerequisites": ["SILPH_SCOPE_OBTAINED"]},
+    {"when": "MR_FUJI_RESCUED", "redPrerequisites": ["MAROWAK_SPIRIT_RESTED"], "fireRedPrerequisites": ["MAROWAK_SPIRIT_RESTED"]},
+    {"when": "POKE_FLUTE_RECEIVED", "redPrerequisites": ["MR_FUJI_RESCUED"], "fireRedPrerequisites": ["MR_FUJI_RESCUED"]},
+    {"when": "SILPH_RIVAL_DEFEATED", "redPrerequisites": ["TEA_OR_GUARD_ACCESS", "CARD_KEY_OBTAINED"], "fireRedPrerequisites": ["TEA_OR_GUARD_ACCESS", "CARD_KEY_OBTAINED"]},
+    {"when": "SILPH_GIOVANNI_DEFEATED", "redPrerequisites": ["TEA_OR_GUARD_ACCESS", "CARD_KEY_OBTAINED", "SILPH_RIVAL_DEFEATED"], "fireRedPrerequisites": ["TEA_OR_GUARD_ACCESS", "CARD_KEY_OBTAINED", "SILPH_RIVAL_DEFEATED"]},
+    {"when": "MASTER_BALL_RECEIVED", "redPrerequisites": ["SILPH_GIOVANNI_DEFEATED"], "fireRedPrerequisites": ["SILPH_GIOVANNI_DEFEATED"]},
+    {"when": "SABRINA_DEFEATED", "redPrerequisites": ["TEA_OR_GUARD_ACCESS", "SILPH_GIOVANNI_DEFEATED"], "fireRedPrerequisites": ["TEA_OR_GUARD_ACCESS", "SILPH_GIOVANNI_DEFEATED"]},
+    {"when": "FIGHTING_DOJO_GIFT_CHOSEN", "redPrerequisites": ["FIGHTING_DOJO_MASTER_DEFEATED"], "fireRedPrerequisites": ["FIGHTING_DOJO_MASTER_DEFEATED"]},
+    {"when": "BLAINE_DEFEATED", "redPrerequisites": ["SECRET_KEY_OBTAINED"], "fireRedPrerequisites": ["SECRET_KEY_OBTAINED"]},
+    {"when": "GIOVANNI_GYM_DEFEATED", "redPrerequisites": ["BLAINE_DEFEATED"], "fireRedPrerequisites": ["BLAINE_DEFEATED"]},
+    {"when": "CHAMPION_DEFEATED", "redPrerequisites": ["GIOVANNI_GYM_DEFEATED", "RIVAL_ROUTE22_FINAL_DEFEATED"], "fireRedPrerequisites": ["GIOVANNI_GYM_DEFEATED", "RIVAL_ROUTE22_FINAL_DEFEATED"]},
+    {"when": "HALL_OF_FAME_FIRST_ENTRY", "redPrerequisites": ["CHAMPION_DEFEATED"], "fireRedPrerequisites": ["CHAMPION_DEFEATED"]}
+  ],
+  "events": {
+    "PLAYER_INITIALIZED": {
+      "authoritativeFlags": true,
+      "source": "Generator-owned SaveBlock2 identity and approved-template initialization state"
+    },
+    "STARTER_CHOSEN": {
+      "requiresSemanticValue": true,
+      "choices": {
+        "bulbasaur": {
+          "variables": {"0x4031": 0, "0x4050": 1, "0x4055": 3},
+          "setFlags": ["0x828", "0x028", "0x02A", "0x291", "0x2CF"],
+          "clearFlags": ["0x02B"]
+        },
+        "squirtle": {
+          "variables": {"0x4031": 1, "0x4050": 1, "0x4055": 3},
+          "setFlags": ["0x828", "0x029", "0x028", "0x291", "0x2CF"],
+          "clearFlags": ["0x02B"]
+        },
+        "charmander": {
+          "variables": {"0x4031": 2, "0x4050": 1, "0x4055": 3},
+          "setFlags": ["0x828", "0x02A", "0x029", "0x291", "0x2CF"],
+          "clearFlags": ["0x02B"]
+        }
+      },
+      "source": "data/maps/PalletTown_ProfessorOaksLab/scripts.inc:1072-1228"
+    },
+    "RIVAL_LAB_BATTLE": {
+      "variables": {"0x4055": 4},
+      "source": "data/maps/PalletTown_ProfessorOaksLab/scripts.inc:478-479"
+    },
+    "OAK_PARCEL_OBTAINED": {
+      "variables": {"0x4057": 1, "0x4055": 5},
+      "source": "data/maps/ViridianCity_Mart/scripts.inc:30-32"
+    },
+    "OAK_PARCEL_DELIVERED": {
+      "variables": {"0x4057": 2, "0x4055": 6},
+      "source": "data/maps/PalletTown_ProfessorOaksLab/scripts.inc:678-682"
+    },
+    "OAK_POKE_BALLS_RECEIVED": {
+      "authoritativeFlags": true,
+      "authoritativeVariables": true,
+      "source": "No distinct persistent state for the five balls given with the Pokédex; the optional later gift uses FLAG_GOT_POKEBALLS_FROM_OAK_AFTER_22_RIVAL"
+    },
+    "POKEDEX_RECEIVED": {
+      "authoritativeFlags": true,
+      "variables": {"0x4055": 6, "0x4057": 2, "0x4051": 1, "0x4058": 1, "0x4054": 1, "0x407C": 1},
+      "setFlags": ["0x829", "0x03A", "0x02D", "0x291", "0x2CF", "0x890", "0x891"],
+      "clearFlags": ["0x02B"],
+      "source": "data/maps/PalletTown_ProfessorOaksLab/scripts.inc:640-682; complete post-Pokédex scene closure"
+    },
+    "TOWN_MAP_RECEIVED": {
+      "authoritativeFlags": true,
+      "variables": {"0x4058": 2},
+      "setFlags": ["0x039"],
+      "source": "data/maps/PalletTown_RivalsHouse/scripts.inc:139 and map.json; gift scene complete and object removed"
+    },
+    "RUNNING_SHOES_RECEIVED": {
+      "authoritativeFlags": true,
+      "variables": {"0x4051": 2, "0x406C": 2},
+      "setFlags": ["0x82F", "0x890", "0x891", "0x892", "0x8A4"],
+      "source": "data/maps/PewterCity/scripts.inc:690-724; derived completion bundle after Brock, plus mandatory prior Viridian tutorial closure"
+    },
+    "BROCK_DEFEATED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x4B0", "0x69E"],
+      "source": "data/maps/PewterCity_Gym/scripts.inc:6,14; trainerbattle engine bit is 0x500 + TRAINER_LEADER_BROCK (414)"
+    },
+    "BOULDER_BADGE_OBTAINED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x820"],
+      "source": "include/constants/flags.h: FLAG_BADGE01_GET"
+    },
+    "BROCK_TM_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x254"],
+      "source": "Pewter Gym post-battle TM39 reward flag"
+    },
+    "FOSSIL_CHOSEN": {
+      "requiresSemanticValue": true,
+      "choices": {
+        "helix": {
+          "variables": {"0x408B": 1},
+          "setFlags": ["0x273", "0x02F", "0x030"],
+          "clearFlags": ["0x272"]
+        },
+        "dome": {
+          "variables": {"0x408B": 1},
+          "setFlags": ["0x272", "0x02F", "0x030"],
+          "clearFlags": ["0x273"]
+        }
+      },
+      "source": "data/maps/MtMoon_B2F/scripts.inc:36-41 and fossil object scripts"
+    },
+    "BILL_RESCUED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x032", "0x233"],
+      "clearFlags": ["0x033"],
+      "source": "data/maps/Route25_SeaCottage/scripts.inc:128-190; helped state set, Clefairy hidden and human Bill visible"
+    },
+    "SS_TICKET_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x031", "0x032", "0x233", "0x234", "0x235", "0x834"],
+      "clearFlags": ["0x033"],
+      "source": "data/maps/Route25_SeaCottage/scripts.inc:91-107; full post-ticket Bill, Nugget Rocket and PC-name closure"
+    },
+    "MISTY_DEFEATED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x4B1", "0x69F", "0x821", "0x297"],
+      "source": "data/maps/CeruleanCity_Gym/scripts.inc; leader, Cascade Badge and TM03"
+    },
+    "BIKE_VOUCHER_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x241"],
+      "source": "Vermilion Pokémon Fan Club voucher script"
+    },
+    "BICYCLE_OBTAINED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x271"],
+      "source": "Cerulean Bike Shop exchange script"
+    },
+    "HM01_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x237"],
+      "source": "S.S. Anne captain Cut reward"
+    },
+    "SS_ANNE_DEPARTED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x03D", "0x087"],
+      "source": "Vermilion Harbor departure plus the persistent rival-removal transition used from Lavender"
+    },
+    "LT_SURGE_DEFEATED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x231", "0x264", "0x4B2", "0x6A0", "0x822"],
+      "source": "data/maps/VermilionCity_Gym/scripts.inc:184,211-235; puzzle, leader, Thunder Badge and TM34"
+    },
+    "HM05_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x23B"],
+      "source": "Route 2 Oak aide Flash reward"
+    },
+    "ROCKET_HIDEOUT_OPENED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x26D"],
+      "source": "Celadon Game Corner poster script"
+    },
+    "LIFT_KEY_OBTAINED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x036", "0x2A5"],
+      "source": "Rocket Hideout B4F Lift Key object and lift permission"
+    },
+    "HIDEOUT_GIOVANNI_DEFEATED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x038", "0x05F", "0x65C"],
+      "clearFlags": ["0x037"],
+      "source": "data/maps/RocketHideout_B4F/scripts.inc:18-37; Giovanni trainer/object state, Celadon Rockets removed and Silph Scope revealed"
+    },
+    "SILPH_SCOPE_OBTAINED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x037"],
+      "source": "Rocket Hideout B4F Silph Scope object removed"
+    },
+    "OLD_AMBER_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x25E", "0x056"],
+      "source": "data/maps/PewterCity_Museum_1F/scripts.inc:145-149 and map.json: FLAG_HIDE_OLD_AMBER"
+    },
+    "MAGIKARP_PURCHASED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x249"],
+      "source": "data/maps/Route4_PokemonCenter_1F/scripts.inc:26-96"
+    },
+    "LAPRAS_GIFT_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x246"],
+      "source": "data/maps/SilphCo_7F/scripts.inc:118-163"
+    },
+    "FIGHTING_DOJO_MASTER_DEFEATED": {
+      "authoritativeFlags": true,
+      "variables": {"0x4081": 1},
+      "setFlags": ["0x63D"],
+      "source": "data/maps/SaffronCity_Dojo/scripts.inc:137-151; TRAINER_BLACK_BELT_KOICHI=317 gives trainer defeat flag 0x500+317=0x63D and the defeat callback sets VAR_MAP_SCENE_SAFFRON_CITY_DOJO=1"
+    },
+    "FIGHTING_DOJO_GIFT_CHOSEN": {
+      "requiresSemanticValue": true,
+      "choices": {
+        "hitmonlee": {
+          "setFlags": ["0x278", "0x060"],
+          "clearFlags": ["0x061"]
+        },
+        "hitmonchan": {
+          "setFlags": ["0x278", "0x061"],
+          "clearFlags": ["0x060"]
+        }
+      },
+      "source": "data/maps/SaffronCity_Dojo/scripts.inc:20-100 and map.json; only the selected gift ball is removed"
+    },
+    "EEVEE_GIFT_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x263", "0x057"],
+      "source": "data/maps/CeladonCity_Condominiums_RoofRoom/scripts.inc:52 and map.json"
+    },
+    "SNORLAX_ROUTE12_COMPLETED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x054"],
+      "source": "data/maps/Route12/scripts.inc:27 and map.json"
+    },
+    "SNORLAX_ROUTE16_COMPLETED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x080"],
+      "source": "data/maps/Route16/scripts.inc:45 and map.json"
+    },
+    "LEGENDARY_ARTICUNO_RESOLVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x2BE", "0x082"],
+      "source": "data/maps/SeafoamIslands_B4F/scripts.inc:22,176-181 and map.json"
+    },
+    "LEGENDARY_ZAPDOS_RESOLVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x2BF", "0x05D"],
+      "source": "data/maps/PowerPlant/scripts.inc:18,57-62 and map.json"
+    },
+    "LEGENDARY_MOLTRES_RESOLVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x2BD", "0x052"],
+      "source": "data/maps/MtEmber_Summit/scripts.inc:17,46-51 and map.json"
+    },
+    "MEWTWO_RESOLVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x2BC", "0x081"],
+      "source": "data/maps/CeruleanCave_B1F/scripts.inc:17,46-51 and map.json"
+    },
+    "RIVAL_CERULEAN_BATTLE": {
+      "variables": {"0x4052": 1, "0x4054": 2},
+      "source": "data/maps/CeruleanCity/scripts.inc:38-56"
+    },
+    "NUGGET_BRIDGE_ROCKET_DEFEATED": {
+      "variables": {"0x406B": 1},
+      "source": "data/maps/Route24/scripts.inc:56-60"
+    },
+    "CERULEAN_ROCKET_TM_RECOVERED": {
+      "authoritativeFlags": true,
+      "variables": {"0x407D": 1},
+      "setFlags": ["0x03B"],
+      "source": "data/maps/CeruleanCity/scripts.inc:170-174"
+    },
+    "SS_ANNE_RIVAL_DEFEATED": {
+      "variables": {"0x405B": 1},
+      "source": "data/maps/SSAnne_2F_Corridor/scripts.inc:46-50"
+    },
+    "POKEMON_TOWER_RIVAL_DEFEATED": {
+      "authoritativeFlags": true,
+      "variables": {"0x405D": 1},
+      "setFlags": ["0x051"],
+      "source": "data/maps/PokemonTower_2F/scripts.inc:40-44"
+    },
+    "MAROWAK_SPIRIT_RESTED": {
+      "variables": {"0x4059": 1},
+      "source": "data/maps/PokemonTower_6F/scripts.inc:24-28"
+    },
+    "MR_FUJI_RESCUED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x034", "0x05E", "0x083", "0x084", "0x23C"],
+      "clearFlags": ["0x035"],
+      "source": "PokemonTower_7F scripts and map objects; all three Rockets resolved and Fuji moves home"
+    },
+    "POKE_FLUTE_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x23D"],
+      "source": "Lavender Pokémon House reward"
+    },
+    "ERIKA_DEFEATED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x293", "0x4B3", "0x6A1", "0x823"],
+      "source": "data/maps/CeladonCity_Gym/scripts.inc:11-31; leader, Rainbow Badge and TM19"
+    },
+    "TEA_OR_GUARD_ACCESS": {
+      "authoritativeFlags": true,
+      "variables": {"0x4062": 1},
+      "setFlags": ["0x2A6"],
+      "source": "data/maps/Route5_SouthEntrance/scripts.inc:29-51 and CeladonCity_Condominiums_1F/scripts.inc:4-14; Tea obtained/consumed and all four gates opened"
+    },
+    "SILPH_RIVAL_DEFEATED": {
+      "authoritativeFlags": true,
+      "variables": {"0x405C": 1},
+      "setFlags": ["0x04E"],
+      "source": "data/maps/SilphCo_7F/scripts.inc:54-58"
+    },
+    "SILPH_GIOVANNI_DEFEATED": {
+      "authoritativeFlags": true,
+      "variables": {"0x4060": 1},
+      "setFlags": ["0x03E", "0x053", "0x65D"],
+      "clearFlags": ["0x03F"],
+      "source": "data/maps/SilphCo_11F/scripts.inc:56-79; boss trainer state, Silph/Saffron Rockets hidden, civilians restored and scene completed"
+    },
+    "CARD_KEY_OBTAINED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x192"],
+      "source": "data/maps/SilphCo_5F/map.json; Card Key object removed"
+    },
+    "MASTER_BALL_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x250"],
+      "source": "Silph president Master Ball reward"
+    },
+    "SABRINA_DEFEATED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x29A", "0x4B5", "0x6A4", "0x825"],
+      "source": "data/maps/SaffronCity_Gym/scripts.inc:11-31; leader, Marsh Badge and TM04"
+    },
+    "SAFARI_GOLD_TEETH_FOUND": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x189"],
+      "source": "data/maps/SafariZone_West/map.json; Gold Teeth object removed"
+    },
+    "HM03_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x239"],
+      "source": "Safari Zone Secret House Surf reward"
+    },
+    "HM04_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x23A"],
+      "source": "Fuchsia Warden Strength reward"
+    },
+    "KOGA_DEFEATED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x259", "0x4B4", "0x6A2", "0x824"],
+      "source": "data/maps/FuchsiaCity_Gym/scripts.inc:10-30; leader, Soul Badge and TM06"
+    },
+    "SECRET_KEY_OBTAINED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x1A8"],
+      "source": "data/maps/PokemonMansion_B1F/map.json; Secret Key object removed"
+    },
+    "FOSSIL_REVIVED": {
+      "requiresSemanticValue": true,
+      "choices": {
+        "helix": {"variables": {"0x4069": 357, "0x406A": 0}, "setFlags": ["0x2ED"], "clearFlags": ["0x2EC", "0x2EE"]},
+        "dome": {"variables": {"0x4069": 358, "0x406A": 0}, "setFlags": ["0x2EC"], "clearFlags": ["0x2ED", "0x2EE"]},
+        "old_amber": {"variables": {"0x4069": 354, "0x406A": 0}, "setFlags": ["0x2EE"], "clearFlags": ["0x2EC", "0x2ED"]}
+      },
+      "source": "data/maps/CinnabarIsland_PokemonLab_ExperimentRoom/scripts.inc:148-250; completed gift resets revive state to 0"
+    },
+    "BLAINE_DEFEATED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x24E", "0x4B6", "0x6A3", "0x826"],
+      "clearFlags": ["0x062"],
+      "variables": {"0x4071": 1},
+      "source": "data/maps/CinnabarIsland_Gym/scripts.inc:49-76; leader, Volcano Badge and TM38; post-battle script sets VAR_MAP_SCENE_CINNABAR_ISLAND=1 and clears FLAG_HIDE_CINNABAR_BILL so the normal Bill invitation is available without completing Sevii progression"
+    },
+    "GIOVANNI_GYM_DEFEATED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x055", "0x298", "0x4B7", "0x65E", "0x827"],
+      "source": "data/maps/ViridianCity_Gym/scripts.inc:3-35; leader, Earth Badge, TM26 and object removal"
+    },
+    "HM02_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x238"],
+      "source": "Route 16 Fly reward"
+    },
+    "RODS_RECEIVED": {
+      "requiresSemanticValue": true,
+      "choices": {
+        "old": {"setFlags": ["0x240"], "clearFlags": ["0x244", "0x255"]},
+        "good": {"setFlags": ["0x244"], "clearFlags": ["0x240", "0x255"]},
+        "super": {"setFlags": ["0x255"], "clearFlags": ["0x240", "0x244"]},
+        "old+good": {"setFlags": ["0x240", "0x244"], "clearFlags": ["0x255"]},
+        "old+super": {"setFlags": ["0x240", "0x255"], "clearFlags": ["0x244"]},
+        "good+super": {"setFlags": ["0x244", "0x255"], "clearFlags": ["0x240"]},
+        "old+good+super": {"setFlags": ["0x240", "0x244", "0x255"]}
+      },
+      "source": "Old/Good/Super Rod receipt flags; semantic value derives from translated target inventory"
+    },
+    "COIN_CASE_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x243"],
+      "source": "Celadon restaurant Coin Case reward"
+    },
+    "ITEMFINDER_RECEIVED": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x252"],
+      "source": "Route 11 Oak aide Itemfinder reward"
+    },
+    "DEX_COUNT_REWARD_50": {
+      "authoritativeFlags": true,
+      "setFlags": ["0x256"],
+      "source": "Route 15 Oak aide Exp. Share reward"
+    },
+    "RIVAL_ROUTE22_EARLY_DEFEATED": {
+      "variables": {"0x4054": 2},
+      "source": "data/maps/Route22/scripts.inc:42-46"
+    },
+    "RIVAL_ROUTE22_FINAL_DEFEATED": {
+      "variables": {"0x4054": 4},
+      "source": "data/maps/Route22/scripts.inc:192-196"
+    },
+    "CHAMPION_DEFEATED": {
+      "authoritativeFlags": true,
+      "authoritativeVariables": true,
+      "variables": {"0x4068": 0},
+      "setFlags": ["0x82C"],
+      "clearFlags": ["0x4B8", "0x4B9", "0x4BA", "0x4BB", "0x4BC", "0x6B6", "0x6B7", "0x6B8"],
+      "source": "data/scripts/hall_of_fame.inc:36; completed Hall of Fame resets the current challenge scene"
+    },
+    "HALL_OF_FAME_FIRST_ENTRY": {
+      "authoritativeFlags": true,
+      "authoritativeVariables": true,
+      "variables": {"0x4050": 3, "0x4068": 0},
+      "setFlags": ["0x82C"],
+      "clearFlags": ["0x09D"],
+      "source": "src/post_battle_event_funcs.c:19-30, data/scripts/hall_of_fame.inc:1-39, and PalletTown/scripts.inc:73-85 stable post-rating state"
+    }
+  }
+}

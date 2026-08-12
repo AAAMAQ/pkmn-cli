@@ -1,6 +1,79 @@
 # Complete pkmn Usage Guide
 
-This guide explains every command endpoint available in `pkmn 0.1.0`. It
+## Continue Red in FireRed
+
+```sh
+pkmn red convert game.sav --template clean-fire-red.sav
+pkmn rjson convert game.red.json --template clean-fire-red.sav
+pkmn rjson convert_to_frjson game.red.json
+```
+
+Default outputs are `game_fr.sav` and `game.fred.json`. Existing outputs are
+never overwritten. Use `--output` for another name or `--auto-suffix` to select
+a numbered collision-free name. Physical conversion writes a JSON manifest and
+Markdown report beside the save.
+
+FireRed inspection and archival work:
+
+```sh
+pkmn fred summary game_fr.sav
+pkmn fred validate game_fr.sav
+pkmn fred decode game_fr.sav
+pkmn frjson validate game_fr.fred.json
+pkmn frjson reconstruct game_fr.fred.json
+```
+
+### Complete v2 command additions
+
+Direct and JSON conversion:
+
+```sh
+pkmn red convert game.sav [game_fr.sav] [--template template.sav]
+pkmn rjson convert game.red.json [game_fr.sav] [--template template.sav]
+pkmn rjson convert_to_frjson game.red.json [game.fred.json]
+pkmn rjson update_schema game.red.json [--output updated.red.json]
+```
+
+The first two write a manifest and Markdown preview beside the generated save.
+Use `--keep-intermediate` on direct physical conversion to retain the proposed
+FireRed JSON. Use `--salt` only when deliberately selecting a reproducible
+alternative conversion identity. `--auto-suffix` preserves existing output
+families.
+
+FireRed JSON:
+
+```sh
+pkmn frjson inspect game.fred.json
+pkmn frjson validate game.fred.json
+pkmn frjson schema [--format json]
+pkmn frjson update_schema game.fred.json [--output updated.fred.json]
+pkmn frjson generate planned.fred.json [generated.sav] --template template.sav
+pkmn frjson reconstruct archival.fred.json [--output reconstructed.sav]
+```
+
+`generate` accepts both the planned conversion contract and complete native
+schema 0.4.0 JSON. Native generation passed Phase 5 and never reads
+`physicalImage`. `reconstruct` is the separate archival operation and requires
+an embedded, hash-valid `physicalImage`.
+
+Physical FireRed saves:
+
+```sh
+pkmn fred summary game.sav [--detailed]
+pkmn fred inspect game.sav [--format json]
+pkmn fred validate game.sav [--format json]
+pkmn fred decode game.sav [--output game.fred.json]
+pkmn fred edit game.sav [--output edited.sav] [safe edit options]
+pkmn fred events list [--kind flag|variable] [--format json]
+pkmn fred events search brock [--kind flag|variable] [--format json]
+pkmn fred events show FLAG_DEFEATED_BROCK [--format json]
+```
+
+Safe edit options are `--player-name`, `--rival-name`, `--money`, `--coins`,
+and repeatable `--badge N:on|off`. The event catalog is pinned pret reference
+data; event discovery itself does not mutate a save.
+
+This guide explains every command endpoint available in `pkmn 2.0.0`. It
 assumes your Pokemon Red save is named `backup.sav`.
 
 `pkmn` never needs a ROM. Commands that create files refuse to replace an
@@ -41,7 +114,7 @@ Quotes are required when a path contains spaces. In the examples below:
 
 ## Basic program commands
 
-These two program controls are not part of the 38 endpoint count, but are the
+These two program controls are not part of the compiled endpoint count, but are the
 first commands to know.
 
 ### Help
@@ -52,8 +125,8 @@ Type:
 pkmn --help
 ```
 
-Expected result: the terminal shows all 38 available endpoints, short
-descriptions, examples, global controls, and the unimplemented future domains.
+Expected result: the terminal shows all available endpoints, short
+descriptions, examples, global controls, and the Phase 5/6 verification gate.
 No files are created.
 
 ### Version
@@ -67,7 +140,7 @@ pkmn --version
 Expected result for this release:
 
 ```text
-pkmn 0.1.0
+pkmn 2.0.0
 ```
 
 No files are created.
@@ -901,6 +974,37 @@ checksums.
 pkmn proof verify backup.pkmn-proof --format json
 ```
 
+## Version 2.0 FireRed and conversion command expansion
+
+The authoritative 89-endpoint syntax is generated from the executable in
+`docs/ALL_COMMANDS.md`. The principal new workflows are:
+
+```sh
+pkmn convert red-to-firered backup.sav --template clean-fr.sav
+pkmn convert red-to-firered backup.sav --plan-only --output-json backup.fred.json
+pkmn convert inspect trainer EVENT_BEAT_VIRIDIAN_GYM_TRAINER_0
+pkmn convert validate-manifest backup_fr.conversion-manifest.json
+
+pkmn fred repair-checksums firered.sav
+pkmn fred validate-batch one.sav two.sav
+pkmn fred decode-batch one.sav two.sav --output-dir decoded
+pkmn fred begin-edit firered.sav
+pkmn fred edit-session firered.fred-edit-session.json --money 999999 --badge 1:on
+pkmn fred validate-edit firered.fred-edit-session.json
+pkmn fred end-edit firered.fred-edit-session.json
+
+pkmn frjson generate complete.fred.json output.sav --template clean-fr.sav
+pkmn compare firered-semantic original.fred.json generated.fred.json
+pkmn compare bridge backup.red.json backup.fred.json --manifest conversion-manifest.json
+pkmn proof fred complete.fred.json --template clean-fr.sav
+pkmn proof red-to-firered backup.red.json --template clean-fr.sav
+```
+
+The two proof commands complete automated determinism, checksum, authority, and
+physical-image-isolation checks and produce MAQ checklists. They deliberately
+report the emulator gate as pending until the corresponding Phase 5 or Phase 6
+master verification is completed.
+
 ## Global controls
 
 These controls go before the command:
@@ -919,18 +1023,13 @@ pkmn --no-color red summary backup.sav
 
 Do not combine `--quiet` and `--verbose`.
 
-## Reserved commands that do not work yet
+## FireRed and conversion verification status
 
-The following domains intentionally return an unsupported-operation message:
-
-```sh
-pkmn fred --help
-pkmn frjson --help
-pkmn convert --help
-```
-
-They reserve future FireRed and Red-to-FireRed command space. `pkmn 0.1.0` does
-not claim FireRed decoding, generation, editing, proof, or conversion support.
+`fred`, `frjson`, `red convert`, and the two `rjson` conversion commands are
+implemented. Physical generation passed Phase 5 and conversion passed Phase 6.
+Generation requires `--template` or
+`PKMN_FIRERED_TEMPLATE` until a distributable public template is approved. The
+CLI never bundles a ROM or a private save.
 
 ## Updating and checking the installed catalog
 

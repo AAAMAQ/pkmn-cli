@@ -16,10 +16,6 @@ public:
     static void PrintVersion(std::ostream& output);
 
 private:
-    static int RunPlannedDomain(const std::vector<std::string>& arguments,
-                                std::ostream& output,
-                                std::ostream& error);
 };
 
 }  // namespace pkmn::cli
-

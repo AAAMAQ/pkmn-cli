@@ -6,7 +6,10 @@
 
 No executable adapter is part of the product. Internal command coverage is built directly from the verified source references, and acceptance tests run without either helper executable.
 
-Future FireRed support follows the same rule: one `pkmn` executable and one coherent CLI architecture, without required Genie/Generator sidecar executables.
+FireRed support now follows the same rule: one `pkmn` executable and one
+coherent installed runtime, without required Genie/Generator sidecar
+executables. The bundled Python modules are project resources, not external
+applications.
 
 ## Attribution and licensing
 

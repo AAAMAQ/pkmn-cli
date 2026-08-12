@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(pkmn-cli VERSION 0.1.0 LANGUAGES CXX)
+project(pkmn-cli VERSION 2.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -10,6 +10,7 @@ option(PKMN_REPRODUCIBLE_BUILD "Remove local source/build paths from compiler ou
 
 include(GNUInstallDirs)
 include(CTest)
+find_package(Python3 3 REQUIRED COMPONENTS Interpreter)
 
 add_library(pkmn_cli_core
     src/app/CommandCatalog.cpp
@@ -18,7 +19,9 @@ add_library(pkmn_cli_core
     src/commands/completion/CompletionCommand.cpp
     src/commands/config/ConfigCommand.cpp
     src/commands/doctor/DoctorCommand.cpp
+    src/commands/fred/FredCommand.cpp
     src/commands/compare/CompareCommand.cpp
+    src/commands/conversion/ConversionCommand.cpp
     src/commands/proof/ProofCommand.cpp
     src/commands/red/EditCommand.cpp
     src/commands/red/RedCommand.cpp
@@ -44,16 +47,23 @@ add_library(pkmn_cli_core
     src/util/ResourceLocator.cpp
 )
 
+file(GLOB FIRERED_NATIVE_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/firered/native/*.cpp")
+target_sources(pkmn_cli_core PRIVATE ${FIRERED_NATIVE_SOURCES})
+
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/resources")
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/resources/pokemon-red-usa-europe-v1.template.bin"
     "${CMAKE_CURRENT_BINARY_DIR}/resources/pokemon-red-usa-europe-v1.template.bin"
     COPYONLY
 )
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/runtime/"
+     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/runtime")
 
 target_include_directories(pkmn_cli_core PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/third_party"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/firered/native"
 )
 target_compile_features(pkmn_cli_core PUBLIC cxx_std_20)
 
@@ -80,13 +90,15 @@ install(DIRECTORY docs/ DESTINATION "${CMAKE_INSTALL_DOCDIR}/docs"
 install(FILES docs/pkmn.1 DESTINATION "${CMAKE_INSTALL_MANDIR}/man1")
 install(FILES resources/pokemon-red-usa-europe-v1.template.bin
         DESTINATION "${CMAKE_INSTALL_DATADIR}/pkmn/resources")
+install(DIRECTORY runtime/ DESTINATION "${CMAKE_INSTALL_DATADIR}/pkmn/runtime"
+        PATTERN "__pycache__" EXCLUDE PATTERN "*.pyc" EXCLUDE)
 install(FILES packaging/sbom/pkmn-cli.spdx.json
         DESTINATION "${CMAKE_INSTALL_DOCDIR}/packaging")
 
 set(CPACK_PACKAGE_NAME "pkmn-cli")
 set(CPACK_PACKAGE_VENDOR "MAQ / BiG MAQ Studios")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Standalone Pokemon Red save workflow CLI")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Pokemon Red to FireRed conversion and save workflow CLI")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_GENERATOR "TGZ")
 if(UNIX AND NOT APPLE)
@@ -100,4 +112,8 @@ if(BUILD_TESTING)
     add_executable(pkmn_cli_tests tests/command_router_tests.cpp)
     target_link_libraries(pkmn_cli_tests PRIVATE pkmn_cli_core)
     add_test(NAME pkmn-cli-command-router COMMAND pkmn_cli_tests)
+    add_test(NAME pkmn-v2-python-runtime
+             COMMAND "${Python3_EXECUTABLE}"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/runtime/pkmn_v2_runtime.py"
+                     --help)
 endif()

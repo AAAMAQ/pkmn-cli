@@ -1,0 +1,60 @@
+{
+  "policyId": "RED_TO_FIRERED_ORIGINAL_V1",
+  "policyVersion": "1.0.0",
+  "status": "implemented-planner-policy",
+  "baseStandard": {
+    "name": "Pokemon Community Conversion Standard",
+    "profile": "ORIGINAL",
+    "commit": "c59d238f1b4dac5221498077bb0a228d21a4c0ff"
+  },
+  "bridgeOverrides": [
+    "Preserve exact source experience instead of truncating to the start of the level.",
+    "Derive Gen III IVs from Gen I DVs with deterministic low bits instead of unrelated random IVs.",
+    "Convert Gen I stat experience into a valid proportional Gen III EV spread instead of clearing EVs."
+  ],
+  "determinism": {
+    "algorithm": "SHA-256 domain-separated counter stream",
+    "defaultSalt": "pkmn-red-to-firered-original-v1",
+    "sourceFingerprint": "canonical input JSON SHA-256",
+    "sameInputPolicyAndSaltSameOutput": true
+  },
+  "identity": {
+    "preservePublicTrainerId": true,
+    "preserveOriginalTrainerName": true,
+    "secretTrainerId": "deterministic per original-trainer identity",
+    "nickname": "preserve after target text validation",
+    "language": "English source assumption; record warning if unavailable"
+  },
+  "pokemon": {
+    "species": "preserve National Dex species 1-151",
+    "glitchSpecies": "reject",
+    "experience": "preserve exact value",
+    "level": "preserve and validate against 1-100",
+    "nature": "source experience modulo 25",
+    "gender": "infer Gen II-compatible gender from species ratio and Attack DV, then constrain PID",
+    "ability": "PID-compatible available FireRed ability slot",
+    "shiny": "preserve source shiny status through PID/TID/SID relation",
+    "ivs": "each Gen I DV doubled plus one deterministic bit; Special feeds both Sp. Atk and Sp. Def",
+    "evs": "ceil square root of stat experience, duplicate Special, proportionally scale to the Gen III 510 total cap",
+    "moves": "map by move name, preserve order and PP Ups, clamp current PP to FireRed maximum",
+    "friendship": 70,
+    "heldItem": "none",
+    "pokerus": "none unless explicitly decoded by source",
+    "metLevel": "current level",
+    "metLocation": 255,
+    "originGame": "FireRed",
+    "pokeball": "Poke Ball",
+    "ribbons": "none",
+    "contestStats": "zero",
+    "mew": "preserve with explicit legality warning"
+  },
+  "wholeSave": {
+    "storyBundle": "KANTO_EQUIVALENT_ONLY",
+    "trainerConfidence": "TRANSFER_CONFIRMED_AND_STRONGLY_INFERRED",
+    "unresolvedTrainer": "DEFAULT_UNDEFEATED",
+    "location": "INHERIT_TEMPLATEFR_BEDROOM",
+    "fireRedOnlyProgression": "LOCKED_OR_SAFE_DEFAULT",
+    "nationalDex": "not inferred from Red completion",
+    "sevii": "not inferred from Red completion"
+  }
+}

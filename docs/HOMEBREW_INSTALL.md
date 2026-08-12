@@ -14,8 +14,9 @@ pkmn --version
 pkmn doctor --deep
 ```
 
-The formula builds with CMake, runs CTest, installs the man page and Red
-template, and generates bash, zsh, and fish completions.
+The formula builds with CMake, runs CTest, installs the man page, Red template,
+FireRed runtime, and generates bash, zsh, and fish completions. Homebrew Python
+is a runtime dependency for Red-to-FireRed conversion.
 
 For tap testing, create `AAAMAQ/homebrew-pkmn`, copy the formula to
 `Formula/pkmn-cli.rb`, and run:
