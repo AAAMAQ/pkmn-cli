@@ -50,4 +50,18 @@ std::filesystem::path RedTemplatePath() {
   throw std::runtime_error(
       "installed Pokemon Red template resource was not found");
 }
+
+std::filesystem::path FireRedRuntimeScriptPath() {
+  constexpr auto name = "pkmn_v2_runtime.py";
+  const auto executable = ExecutablePath();
+  const std::vector<std::filesystem::path> candidates = {
+      executable.parent_path() / "runtime" / name,
+      executable.parent_path().parent_path() / "share" / "pkmn" / "runtime" /
+          name,
+      std::filesystem::current_path() / "runtime" / name};
+  for (const auto &candidate : candidates)
+    if (std::filesystem::is_regular_file(candidate))
+      return candidate;
+  throw std::runtime_error("installed pkmn 2.0 FireRed runtime was not found");
+}
 } // namespace pkmn::cli::util

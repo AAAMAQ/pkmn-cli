@@ -1,13 +1,32 @@
-.TH PKMN 1 "July 2026" "pkmn 0.1.0" "User Commands"
+.TH PKMN 1 "August 2026" "pkmn 2.0.0" "User Commands"
 .SH NAME
-pkmn \- standalone Pokemon Red save workflow command line
+pkmn \- Pokemon Red to FireRed conversion and save workflow command line
 .SH SYNOPSIS
 .B pkmn
 .I domain command
 [arguments] [options]
 .SH DESCRIPTION
 .B pkmn
-provides internal Pokemon Red decoding, inspection, validation, canonical JSON, archival reconstruction, semantic generation, comparison, proof, post-emulator validation, and copy-first editing. It does not require Save Genie or Save Generator executables or a ROM.
+provides Pokemon Red to FireRed conversion plus internal Red and FireRed decoding, inspection, validation, canonical JSON, archival reconstruction, semantic generation, comparison, proof, post-emulator validation, and copy-first editing. It does not require a ROM.
+.SH CONVERSION
+.TP
+.B pkmn red convert game.sav [--output game_fr.sav] [--template clean-fr.sav]
+Validate and convert a Pokemon Red save. The default output is game_fr.sav.
+.TP
+.B pkmn rjson convert game.red.json [--output game_fr.sav] [--template clean-fr.sav]
+Convert canonical Red JSON directly to a FireRed save.
+.TP
+.B pkmn rjson convert_to_frjson game.red.json [--output game.fred.json]
+Translate Red semantics into FireRed JSON without writing a physical save.
+.TP
+.B pkmn convert red-to-firered RED [--preview|--plan-only] [--output-json FILE|--output-save SAVE]
+Use the unified converter with preview, plan-only, policy, manifest, and output controls.
+.TP
+.B pkmn convert inspect|explain event|trainer|item [QUERY]
+Inspect source-backed bridge decisions.
+.PP
+Until a legally distributable public template is approved, physical generation requires
+--template or PKMN_FIRERED_TEMPLATE.
 .SH GENERAL COMMANDS
 .TP
 .B pkmn --help
@@ -68,6 +87,31 @@ Perform exact archival reconstruction requiring physicalImage.
 .TP
 .B pkmn rjson migrate FILE | pkmn rjson schema | pkmn rjson generate-batch ...
 Enrich compatible canonical documents or generate several transactionally.
+.SH FIRERED COMMANDS
+.TP
+.B pkmn fred summary|inspect|validate|decode SAVE ...
+Summarize, inspect, validate, or decode a FireRed save using the native engine.
+.TP
+.B pkmn fred edit SAVE [--output COPY] [safe edits]
+Apply narrow copy-first FireRed edits.
+.TP
+.B pkmn fred repair-checksums|validate-batch|decode-batch|validate-post-emulator ...
+Run copy-first repair, batch automation, and emulator-round-trip validation.
+.TP
+.B pkmn fred begin-edit|edit-session|pending-edits|undo-edit|edit-history|annotate-edit|validate-edit|end-edit ...
+Run safe persistent FireRed edit sessions.
+.TP
+.B pkmn fred events list|search|show ...
+Discover pinned pret FireRed flag, variable, trainer, and semantic-event records.
+.TP
+.B pkmn frjson inspect|validate|schema|update_schema ...
+Inspect and maintain native or planned FireRed JSON.
+.TP
+.B pkmn frjson generate FILE [OUTPUT] --template SAVE
+Generate from accepted planned or complete native schema 0.4.0 FireRed JSON without physicalImage authority. Native generation passed Phase 5.
+.TP
+.B pkmn frjson reconstruct FILE [--output SAVE]
+Perform archival reconstruction from a native JSON physicalImage.
 .SH COMPARISON AND PROOF
 .TP
 .B pkmn compare progress OLDER NEWER
@@ -79,6 +123,12 @@ Compare save bytes, hashes, percentages, and regions.
 .B pkmn compare semantic A B
 Classify field-aware canonical semantic differences.
 .TP
+.B pkmn compare firered-semantic|firered-progress|firered-pokemon|firered-events|firered-trainers|firered-items|firered-fly|firered-hall-of-fame A B
+Run complete or focused FireRed comparisons.
+.TP
+.B pkmn compare bridge RED_JSON FRED_JSON [--manifest FILE]
+Audit the cross-generation semantic boundary.
+.TP
 .B pkmn proof red SAVE [--output-dir DIR] [--zip|--zip-output ZIP]
 Run decode, generation, re-decode, comparison, determinism, isolation, report, and emulator-checklist workflows.
 .TP
@@ -87,14 +137,25 @@ Complete the manual emulator proof gate after validating expected drift.
 .TP
 .B pkmn proof verify DIRECTORY|ZIP
 Verify proof artifact hashes, ZIP safety, JSON, and generated checksums.
+.TP
+.B pkmn proof fred FRED_JSON --template SAVE
+Build the automated Phase 5 deterministic and physical-image-isolation package.
+.TP
+.B pkmn proof red-to-firered RED_JSON --template SAVE
+Build the automated Phase 6 conversion package and MAQ checklist.
 .SH SAFETY
 Inputs and existing outputs are not overwritten. Semantic generation never uses physicalImage as authority. Reconstruction is explicitly archival. Arbitrary runtime location editing is disabled. Proof packages contain save data and require publication review.
 .PP
 Commands that create outputs accept explicit --auto-suffix where documented, producing numbered alternatives without weakening the no-overwrite default.
-.SH FUTURE DOMAINS
-fred, frjson, and convert are disabled placeholders until separately verified and emulator-proven FireRed engines exist.
+.SH VERIFICATION GATES
+FireRed and Red-to-FireRed commands are implemented. Native schema 0.4.0
+generation passed Phase 5. Public-template approval remains a separate
+legal/release decision. The supported Red-to-FireRed conversion policy passed
+Phase 6; per-save warnings and policy decisions remain explicit.
 .SH FILES
 Installed Red template: share/pkmn/resources/pokemon-red-usa-europe-v1.template.bin
+.PP
+Installed FireRed bridge runtime: share/pkmn/runtime
 .SH LICENSE
 MIT License, MAQ / BiG MAQ Studios stewardship note. Independent and not affiliated with Nintendo, Game Freak, Creatures, or The Pokemon Company.
 .SH SEE ALSO

@@ -1,5 +1,28 @@
 # Command Reference
 
+## Pokémon Red to FireRed conversion
+
+```sh
+pkmn red convert game.sav [--output game_fr.sav] [--template clean-fr.sav]
+pkmn rjson convert game.red.json [--output game_fr.sav] [--template clean-fr.sav]
+pkmn rjson convert_to_frjson game.red.json [--output game.fred.json]
+pkmn convert red-to-firered game.sav [--plan-only] [--output-json game.fred.json]
+pkmn convert inspect event|trainer|item [query]
+pkmn convert validate-manifest conversion-manifest.json
+```
+
+Physical conversion validates Red, applies the pinned semantic bridge, writes a
+manifest and report, generates FireRed, and refuses collisions. Set
+`PKMN_FIRERED_TEMPLATE` once to omit `--template` while Phase 5's public-template
+gate remains pending.
+
+Schema migration is copy-first:
+
+```sh
+pkmn rjson update_schema game.red.json
+pkmn frjson update_schema game.fred.json
+```
+
 All currently implemented workflows are internal to `pkmn`. Save Genie and Save Generator executables are not runtime dependencies.
 
 ## General
@@ -54,17 +77,45 @@ See `docs/EDIT_MODE.md` for the complete editor and validation contract.
 - `pkmn rjson reconstruct <file.red.json> [--output <output.sav>]` performs archival byte reconstruction and requires `physicalImage`.
 - `pkmn rjson generate <file.red.json> [output.sav]` performs deterministic semantic generation. It never uses `physicalImage` as authority and emits generation reports.
 
+## Pokémon FireRed saves and JSON
+
+- `pkmn fred summary <save.sav> [--detailed]` prints compact or detailed decoded data.
+- `pkmn fred inspect|validate <save.sav> [--format json]` checks both save slots, section IDs, counters, signatures, and checksums.
+- `pkmn fred decode <save.sav>` exports complete native schema 0.4.0 JSON.
+- `pkmn fred repair-checksums`, `validate-batch`, `decode-batch`, and
+  `validate-post-emulator` provide copy-first repair and automation parity.
+- `pkmn fred edit` applies narrow copy-first trainer-name, rival-name, money, coin, and badge edits.
+- `pkmn fred begin-edit|edit-session|pending-edits|undo-edit|edit-history|annotate-edit|validate-edit|end-edit`
+  provide persistent safe edit sessions for that intentionally compact edit scope.
+- `pkmn fred pokemon` renames an occupied party Pokémon; `fred bag` changes an
+  existing identity-checked stack quantity; `fred progress` stages badge state.
+- `pkmn fred events list|search|show` exposes flags, variables, trainers, and
+  semantic events from pinned authorities.
+- `pkmn frjson inspect|validate` accepts native schema 0.4.0 and planned conversion JSON.
+- `pkmn frjson schema [--format json]` describes both contracts and records Phase 5 acceptance.
+- `pkmn frjson reconstruct` restores a native archival JSON's `physicalImage` bytes.
+- `pkmn frjson generate` accepts planned conversion JSON or complete native
+  schema 0.4.0 JSON and an approved template. Native generation ignores
+  `physicalImage`; native generation passed the Phase 5 gameplay-equivalence gate.
+- `pkmn frjson migrate` and `generate-batch` provide schema and batch parity.
+
 ## Comparison and proof
 
 - `pkmn compare progress <older.sav> <newer.sav> [report options]` explains gameplay changes between two valid backups with the same trainer name and ID: elapsed time, currency, badges, Pokedex, location, party, items, storage, Hall of Fame, verified events, battles, encounters, and story flags. Older input comes first.
 - `pkmn compare physical <a.sav> <b.sav> [report options]` reports SHA-256, byte counts and percentages, first/last difference, and contiguous differing ranges.
 - `pkmn compare semantic <a.red.json> <b.red.json> [report options]` reports field-aware differences classified as exact, normalized, derived, synchronized mirror, permitted canonical, runtime drift, cache drift, deferred, or unexpected.
 - `pkmn compare semantic-batch <baseline> <candidates...>` summarizes several semantic comparisons.
+- `pkmn compare firered-semantic|firered-progress|firered-pokemon|firered-events|firered-trainers|firered-items|firered-fly|firered-hall-of-fame`
+  provides FireRed-wide and focused reports.
+- `pkmn compare bridge <red.json> <fred.json> [--manifest <file>]` audits the
+  cross-generation source, proposed target, and manifest boundary.
 - Comparison report options are `--format markdown|json`, `--output-json <file>`, and `--output-markdown <file>`.
 - `pkmn proof red <source.sav> [--output-dir <directory>] [--zip|--zip-output <archive.zip>]` decodes, generates, re-decodes, compares, proves determinism and physical-image isolation, and writes the complete machine/human report set plus a manual emulator checklist.
 - `pkmn red validate-post-emulator <before.sav> <after.sav> [--output-dir <directory>]` validates and classifies an emulator round trip without modifying either save.
 - `pkmn proof post-emulator --before <save> --after <save> [--output-dir <directory>|--proof-dir <proof-package>]` performs independent validation or explicitly advances an existing proof manifest.
 - `pkmn proof verify <proof-directory|proof.zip>` verifies artifact hashes, ZIP safety, JSON schemas, and generated-save checksums.
+- `pkmn proof fred` creates the automated Phase 5 native-generation package.
+- `pkmn proof red-to-firered` creates the automated Phase 6 conversion package.
 
 Proof output is evidence, not source material. Do not commit it. Automated checks do not claim that the manual emulator gate passed.
 
@@ -76,6 +127,9 @@ New users can follow `docs/BEGINNERS_GUIDE.md`; exact examples and expected outp
 
 The stable categories are: `0` success, `1` general failure, `2` invalid arguments, `3` invalid input, `4` checksum failure, `5` generation failure, `6` physical-image isolation failure, `7` determinism failure, `8` semantic mismatch, `9` output/collision failure, `10` post-emulator validation failure, `11` edit validation failure, and `12` unsupported operation.
 
-## Reserved commands
+## FireRed release boundary
 
-`fred`, `frjson`, and `convert` are honest placeholders. This release does not claim FireRed parsing, generation, editing, or conversion support.
+The FireRed and conversion commands are implemented. Native `.fred.json`
+generation passed Phase 5. Approval of a distributable public template remains
+a separate legal/release decision. The supported conversion policy passed
+Phase 6; each run still reports warnings, omissions, and policy translations.

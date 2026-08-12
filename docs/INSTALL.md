@@ -2,7 +2,8 @@
 
 ## Build and install from source
 
-Requirements are CMake 3.20 or newer and a C++20 compiler.
+Requirements are CMake 3.20 or newer, a C++20 compiler, and Python 3 for the
+bundled Red-to-FireRed planning/generation runtime.
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -38,7 +39,17 @@ CPack creates `.tar.gz` packages on supported platforms and `.deb` packages on
 Linux. Windows CI verifies `pkmn.exe`; the macOS universal helper is under
 `packaging/macos`. The installed packaging documentation includes the SPDX SBOM.
 
-The install step places the executable in `bin` and the identity-checked public Red template in `share/pkmn/resources`. Moving only the executable without its installed resource directory will disable semantic generation and editing.
+The install step places the executable in `bin`, the identity-checked public Red
+template in `share/pkmn/resources`, and the FireRed bridge runtime in
+`share/pkmn/runtime`. Moving only the executable disables resource-backed
+generation, editing, and conversion.
+
+Until a legally distributable public FireRed template is approved, physical FireRed output also
+requires either `--template <approved-save.sav>` or:
+
+```sh
+export PKMN_FIRERED_TEMPLATE="/path/to/approved-template.sav"
+```
 
 ## Homebrew readiness
 

@@ -112,14 +112,14 @@ int main() {
              commandCatalog.output ==
                  Run({"get-all-cmds", "--format", "json"}).output &&
              nlohmann::ordered_json::parse(commandCatalog.output)
-                     .at("commandCount") == 41 &&
+                     .at("commandCount") == 92 &&
              nlohmann::ordered_json::parse(commandCatalog.output)
                      .at("commands").at(0).contains("usage"),
          "get-all-cmds should expose the complete compiled command catalog");
 
   const auto version = Run({"--version"});
   Expect(version.code == 0, "--version should succeed");
-  Expect(version.output == "pkmn 0.1.0\n", "version output should be stable");
+  Expect(version.output == "pkmn 2.0.0\n", "version output should be stable");
   Expect(Run({"--quiet", "--version"}).output.empty() &&
              Run({"--verbose", "--no-color", "--version"})
                      .output.find("standalone=true") != std::string::npos &&
@@ -160,9 +160,43 @@ int main() {
              pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidArguments),
          "rjson should reject an unimplemented or incomplete command form");
 
-  const auto future = Run({"fred", "decode", "sample.sav"});
-  Expect(future.error.find("emulator-proven") != std::string::npos,
-         "FireRed placeholder should state its verification gate");
+  const auto fireRedHelp = Run({"fred", "--help"});
+  Expect(fireRedHelp.code == 0 &&
+             fireRedHelp.output.find("fred decode") != std::string::npos &&
+             fireRedHelp.output.find("fred repair-checksums") != std::string::npos &&
+             fireRedHelp.output.find("fred begin-edit") != std::string::npos,
+         "FireRed domain should expose native read and decode workflows");
+  const auto fireRedSchema = Run({"frjson", "schema", "--format", "json"});
+  Expect(fireRedSchema.code == 0 &&
+             nlohmann::ordered_json::parse(fireRedSchema.output)
+                     .at("nativeSchemaVersion") == "0.4.0" &&
+             nlohmann::ordered_json::parse(fireRedSchema.output)
+                     .at("nativeSemanticGenerationGate") ==
+                 "phase-5-accepted",
+         "FireRed JSON schema discovery should expose contracts and gates");
+  const auto fireRedEvent =
+      Run({"fred", "events", "show", "FLAG_DEFEATED_BROCK", "--format", "json"});
+  Expect(fireRedEvent.code == 0 &&
+             nlohmann::ordered_json::parse(fireRedEvent.output)
+                     .at("records").at(0).at("name") ==
+                 "FLAG_DEFEATED_BROCK",
+         "FireRed event discovery should expose pinned pret symbols");
+  const auto bridgeHelp = Run({"convert", "--help"});
+  Expect(bridgeHelp.code == 0 &&
+             bridgeHelp.output.find("red-to-firered") != std::string::npos &&
+             bridgeHelp.output.find("validate-manifest") != std::string::npos,
+         "unified conversion help should expose planning and audit workflows");
+  const auto bridgeTrainer =
+      Run({"convert", "inspect", "trainer", "EVENT_BEAT_VIRIDIAN_GYM_TRAINER_0"});
+  Expect(bridgeTrainer.code == 0 &&
+             nlohmann::ordered_json::parse(bridgeTrainer.output)
+                     .at("resultCount").get<std::size_t>() == 1,
+         "bridge inspection should resolve a source-backed trainer identity");
+  const auto proofHelp = Run({"proof", "--help"});
+  Expect(proofHelp.code == 0 &&
+             proofHelp.output.find("proof fred") != std::string::npos &&
+             proofHelp.output.find("proof red-to-firered") != std::string::npos,
+         "proof help should expose Phase 5 and Phase 6 workflows");
 
   const auto doctorHelp = Run({"doctor", "--help"});
   Expect(doctorHelp.code == 0,

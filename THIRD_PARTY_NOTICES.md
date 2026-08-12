@@ -15,6 +15,38 @@ The public synthetic canonical initialization resource is incorporated as `resou
 
 No ROMs, private saves, screenshots, emulator artifacts, personal resources, or proof evidence from the source projects are incorporated.
 
+## Pokemon FireRed and conversion engine provenance
+
+The native FireRed reader, checksum/sector analysis, schema 0.4.0 exporter,
+summary engine, archival importer, and narrow safe editor are adapted from
+**Pkmn FireRed Save Genie**, source reference commit
+`713f053`, copyright 2026 MAQ / BiG MAQ Studios, MIT License.
+
+The bundled deterministic bridge planner, Pokémon conversion policy, event,
+trainer and item authorities, and template-backed generator are adapted from:
+
+- **Pkmn Bridge Research**, source reference commit `ea10edc`, MIT License;
+- **Pkmn FireRed Save Generator**, source reference commit `a1a0743`, MIT
+  License.
+
+The pinned research authorities remain:
+
+- `pret/pokered@d70d99ffbd329473d96eaaf19fd97c86d2220b7f`;
+- `pret/pokefirered@df4449a27cd78dd747ce269e47d3ab4a0149d8f4`.
+
+The Pokémon conversion policy uses the **Pokémon Community Conversion
+Standard** `ORIGINAL` profile as a research/specification foundation at commit
+`c59d238f1b4dac5221498077bb0a228d21a4c0ff`, with every project-specific
+override recorded in `runtime/data/pokemon_policy_original_v1.json`. No PCCS
+source code or repository files are copied into this project. The upstream
+repository did not declare a GitHub-detectable license when this notice was
+reviewed, so this project treats it as a cited standard rather than incorporated
+licensed code.
+
+No FireRed ROM, private template save, user save, screenshot, or emulator state
+is incorporated. Until Phase 5 approves a distributable template, users must
+provide their own clean template save for physical FireRed generation.
+
 ## JSON for Modern C++
 
 This repository vendors JSON for Modern C++ 3.12.0 by Niels Lohmann under the MIT License. Its license is stored at `third_party/nlohmann/LICENSE.MIT`.

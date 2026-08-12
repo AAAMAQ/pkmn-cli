@@ -17,6 +17,8 @@
 - [ ] Install into an empty temporary prefix.
 - [ ] Run installed `pkmn --help`, `pkmn --version`, and `pkmn doctor` outside the source tree.
 - [ ] Run installed `pkmn doctor --deep` and verify deterministic self-test output.
+- [ ] Run installed `pkmn frjson schema --format json` outside the source tree.
+- [ ] Exercise Red JSON to proposed FireRed JSON planning without a private template.
 - [ ] Exercise decode, validation, generation, reconstruction, comparison, proof, and edit workflows only with synthetic/public fixtures.
 
 ## Packaging
@@ -26,14 +28,19 @@
 - [ ] Convert the tested head-only formula to an immutable release URL and its downloaded SHA-256.
 - [ ] Run `brew audit --strict`, `brew style`, install, and formula test.
 - [ ] Confirm the installed generation resource is found relative to the installed executable.
+- [ ] Confirm the installed FireRed Python runtime is found relative to the executable.
 - [ ] Generate CPack artifacts, inspect their contents, and include the SPDX SBOM.
 - [ ] Verify each proof directory and ZIP with `pkmn proof verify` before publication.
 - [ ] Build/test universal macOS output on real arm64 and x86_64 toolchains when publishing that artifact.
 - [ ] Sign release artifacts only with maintainer-controlled signing identities.
 
-## Claims
+## Claims and verification gates
 
-- [ ] Do not claim FireRed or conversion support.
+- [x] Record Phase 5 native `.fred.json` generation acceptance without committing private evidence.
+- [x] Native `.fred.json` generation passed deterministic, physical-image-isolation, authority, checksum, and MAQ emulator review.
+- [x] Record Phase 6 Red-to-FireRed acceptance without committing private evidence.
+- [x] Red-to-FireRed conversion passed deterministic, bridge, manifest, checksum, proof-package, and MAQ emulator review.
+- [ ] Do not publish or bundle a private template, save, ROM, screenshot, or emulator artifact.
 - [ ] Do not describe automated proof as emulator proof.
 - [ ] Keep the semantic-generation versus archival-reconstruction boundary explicit.
 - [ ] Record any emulator-tested public sample separately without committing private evidence.

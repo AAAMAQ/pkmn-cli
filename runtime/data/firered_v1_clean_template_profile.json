@@ -1,0 +1,534 @@
+{
+  "format": "pkmn-firered-generator-template-profile",
+  "version": "1.0.0",
+  "profileId": "FIRERED_V1_TEMPLATE_MAQ_002",
+  "studio": "BiG MAQ Studios",
+  "creator": "MAQ",
+  "privacy": "No filename, player identity, full hex, or save payload is published.",
+  "source": {
+    "saveSha256": "7de66f0e6b9cb224a46a32e6f549cdf42ceb13eebf4b5a41122bbe0055caa8d0",
+    "size": 131072,
+    "saveGenieSchema": "0.4.0",
+    "activeSlot": 1,
+    "counter": 1,
+    "mainSections": 14
+  },
+  "logicalBlockSha256": {
+    "saveBlock2": "6cb9ac813a4873d411462ed44823f04152d38c0f4c0766b5d9335ca3b9948343",
+    "saveBlock1": "302edcb28b1d5e96621a93da0691bc126341ac89265321a31d346ea9148c11db",
+    "pokemonStorage": "faade62b8927615ebc110cf83881f1ac09fbf6367630ef6f194552c0d4693795"
+  },
+  "specialSectorSha256": [
+    "f47a8ec3e9aff2318d896942282ad4fe37d6391c82914f54a5da8a37de1300c6",
+    "f47a8ec3e9aff2318d896942282ad4fe37d6391c82914f54a5da8a37de1300c6",
+    "f47a8ec3e9aff2318d896942282ad4fe37d6391c82914f54a5da8a37de1300c6",
+    "f47a8ec3e9aff2318d896942282ad4fe37d6391c82914f54a5da8a37de1300c6"
+  ],
+  "baseline": {
+    "partyPokemon": 0,
+    "storedPokemon": 0,
+    "badges": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    "pokedexOwned": 0,
+    "pokedexSeen": 0,
+    "occupiedInventorySlots": 1,
+    "location": {
+      "mapGroup": 4,
+      "mapNumber": 1,
+      "warpId": -1,
+      "x": 6,
+      "y": 6,
+      "mapLayoutId": 2,
+      "lastHealLocation": {
+        "mapGroup": 3,
+        "mapNumber": 0,
+        "mapName": "PalletTown",
+        "warpId": -1,
+        "x": 6,
+        "y": 8
+      }
+    },
+    "setFlags": [
+      {
+        "id": 43,
+        "name": "Hide Oak In His Lab"
+      },
+      {
+        "id": 44,
+        "name": "Hide Oak In Pallet Town"
+      },
+      {
+        "id": 51,
+        "name": "Hide Bill Human Sea Cottage"
+      },
+      {
+        "id": 53,
+        "name": "Hide Pokehouse Fuji"
+      },
+      {
+        "id": 54,
+        "name": "Hide Lift Key"
+      },
+      {
+        "id": 55,
+        "name": "Hide Silph Scope"
+      },
+      {
+        "id": 60,
+        "name": "Hide Cerulean Rival"
+      },
+      {
+        "id": 61,
+        "name": "Hide Ss Anne Rival"
+      },
+      {
+        "id": 63,
+        "name": "Hide Saffron Civilians"
+      },
+      {
+        "id": 79,
+        "name": "Hide Route 22 Rival"
+      },
+      {
+        "id": 90,
+        "name": "Hide Oak In Champ Room"
+      },
+      {
+        "id": 98,
+        "name": "Hide Cinnabar Bill"
+      },
+      {
+        "id": 107,
+        "name": "Hide Cinnabar Seagallop"
+      },
+      {
+        "id": 108,
+        "name": "Hide Saffron Fan Club Black Belt"
+      },
+      {
+        "id": 109,
+        "name": "Hide Saffron Fan Club Rocker"
+      },
+      {
+        "id": 110,
+        "name": "Hide Saffron Fan Club Woman"
+      },
+      {
+        "id": 111,
+        "name": "Hide Saffron Fan Club Beauty"
+      },
+      {
+        "id": 116,
+        "name": "Hide Two Island Game Corner Biker"
+      },
+      {
+        "id": 117,
+        "name": "Hide Two Island Game Corner Lostelle"
+      },
+      {
+        "id": 118,
+        "name": "Hide Lostelle In Her Home"
+      },
+      {
+        "id": 123,
+        "name": "Hide Two Island Woman"
+      },
+      {
+        "id": 124,
+        "name": "Hide Two Island Beauty"
+      },
+      {
+        "id": 125,
+        "name": "Hide Two Island Poke Maniac"
+      },
+      {
+        "id": 140,
+        "name": "Hide Lorelei In Her House"
+      },
+      {
+        "id": 144,
+        "name": "Hide Dotted Hole Scientist"
+      },
+      {
+        "id": 145,
+        "name": "Hide Three Island Lone Biker"
+      },
+      {
+        "id": 146,
+        "name": "Hide Pewter City Running Shoes Guy"
+      },
+      {
+        "id": 148,
+        "name": "Hide Resort Gorgeous Selphy"
+      },
+      {
+        "id": 149,
+        "name": "Hide Resort Gorgeous Inside Selphy"
+      },
+      {
+        "id": 150,
+        "name": "Hide Selphys Butler"
+      },
+      {
+        "id": 151,
+        "name": "Hide Four Island Rival"
+      },
+      {
+        "id": 153,
+        "name": "Hide Deoxys"
+      },
+      {
+        "id": 157,
+        "name": "Hide Postgame Gossipers"
+      },
+      {
+        "id": 158,
+        "name": "Hide Fame Checker Erika Journals"
+      },
+      {
+        "id": 159,
+        "name": "Hide Fame Checker Koga Journal"
+      },
+      {
+        "id": 160,
+        "name": "Hide Fame Checker Lt Surge Journal"
+      },
+      {
+        "id": 161,
+        "name": "Hide Vermilion City Oaks Aide"
+      },
+      {
+        "id": 162,
+        "name": "Hide Cinnabar Pokecenter Bill"
+      },
+      {
+        "id": 163,
+        "name": "Hide Credits Rival"
+      },
+      {
+        "id": 164,
+        "name": "Hide Credits Oak"
+      },
+      {
+        "id": 165,
+        "name": "Hide Lorelei House Meowth Doll"
+      },
+      {
+        "id": 166,
+        "name": "Hide Lorelei House Chansey Doll"
+      },
+      {
+        "id": 167,
+        "name": "Hide Loreleis House Nidoran F Doll"
+      },
+      {
+        "id": 168,
+        "name": "Hide Lorelei House Jigglypuff Doll"
+      },
+      {
+        "id": 169,
+        "name": "Hide Loreleis House Nidoran M Doll"
+      },
+      {
+        "id": 170,
+        "name": "Hide Loreleis House Fearow Doll"
+      },
+      {
+        "id": 171,
+        "name": "Hide Loreleis House Pidgeot Doll"
+      },
+      {
+        "id": 172,
+        "name": "Hide Loreleis House Lapras Doll"
+      },
+      {
+        "id": 174,
+        "name": "Hide Saffron City Pokecenter Sabrina Journals"
+      },
+      {
+        "id": 1064,
+        "name": "Hidden Item Seven Island Tanoby Ruins Heart Scale 4"
+      },
+      {
+        "id": 1065,
+        "name": "Hidden Item Seven Island Tanoby Ruins Heart Scale"
+      },
+      {
+        "id": 1066,
+        "name": "Hidden Item Seven Island Tanoby Ruins Heart Scale 2"
+      },
+      {
+        "id": 1067,
+        "name": "Hidden Item Seven Island Tanoby Ruins Heart Scale 3"
+      },
+      {
+        "id": 1070,
+        "name": "Hidden Item Underground Path North South Tunnel Potion"
+      },
+      {
+        "id": 1071,
+        "name": "Hidden Item Underground Path North South Tunnel Antidote"
+      },
+      {
+        "id": 1072,
+        "name": "Hidden Item Underground Path North South Tunnel Paralyze Heal"
+      },
+      {
+        "id": 1073,
+        "name": "Hidden Item Underground Path North South Tunnel Awakening"
+      },
+      {
+        "id": 1074,
+        "name": "Hidden Item Underground Path North South Tunnel Burn Heal"
+      },
+      {
+        "id": 1075,
+        "name": "Hidden Item Underground Path North South Tunnel Ice Heal"
+      },
+      {
+        "id": 1076,
+        "name": "Hidden Item Underground Path North South Tunnel Ether"
+      },
+      {
+        "id": 1077,
+        "name": "Hidden Item Underground Path East West Tunnel Potion"
+      },
+      {
+        "id": 1078,
+        "name": "Hidden Item Underground Path East West Tunnel Antidote"
+      },
+      {
+        "id": 1079,
+        "name": "Hidden Item Underground Path East West Tunnel Paralyze Heal"
+      },
+      {
+        "id": 1080,
+        "name": "Hidden Item Underground Path East West Tunnel Awakening"
+      },
+      {
+        "id": 1081,
+        "name": "Hidden Item Underground Path East West Tunnel Burn Heal"
+      },
+      {
+        "id": 1082,
+        "name": "Hidden Item Underground Path East West Tunnel Ice Heal"
+      },
+      {
+        "id": 1083,
+        "name": "Hidden Item Underground Path East West Tunnel Ether"
+      },
+      {
+        "id": 1084,
+        "name": "Hidden Item Mt Moon B1f Tiny Mushroom"
+      },
+      {
+        "id": 1085,
+        "name": "Hidden Item Mt Moon B1f Tiny Mushroom 2"
+      },
+      {
+        "id": 1086,
+        "name": "Hidden Item Mt Moon B1f Tiny Mushroom 3"
+      },
+      {
+        "id": 1087,
+        "name": "Hidden Item Mt Moon B1f Big Mushroom"
+      },
+      {
+        "id": 1088,
+        "name": "Hidden Item Mt Moon B1f Big Mushroom 2"
+      },
+      {
+        "id": 1089,
+        "name": "Hidden Item Mt Moon B1f Big Mushroom 3"
+      },
+      {
+        "id": 1090,
+        "name": "Hidden Item Three Island Berry Forest Razz Berry"
+      },
+      {
+        "id": 1091,
+        "name": "Hidden Item Three Island Berry Forest Bluk Berry"
+      },
+      {
+        "id": 1092,
+        "name": "Hidden Item Three Island Berry Forest Nanab Berry"
+      },
+      {
+        "id": 1093,
+        "name": "Hidden Item Three Island Berry Forest Wepear Berry"
+      },
+      {
+        "id": 1094,
+        "name": "Hidden Item Three Island Berry Forest Oran Berry"
+      },
+      {
+        "id": 1095,
+        "name": "Hidden Item Three Island Berry Forest Cheri Berry"
+      },
+      {
+        "id": 1096,
+        "name": "Hidden Item Three Island Berry Forest Chesto Berry"
+      },
+      {
+        "id": 1097,
+        "name": "Hidden Item Three Island Berry Forest Pecha Berry"
+      },
+      {
+        "id": 1098,
+        "name": "Hidden Item Three Island Berry Forest Rawst Berry"
+      },
+      {
+        "id": 1099,
+        "name": "Hidden Item Three Island Berry Forest Aspear Berry"
+      },
+      {
+        "id": 1100,
+        "name": "Hidden Item Three Island Berry Forest Persim Berry"
+      },
+      {
+        "id": 1101,
+        "name": "Hidden Item Three Island Berry Forest Pinap Berry"
+      },
+      {
+        "id": 1102,
+        "name": "Hidden Item Three Island Berry Forest Lum Berry"
+      },
+      {
+        "id": 1103,
+        "name": "Hidden Item One Island Treasure Beach Stardust"
+      },
+      {
+        "id": 1104,
+        "name": "Hidden Item One Island Treasure Beach Stardust 2"
+      },
+      {
+        "id": 1105,
+        "name": "Hidden Item One Island Treasure Beach Pearl"
+      },
+      {
+        "id": 1106,
+        "name": "Hidden Item One Island Treasure Beach Pearl 2"
+      },
+      {
+        "id": 1107,
+        "name": "Hidden Item One Island Treasure Beach Ultra Ball"
+      },
+      {
+        "id": 1108,
+        "name": "Hidden Item One Island Treasure Beach Ultra Ball 2"
+      },
+      {
+        "id": 1109,
+        "name": "Hidden Item One Island Treasure Beach Star Piece"
+      },
+      {
+        "id": 1110,
+        "name": "Hidden Item One Island Treasure Beach Big Pearl"
+      },
+      {
+        "id": 1153,
+        "name": "Hidden Item Route20 Stardust"
+      },
+      {
+        "id": 1154,
+        "name": "Hidden Item Route21 North Pearl"
+      },
+      {
+        "id": 1166,
+        "name": "Hidden Item Three Island Bond Bridge Pearl"
+      },
+      {
+        "id": 1167,
+        "name": "Hidden Item Three Island Bond Bridge Stardust"
+      },
+      {
+        "id": 1168,
+        "name": "Hidden Item Four Island Pearl"
+      },
+      {
+        "id": 1169,
+        "name": "Hidden Item Four Island Ultra Ball"
+      },
+      {
+        "id": 1170,
+        "name": "Hidden Item Five Island Memorial Pillar Big Pearl"
+      },
+      {
+        "id": 1174,
+        "name": "Hidden Item Five Island Resort Gorgeous Nest Ball"
+      },
+      {
+        "id": 1175,
+        "name": "Hidden Item Five Island Resort Gorgeous Stardust"
+      },
+      {
+        "id": 1176,
+        "name": "Hidden Item Five Island Resort Gorgeous Star Piece"
+      },
+      {
+        "id": 1177,
+        "name": "Hidden Item Five Island Resort Gorgeous Stardust 2"
+      },
+      {
+        "id": 1178,
+        "name": "Hidden Item Six Island Outcast Island Star Piece"
+      },
+      {
+        "id": 1179,
+        "name": "Hidden Item Six Island Outcast Island Net Ball"
+      },
+      {
+        "id": 1180,
+        "name": "Hidden Item Six Island Green Path Ultra Ball"
+      },
+      {
+        "id": 1185,
+        "name": "Hidden Item Seven Island Trainer Tower Big Pearl"
+      },
+      {
+        "id": 1186,
+        "name": "Hidden Item Seven Island Trainer Tower Pearl"
+      },
+      {
+        "id": 2104,
+        "name": "FLAG_UNKNOWN_2104"
+      },
+      {
+        "id": 2110,
+        "name": "Opened Start Menu"
+      }
+    ],
+    "nonzeroVariables": [
+      {
+        "id": 16421,
+        "name": "Massage Cooldown Step Counter",
+        "value": 500
+      },
+      {
+        "id": 16444,
+        "name": "VAR_UNKNOWN_16444",
+        "value": 770
+      },
+      {
+        "id": 16470,
+        "name": "Map Scene Pallet Town Players House 2f",
+        "value": 1
+      }
+    ],
+    "decoderWarnings": []
+  },
+  "approval": {
+    "staticStructureApproved": true,
+    "visualPlayerPositionApprovedByMAQ": true,
+    "emulatorBootSaveReloadApproved": false,
+    "allowedUse": "private physical scaffold for generator candidates"
+  }
+}

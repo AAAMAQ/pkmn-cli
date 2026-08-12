@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bigmaq.studio/schema/pkmn-firered-planned-save-1.0.0.json",
+  "title": "Planned FireRed Semantic Save Request",
+  "description": "A deterministic pre-generator plan. It is not a physical save and is not the lossless FireRed master-save format.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "schemaVersion", "targetMasterSchemaVersion", "planningStatus", "generatorReady", "doesNotContainPhysicalSaveBytes", "authority", "source", "target", "semantic", "warnings", "rejectedInconsistencies"],
+  "properties": {
+    "format": {"const": "pkmn-firered-planned-save"},
+    "schemaVersion": {"const": "1.0.0"},
+    "targetMasterSchemaVersion": {"type": "string"},
+    "planningStatus": {"enum": ["READY", "READY_WITH_WARNINGS", "REJECTED"]},
+    "generatorReady": {"type": "boolean"},
+    "doesNotContainPhysicalSaveBytes": {"const": true},
+    "authority": {
+      "type": "object",
+      "required": ["bridgeVersion", "pokemonPolicy", "sourceFingerprint"]
+    },
+    "source": {"type": "object"},
+    "target": {"type": "object"},
+    "semantic": {
+      "type": "object",
+      "required": ["trainer", "playtime", "options", "currency", "location", "badges", "pokedex", "party", "storage", "daycare", "inventory", "progression", "trainerBattles", "hallOfFame", "fireRedOnly"]
+    },
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "rejectedInconsistencies": {"type": "array"}
+  }
+}

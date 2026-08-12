@@ -2,8 +2,8 @@
   "spdxVersion": "SPDX-2.3",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "name": "pkmn-cli-0.1.0",
-  "documentNamespace": "https://github.com/AAAMAQ/pkmn-cli/sbom/0.1.0",
+  "name": "pkmn-cli-2.0.0",
+  "documentNamespace": "https://github.com/AAAMAQ/pkmn-cli/sbom/2.0.0",
   "creationInfo": {
     "created": "2026-07-17T00:00:00Z",
     "creators": ["Organization: MAQ / BiG MAQ Studios"]
@@ -12,7 +12,7 @@
     {
       "name": "pkmn-cli",
       "SPDXID": "SPDXRef-Package-pkmn-cli",
-      "versionInfo": "0.1.0",
+      "versionInfo": "2.0.0",
       "downloadLocation": "NOASSERTION",
       "filesAnalyzed": false,
       "licenseConcluded": "MIT",
@@ -28,6 +28,26 @@
       "licenseConcluded": "MIT",
       "licenseDeclared": "MIT",
       "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "pkmn FireRed bridge and generator runtime",
+      "SPDXID": "SPDXRef-Package-pkmn-firered-runtime",
+      "versionInfo": "2.0.0",
+      "downloadLocation": "https://github.com/AAAMAQ/pkmn-bridge-research",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright 2026 MAQ / BiG MAQ Studios"
+    },
+    {
+      "name": "Python",
+      "SPDXID": "SPDXRef-Package-python",
+      "versionInfo": "3.x",
+      "downloadLocation": "https://www.python.org/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "PSF-2.0",
+      "licenseDeclared": "PSF-2.0",
+      "copyrightText": "NOASSERTION"
     }
   ],
   "relationships": [
@@ -40,6 +60,16 @@
       "spdxElementId": "SPDXRef-Package-pkmn-cli",
       "relationshipType": "DEPENDS_ON",
       "relatedSpdxElement": "SPDXRef-Package-nlohmann-json"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-pkmn-cli",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-pkmn-firered-runtime"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-pkmn-cli",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-python"
     }
   ]
 }

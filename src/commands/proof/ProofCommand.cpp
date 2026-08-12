@@ -1,6 +1,7 @@
 #include "commands/proof/ProofCommand.hpp"
 
 #include <filesystem>
+#include <chrono>
 #include <fstream>
 #include <map>
 #include <ostream>
@@ -19,6 +20,10 @@
 #include "util/OutputPath.hpp"
 #include "util/ZipWriter.hpp"
 #include "util/AtomicOutput.hpp"
+#include "commands/conversion/ConversionCommand.hpp"
+#include "FireRedSectionMap.hpp"
+#include "FileManipulation.hpp"
+#include "FireRedMasterJson.hpp"
 
 namespace pkmn::cli::commands::proof {
 namespace {
@@ -60,6 +65,43 @@ std::string BuildPlatform() {
 #else
   return "unknown";
 #endif
+}
+
+void AugmentFireRedProof(const std::filesystem::path &directory,
+                         const std::filesystem::path &sourceJson,
+                         bool compareNativeAuthority,
+                         std::ostream &output, std::ostream &error) {
+  const auto savePath = directory / "generated.sav";
+  const auto bytes = firered::ReadBinaryFile(savePath);
+  const auto analysis = firered::AnalyzeSave(bytes);
+  if (!analysis.activeSlot || analysis.activeSlotAmbiguous ||
+      !analysis.slots[*analysis.activeSlot].valid)
+    throw std::runtime_error("proof generated FireRed save failed native reanalysis");
+  const auto nativePath = directory / "native-reanalysis.fred.json";
+  util::WriteTextAtomic(nativePath,
+      firered::ExportMasterJson(savePath, bytes, analysis));
+  if (compareNativeAuthority) {
+    const auto comparisonPath = directory / "native-authority-comparison.json";
+    const auto result = commands::conversion::RunRuntimeUtility(
+        {"compare-frjson", "native-authority", sourceJson.string(),
+         nativePath.string(), "--output", comparisonPath.string()}, output, error);
+    if (result != 0)
+      throw std::runtime_error("native FireRed authority comparison failed");
+  }
+  const auto manifestPath = directory / "proof-manifest.json";
+  Json manifest;
+  { std::ifstream input(manifestPath); input >> manifest; }
+  manifest["nativeReanalysisValid"] = true;
+  manifest["nativeReanalysisActiveSlot"] = *analysis.activeSlot;
+  manifest["artifactSha256"]["native-reanalysis.fred.json"] =
+      util::Sha256Hex(firered::ReadBinaryFile(nativePath));
+  if (compareNativeAuthority) {
+    const auto comparison = directory / "native-authority-comparison.json";
+    manifest["nativeAuthorityEquivalent"] = true;
+    manifest["artifactSha256"]["native-authority-comparison.json"] =
+        util::Sha256Hex(firered::ReadBinaryFile(comparison));
+  }
+  util::ReplaceTextAtomic(manifestPath, manifest.dump(2) + "\n");
 }
 
 int VerifyPackage(const std::vector<std::string> &args, std::ostream &output,
@@ -106,6 +148,26 @@ int VerifyPackage(const std::vector<std::string> &args, std::ostream &output,
       if (name != "proof-manifest.json" &&
           !manifest.at("artifactSha256").contains(name))
         throw std::runtime_error("unhashed artifact is present: " + name);
+    }
+    const auto proofType = manifest.value("proofType", "pokemon-red-semantic-generation");
+    if (proofType == "firered-phase5" || proofType == "red-to-firered-phase6") {
+      if (!files.contains("generated.sav"))
+        throw std::runtime_error("generated.sav is missing");
+      const auto analysis = firered::AnalyzeSave(files.at("generated.sav"));
+      if (!analysis.activeSlot || analysis.activeSlotAmbiguous ||
+          !analysis.slots[*analysis.activeSlot].valid)
+        throw std::runtime_error("generated FireRed save validation failed");
+      const Json report = {{"valid", true}, {"proofType", proofType},
+                           {"packageType", zip ? "deterministic-zip" : "directory"},
+                           {"artifactCount", files.size()},
+                           {"artifactHashesVerified", verified},
+                           {"generatedChecksumsValid", true},
+                           {"emulatorValidation", manifest.value("emulatorValidation", "unknown")}};
+      if (jsonOutput) output << report.dump(2) << '\n';
+      else output << "Proof package verification: passed\nProof type: " << proofType
+                  << "\nArtifacts hashed: " << verified
+                  << "\nGenerated FireRed checksums: valid\n";
+      return 0;
     }
     if (!files.contains("generated.sav"))
       throw std::runtime_error("generated.sav is missing");
@@ -246,12 +308,88 @@ int Run(const std::vector<std::string> &args, std::ostream &output,
               "  pkmn proof post-emulator --before <save.sav> --after "
               "<save.sav> [--output-dir <directory>|--proof-dir <directory>]\n"
               "  pkmn proof verify <proof-directory|proof.zip> [--format json]\n";
+    output << "  pkmn proof fred <complete.fred.json> --template <clean.sav> [--output-dir <directory>]\n"
+              "  pkmn proof red-to-firered <save.red.json> --template <clean.sav> [--output-dir <directory>]\n";
     return 0;
   }
   if (args[0] == "post-emulator")
     return RunPostEmulator({args.begin() + 1, args.end()}, output, error);
   if (args[0] == "verify")
     return VerifyPackage({args.begin() + 1, args.end()}, output, error);
+  if ((args[0] == "fred" || args[0] == "red-to-firered") && args.size() >= 2) {
+    std::filesystem::path proofInput = args[1];
+    std::filesystem::path temporaryRedJson;
+    std::filesystem::path temporaryFireRedJson;
+    if (args[0] == "fred" && !proofInput.filename().string().ends_with(".json")) {
+      try {
+        const auto bytes = firered::ReadBinaryFile(proofInput);
+        const auto analysis = firered::AnalyzeSave(bytes);
+        if (!analysis.activeSlot || analysis.activeSlotAmbiguous ||
+            !analysis.slots[*analysis.activeSlot].valid)
+          throw std::runtime_error("source FireRed save failed validation");
+        temporaryFireRedJson = std::filesystem::temp_directory_path() /
+            ("pkmn-phase5-" + std::to_string(std::chrono::high_resolution_clock::now().time_since_epoch().count()) + ".fred.json");
+        util::WriteTextAtomic(temporaryFireRedJson,
+            firered::ExportMasterJson(proofInput, bytes, analysis));
+        proofInput = temporaryFireRedJson;
+      } catch (const std::exception &exception) {
+        error << "pkmn proof fred: " << exception.what() << '\n';
+        return ToInt(ExitCode::InvalidInput);
+      }
+    }
+    if (args[0] == "red-to-firered" &&
+        !proofInput.filename().string().ends_with(".json")) {
+      try {
+        const auto save = red::save::RedSave::Read(proofInput);
+        const auto integrity = red::validation::SaveValidator::Validate(save);
+        if (!integrity.Valid())
+          throw std::runtime_error("source Red save failed validation");
+        temporaryRedJson = std::filesystem::temp_directory_path() /
+            ("pkmn-phase6-" + std::to_string(std::chrono::high_resolution_clock::now().time_since_epoch().count()) + ".red.json");
+        const auto document = red::json::Decode(save, proofInput.filename().string(), integrity,
+                                                {.includePhysicalImage = false});
+        util::WriteTextAtomic(temporaryRedJson, red::json::Serialize(document));
+        proofInput = temporaryRedJson;
+      } catch (const std::exception &exception) {
+        error << "pkmn proof red-to-firered: " << exception.what() << '\n';
+        return ToInt(ExitCode::InvalidInput);
+      }
+    }
+    std::vector<std::string> runtime{
+        args[0] == "fred" ? "proof-fred" : "proof-red-to-firered", proofInput.string()};
+    for (std::size_t index = 2; index < args.size(); ++index) {
+      if ((args[index] == "--template" || args[index] == "--output-dir" ||
+           args[index] == "--salt") && index + 1 < args.size()) {
+        runtime.push_back(args[index]); runtime.push_back(args[++index]);
+      } else {
+        error << "pkmn proof " << args[0] << ": invalid arguments\n";
+        return ToInt(ExitCode::InvalidArguments);
+      }
+    }
+    auto result = commands::conversion::RunRuntimeUtility(runtime, output, error);
+    if (result == 0) {
+      std::filesystem::path directory;
+      for (std::size_t index = 2; index + 1 < args.size(); ++index)
+        if (args[index] == "--output-dir") directory = args[index + 1];
+      if (directory.empty())
+        directory = std::filesystem::path(args[1]).parent_path() /
+            (std::filesystem::path(args[1]).stem().string() +
+             (args[0] == "fred" ? ".phase5-proof" : ".phase6-proof"));
+      try {
+        AugmentFireRedProof(directory, proofInput, args[0] == "fred", output, error);
+      } catch (const std::exception &exception) {
+        error << "pkmn proof " << args[0] << ": " << exception.what() << '\n';
+        result = ToInt(ExitCode::SemanticMismatch);
+      }
+    }
+    if (!temporaryRedJson.empty()) {
+      std::error_code ignored; std::filesystem::remove(temporaryRedJson, ignored);
+    }
+    if (!temporaryFireRedJson.empty()) {
+      std::error_code ignored; std::filesystem::remove(temporaryFireRedJson, ignored);
+    }
+    return result;
+  }
   if (args.size() < 2 || args[0] != "red") {
     error << "pkmn proof: expected 'red <source.sav>'\n";
     return ToInt(ExitCode::InvalidArguments);

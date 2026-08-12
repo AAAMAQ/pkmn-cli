@@ -39,11 +39,19 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
       {"arbitraryLocationEditing", false},
       {"safeGeneratedLocation", "Red's house second floor"},
       {"canonicalRedJsonSchema", "0.1.0"},
+      {"canonicalFireRedJsonSchema", "0.4.0"},
+      {"pokemonConversionProfile", "PCCS ORIGINAL pinned deterministic profile"},
+      {"ambiguousTrainerPolicy", "target remains undefeated"},
+      {"fireRedOnlyProgressionPolicy", "locked unless explicitly derived"},
+      {"rawCrossGenerationIdCopying", false},
+      {"nativeFireRedGeneration", "implemented; Phase 5 MAQ acceptance passed"},
+      {"redToFireRedConversion", "implemented; Phase 6 MAQ acceptance passed"},
       {"environmentVariables",
        nlohmann::ordered_json::array({"PKMN_QUIET=1", "PKMN_VERBOSE=1",
-                                      "NO_COLOR"})},
+                                      "NO_COLOR", "PKMN_FIRERED_TEMPLATE"})},
+      {"pythonRuntimeRequiredForFireRedConversion", true},
       {"transactionalOutputWrites", true},
-      {"fireRedSupport", "not-implemented"}};
+      {"fireRedSupport", "phase-5-and-phase-6-accepted"}};
   if (json)
     output << policy.dump(2) << '\n';
   else
@@ -55,9 +63,15 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
               "Reconstruction physicalImage authority: required\n"
               "Arbitrary location editing: disabled\n"
               "Safe generated location: Red's house second floor\n"
-              "Environment controls: PKMN_QUIET=1, PKMN_VERBOSE=1, NO_COLOR\n"
+              "Pokemon conversion: pinned deterministic PCCS ORIGINAL profile\n"
+              "Ambiguous trainers: remain undefeated\n"
+              "FireRed-only progression: locked unless explicitly derived\n"
+              "Raw event/trainer/item IDs copied between games: never\n"
+              "Environment controls: PKMN_QUIET=1, PKMN_VERBOSE=1, NO_COLOR, "
+              "PKMN_FIRERED_TEMPLATE\n"
               "Transactional output writes: enabled\n"
-              "FireRed support: not implemented\n";
+              "FireRed generation: Phase 5 accepted\n"
+              "Red-to-FireRed conversion: Phase 6 accepted\n";
   return 0;
 }
 

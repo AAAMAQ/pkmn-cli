@@ -1,7 +1,5 @@
 #include "app/CommandRouter.hpp"
 
-#include <algorithm>
-#include <array>
 #include <ostream>
 #include <sstream>
 #include <cstdlib>
@@ -15,16 +13,15 @@
 #include "commands/completion/CompletionCommand.hpp"
 #include "commands/config/ConfigCommand.hpp"
 #include "commands/doctor/DoctorCommand.hpp"
+#include "commands/fred/FredCommand.hpp"
 #include "commands/compare/CompareCommand.hpp"
+#include "commands/conversion/ConversionCommand.hpp"
 #include "commands/proof/ProofCommand.hpp"
 #include "commands/red/RedCommand.hpp"
 #include "commands/rjson/RjsonCommand.hpp"
 
 namespace pkmn::cli {
 namespace {
-
-constexpr std::array<std::string_view, 7> kPlannedDomains = {
-    "red", "rjson", "proof", "compare", "fred", "frjson", "convert"};
 
 bool IsHelp(std::string_view argument) {
     return argument == "help" || argument == "--help" || argument == "-h";
@@ -117,6 +114,10 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
     if (arguments.front() == "compare") {
         return commands::compare::Run({arguments.begin() + 1, arguments.end()}, output, error);
     }
+    if (arguments.front() == "convert") {
+        return commands::conversion::RunConvert(
+            {arguments.begin() + 1, arguments.end()}, output, error);
+    }
     if (arguments.front() == "proof") {
         return commands::proof::Run({arguments.begin() + 1, arguments.end()}, output, error);
     }
@@ -127,10 +128,13 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
     if (arguments.front() == "rjson") {
         return commands::rjson::Run({arguments.begin() + 1, arguments.end()}, output, error);
     }
-
-    if (std::find(kPlannedDomains.begin(), kPlannedDomains.end(), arguments.front()) !=
-        kPlannedDomains.end()) {
-        return RunPlannedDomain(arguments, output, error);
+    if (arguments.front() == "fred") {
+        return commands::fred::Run(
+            {arguments.begin() + 1, arguments.end()}, output, error);
+    }
+    if (arguments.front() == "frjson") {
+        return commands::conversion::RunFrjson(
+            {arguments.begin() + 1, arguments.end()}, output, error);
     }
 
     error << "pkmn: unknown command or domain '" << arguments.front() << "'\n"
@@ -144,7 +148,11 @@ void CommandRouter::PrintVersion(std::ostream& output) {
 
 void CommandRouter::PrintHelp(std::ostream& output) {
     output
-        << "pkmn - unified Pokemon save research command line\n\n"
+        << "pkmn 2.0 - continue a Pokemon Red journey in Pokemon FireRed\n\n"
+        << "Conversion:\n"
+        << "  pkmn red convert game.sav\n"
+        << "  pkmn rjson convert game.red.json\n"
+        << "  pkmn rjson convert_to_frjson game.red.json\n\n"
         << "Usage:\n"
         << "  pkmn <domain> <command> [arguments] [options]\n"
         << "  pkmn doctor\n"
@@ -166,39 +174,23 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "\nUse 'pkmn get-all-cmds' for complete usage lines and descriptions.\n"
         << "Use 'pkmn get-all-cmds --format markdown --output commands.md' "
            "to save them.\n\n"
-        << "Reserved/planned command domains:\n"
-        << "  fred, frjson         Future FireRed workflows (not implemented)\n"
-        << "  convert              Future Red-to-FireRed conversion (not implemented)\n\n"
+        << "Verification status:\n"
+        << "  Red workflows are release-proven. FireRed physical generation passed\n"
+        << "  Phase 5 and Red-to-FireRed conversion passed Phase 6.\n"
+        << "  Until a public template is approved, pass --template or set\n"
+        << "  PKMN_FIRERED_TEMPLATE.\n\n"
         << "Core safety model:\n"
         << "  generate             Semantic generation; physicalImage is never authority\n"
         << "  reconstruct          Archival reconstruction; physicalImage is required\n"
         << "  edit                 Writes a validated copy; never overwrites input by default\n\n"
-        << "Examples:\n"
+        << "More examples:\n"
+        << "  pkmn red convert savefile.sav\n"
         << "  pkmn red summary savefile.sav\n"
         << "  pkmn red validate savefile.sav\n"
         << "  pkmn red decode savefile.sav\n"
         << "  pkmn compare progress older.sav newer.sav\n"
         << "  pkmn get-all-cmds\n"
         << "  pkmn doctor\n";
-}
-
-int CommandRouter::RunPlannedDomain(const std::vector<std::string>& arguments,
-                                    std::ostream& output,
-                                    std::ostream& error) {
-    if (arguments.size() > 1 && IsHelp(arguments[1])) {
-        output << "The '" << arguments.front()
-               << "' domain is reserved by the command router but is not implemented yet.\n";
-        return ToInt(ExitCode::Success);
-    }
-
-    error << "pkmn: the '" << arguments.front()
-          << "' domain is planned but not implemented in this foundation release.\n";
-    if (arguments.front() == "fred" || arguments.front() == "frjson" ||
-        arguments.front() == "convert") {
-        error << "FireRed and Red-to-FireRed support will remain disabled until their "
-                 "separate engines are verified and emulator-proven.\n";
-    }
-    return ToInt(ExitCode::UnsupportedOperation);
 }
 
 }  // namespace pkmn::cli

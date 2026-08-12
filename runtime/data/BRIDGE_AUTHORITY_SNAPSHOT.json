@@ -1,0 +1,59 @@
+{
+  "format": "pkmn-firered-generator-authority-snapshot",
+  "version": "1.0.0",
+  "bridgeRepository": "Pkmn Bridge Research",
+  "pret": {
+    "pokered": "d70d99ffbd329473d96eaaf19fd97c86d2220b7f",
+    "pokefirered": "df4449a27cd78dd747ce269e47d3ab4a0149d8f4"
+  },
+  "files": [
+    {
+      "path": "firered_generator/__init__.py",
+      "sha256": "ca3fdb9390e0008df488a983a013a4167722acbdc2f332ca28d4cbadf8445ce2"
+    },
+    {
+      "path": "firered_generator/binary.py",
+      "sha256": "9c55fb0d3131c2961bc0e94884f5e4019ca6c72a92077024f753c61f4af0a134"
+    },
+    {
+      "path": "firered_generator/text.py",
+      "sha256": "1991b4dccf42db1ea7188a8a11b128c670eb8694c24ab0267ae46d4db80547bc"
+    },
+    {
+      "path": "firered_generator/pokemon.py",
+      "sha256": "bff0a16d40deb61c1da3ec833a38ed2940d17a323b38ac4f46ba0007ac073562"
+    },
+    {
+      "path": "firered_generator/generator.py",
+      "sha256": "cf97ca78f51adc206ffac3fc60afec45fff3a5bce9fe77e900efeff8ef9aa2ab"
+    },
+    {
+      "path": "data/original_v1_conversion_metadata.json",
+      "sha256": "36fa5e6cf9f7cb66094c8647bedfe0353c80fc4881ff87c6868178573ed16745"
+    },
+    {
+      "path": "data/event_bridge_red_to_firered.json",
+      "sha256": "9063ae0d43346d07bd05ac063a43ce7c0e58bc7d3f21e3d0e267a67953cccc42"
+    },
+    {
+      "path": "data/firered_event_generator_rules.json",
+      "sha256": "5a47e897beaf1804e9db2d9f12744b27cd7b60de3203a0e4a74696cfb65e0c1e"
+    },
+    {
+      "path": "data/firered_location_generator_rules.json",
+      "sha256": "47a0b3e15d0715a0b48e3422b5138cbe1a8f5a3a89e7487d9be51e17b03be736"
+    },
+    {
+      "path": "data/trainer_bridge_red_to_firered.json",
+      "sha256": "fd5fc96c20a60489020bec4e968235d46b9cc304ba30b01343a36f4ea21268b0"
+    },
+    {
+      "path": "schemas/proposed_fred.schema.json",
+      "sha256": "6c381fc2f3713f31b2a82b139bc215a0ca51ac7205d1485a342c97081d03537c"
+    },
+    {
+      "path": "schemas/firered_generation_report.schema.json",
+      "sha256": "adc4e5da16fdd4c8e73ce21f822510d16d720d20a1e8512a5c9e34f3b1f35d11"
+    }
+  ]
+}

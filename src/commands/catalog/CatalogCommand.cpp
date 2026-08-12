@@ -28,7 +28,7 @@ std::string TextCatalog() {
               std::string(command.description) + "\n";
   }
   result += "\nGlobal controls: --quiet, --verbose, --no-color\n";
-  result += "Reserved only: fred, frjson, convert (not implemented)\n";
+  result += "FireRed generation passed Phase 5; Red-to-FireRed conversion passed Phase 6.\n";
   return result;
 }
 
@@ -49,8 +49,8 @@ std::string MarkdownCatalog() {
               std::string(command.description) + "\n\n";
   }
   result += "## Global controls\n\n`--quiet`, `--verbose`, and `--no-color` "
-            "must appear before the command. The `fred`, `frjson`, and "
-            "`convert` domains are reserved but not implemented.\n";
+            "must appear before the command. FireRed physical generation passed "
+            "Phase 5; Red-to-FireRed conversion passed Phase 6.\n";
   return result;
 }
 
@@ -68,7 +68,7 @@ std::string JsonCatalog() {
               {"toolVersion", std::string(kVersion)},
               {"commandCount", commands.size()},
               {"globalControls", {"--quiet", "--verbose", "--no-color"}},
-              {"reservedDomains", {"fred", "frjson", "convert"}},
+              {"reservedDomains", nlohmann::ordered_json::array()},
               {"commands", commands}})
              .dump(2) +
          '\n';

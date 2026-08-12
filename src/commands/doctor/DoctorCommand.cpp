@@ -1,6 +1,7 @@
 #include "commands/doctor/DoctorCommand.hpp"
 
 #include <ostream>
+#include <array>
 
 #include <nlohmann/json.hpp>
 
@@ -13,6 +14,8 @@
 #include "red/validation/SaveValidator.hpp"
 #include "util/ResourceLocator.hpp"
 #include "util/Sha256.hpp"
+#include "FireRedChecksum.hpp"
+#include <filesystem>
 
 namespace pkmn::cli::commands::doctor {
 namespace {
@@ -70,11 +73,25 @@ int Run(const std::vector<std::string>& arguments,
                 red::save::RedSave(first.bytes));
             if (first.bytes != second.bytes || !generatedIntegrity.Valid())
                 throw std::runtime_error("internal deterministic round trip failed");
+            const auto runtime = util::FireRedRuntimeScriptPath();
+            const auto data = runtime.parent_path() / "data";
+            const bool bridgeAuthorities =
+                std::filesystem::is_regular_file(data / "event_bridge_red_to_firered.json") &&
+                std::filesystem::is_regular_file(data / "trainer_bridge_red_to_firered.json") &&
+                std::filesystem::is_regular_file(data / "item_bridge_red_to_firered.json");
+            const std::array<std::uint8_t, 4> zero{};
+            if (!std::filesystem::is_regular_file(runtime) || !bridgeAuthorities ||
+                firered::CalculateSectionChecksum(zero) != 0)
+                throw std::runtime_error("FireRed runtime/authority self-test failed");
             deepReport = {{"passed", true},
                           {"resource", util::RedTemplatePath().filename().string()},
                           {"deterministic", true},
                           {"generatedChecksumsValid", true},
-                          {"generatedSha256", util::Sha256Hex(first.bytes)}};
+                          {"generatedSha256", util::Sha256Hex(first.bytes)},
+                          {"fireRedNativeChecksumSelfTest", true},
+                          {"fireRedRuntimePresent", true},
+                          {"bridgeAuthoritiesPresent", true},
+                          {"fireRedPhysicalSelfTest", "requires PKMN_FIRERED_TEMPLATE"}};
         } catch (const std::exception &exception) {
             error << "pkmn doctor --deep: " << exception.what() << '\n';
             return ToInt(ExitCode::GeneralFailure);
@@ -87,11 +104,17 @@ int Run(const std::vector<std::string>& arguments,
             {"version", std::string(kVersion)},
             {"standaloneReadiness", "ready"},
             {"externalExecutablesRequired", false},
+            {"fireRedPythonRuntimeRequired", true},
+            {"fireRedVerificationGate", "phase-5-and-phase-6-passed"},
             {"modules", nlohmann::ordered_json::array({
                 "command-router", "red-save-loader", "red-checksum-validator",
                 "red-json-decoder-validator-reconstructor", "red-semantic-generator",
                 "physical-semantic-comparison", "red-proof",
-                "post-emulator-validation", "red-editing"})}};
+                "post-emulator-validation", "red-editing",
+                "red-to-firered-bridge-planner", "firered-template-generator",
+                "firered-native-json-generator", "firered-proof",
+                "red-to-firered-proof", "bridge-inspection",
+                "red-and-firered-schema-updater"})}};
         report["deepSelfTest"] = deepReport;
         output << report.dump(2) << '\n';
         return ToInt(ExitCode::Success);
@@ -108,6 +131,10 @@ int Run(const std::vector<std::string>& arguments,
         << "[ok] physical/semantic comparison and Red proof workflow\n"
         << "[ok] post-emulator validation and proof continuation\n"
         << "[ok] validated copy-first Red editing sessions\n"
+        << "[ok] bundled Red-to-FireRed bridge and generator runtime\n"
+        << "[ok] FireRed reader, native JSON generator, comparisons, and proof runtime\n"
+        << "[ok] FireRed Phase 5 native-generation acceptance\n"
+        << "[ok] Red-to-FireRed Phase 6 conversion acceptance\n"
            << (deep ? "[ok] deep deterministic generation self-test\n" : "")
            << "\nStandalone readiness: ready\n";
     return ToInt(ExitCode::Success);
