@@ -12,6 +12,9 @@
   schema 0.4.0 decoding, narrow copy-first editing, and pinned event discovery.
 - Bundled the pinned deterministic bridge planner, Pokémon policy, event/item/
   trainer authorities, and FireRed generator runtime.
+- Added MAQ's clean pre-starter FireRed template as the validated automatic
+  default, strict support for equivalent user-dumped templates, installed
+  resource self-tests, and a complete cartridge/emulator conversion guide.
 - Added copy-first output collision protection, conversion manifests, reports,
   physical-image isolation, and explicit Phase 5/6 verification gating.
 - Expanded the compiled v2 catalog to 92 endpoints and preserved original

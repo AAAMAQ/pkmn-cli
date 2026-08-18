@@ -1,119 +1,211 @@
-# pkmn-cli
+# pkmn 2.0
 
-`pkmn-cli` 2.0 is the unified command-line tool for continuing a Pokémon Red
-journey in Pokémon FireRed, with auditable save research, preservation,
-validation, editing, generation, reconstruction, comparison, and proof
-workflows by **MAQ / BiG MAQ Studios**.
+## The first complete Pokémon Red → FireRed save translator
+
+`pkmn` is, to the best of our knowledge, the first publicly documented
+complete-save translator designed to turn an entire **Pokémon Red** save
+journey into a consistent, playable **Pokémon FireRed** save—not merely
+transfer individual Pokémon.
+
+> **From Pokémon Red `.sav` to Pokémon FireRed `.sav`, with the journey in
+> between translated and explained.**
+
+To the best of our knowledge after reviewing publicly available Pokémon save
+editors, transporters, and conversion projects, no earlier released tool
+translated the complete Red save experience—Pokémon, identity, inventory,
+trainers, badges, story progression, world state, and remake-specific
+defaults—into FireRed. Existing cross-generation projects generally move
+individual Pokémon or convert save containers. `pkmn` translates the meaning
+of the whole supported save.
+
+The project is created and maintained by **MAQ / BiG MAQ Studios**. It is free,
+open source, MIT licensed, and built for educational research, archival work,
+game preservation, and personal save continuity.
 
 ## Convert Pokémon Red to FireRed
 
-Convert a physical Red save:
-
 ```sh
 pkmn red convert game.sav
-# writes game_fr.sav plus an audit manifest and report
 ```
 
-Convert canonical Red JSON directly to a FireRed save:
+If no output name is supplied, the result is written as:
+
+```text
+game_fr.sav
+```
+
+The conversion also produces an audit manifest and readable report explaining
+what was transferred, translated, derived, defaulted, omitted, warned about,
+or rejected.
+
+Canonical JSON is supported too:
 
 ```sh
+# Red JSON directly to a FireRed save
 pkmn rjson convert game.red.json
-# writes game_fr.sav
-```
 
-Create FireRed JSON without writing a physical save:
-
-```sh
+# Red JSON to FireRed JSON without writing a physical save
 pkmn rjson convert_to_frjson game.red.json
-# writes game.fred.json
+
+# Generate a FireRed save from canonical FireRed JSON
+pkmn frjson generate game.fred.json
 ```
 
-The unified conversion form adds preview, plan-only, custom output, manifest,
-policy, and batch workflows:
+Advanced conversion workflows provide preview, plan-only, custom-output,
+manifest-validation, policy, and inspection commands:
 
 ```sh
-pkmn convert red-to-firered game.sav --template clean-fr.sav
+pkmn convert red-to-firered game.sav
 pkmn convert red-to-firered game.sav --plan-only --output-json game.fred.json
 pkmn convert inspect trainer EVENT_BEAT_VIRIDIAN_GYM_TRAINER_0
 pkmn convert validate-manifest game_fr.conversion-manifest.json
 ```
 
-The converter validates Pokémon Red before translating semantic progression,
-Pokémon, trainers, events, items, visited Fly destinations, and explicit
-FireRed-only defaults. It never copies raw Red event IDs into FireRed. Every
-transfer, translation, derivation, default, omission, warning, and rejection is
-recorded in sidecar reports.
+The release includes a validated clean FireRed template, so beginners do not
+need to find or create one. Advanced users can select their own equivalent
+clean dump with `--template clean-fire-red.sav` or the
+`PKMN_FIRERED_TEMPLATE` environment variable. Personal templates are accepted
+only after strict clean-state and privacy validation.
 
-FireRed physical generation currently requires the approved clean template to
-be supplied with `--template` or `PKMN_FIRERED_TEMPLATE`. The template is a save
-container, not a ROM. Native `.fred.json` generation passed Phase 5: MAQ
-confirmed that the generated save was equivalent in the emulator without using
-the original physical image. Red → FireRed conversion also passed Phase 6:
-MAQ accepted the detailed converted-save emulator comparison as equivalent for
-the converter's supported and documented policies.
+**New to emulators, cartridge dumping, save files, or Terminal?** Follow
+[Pokémon Red to FireRed: the complete beginner guide](docs/RED_TO_FIRERED_BEGINNER_CONVERSION_GUIDE.md).
 
-## The unified home for future updates
+## What the translator carries forward
 
-From version 2.0 onward, `pkmn-cli` is the unified maintained tool for Pokémon
-Red and Pokémon FireRed save analysis, validation, editing, JSON schema
-migration, generation, comparison, proof, and conversion. Future schema
-updates and bug fixes will be made here instead of being released separately
-through the earlier Save Genie and Save Generator research repositories.
+| Domain | Red → FireRed treatment |
+|---|---|
+| Player identity | Player name, rival name, public Trainer ID, gender policy, and deterministic target identity |
+| General state | Money, Game Corner coins, play time, options, badges, and supported completion state |
+| Pokémon | Party, PC storage, Daycare, species, experience, level, moves, PP, names, OT identity, and supported held-state semantics |
+| Gen I → Gen III mechanics | DVs → IVs, stat experience → legal EVs, deterministic PID and Secret ID, nature, gender, ability, friendship, origin data, and shiny policy |
+| Pokédex | Seen and owned species translated into consistent FireRed Pokédex mirrors |
+| Trainers | All 322 saved Red trainer events classified; confirmed remake counterparts receive translated defeat state |
+| Story | Starter, rival, Gyms, Team Rocket, S.S. Anne, Pokémon Tower, Silph Co., Safari Zone, Cinnabar, League, and other supported Kanto milestones |
+| Inventory | Items, Key Items, Poké Balls, TMs, HMs, obtained-history semantics, and pocket/capacity rules |
+| World state | Supported blockers, objects, transportation, field permissions, and Fly destinations based on Red visit history |
+| FireRed-only systems | Explicit safe defaults or policy decisions for content Red cannot represent, including Sevii, rematches, and other remake extensions |
 
-Planned later support includes Pokémon Blue, Pokémon LeafGreen, Blue → FireRed,
-Red → LeafGreen, Generation II, and the corresponding remake/conversion paths.
-The first bridge deliberately focuses on Red and FireRed: Charizard is the
-shared version mascot, while Blue and LeafGreen center Blastoise and Venusaur.
-There was no international Pokémon Green or official AquaBlue counterpart to
-form an equivalent three-version bridge.
+The conversion is semantic. It does **not** copy Red flag numbers, trainer IDs,
+item IDs, or raw offsets into FireRed.
 
-Community help is welcome. Save samples that can be shared legally, carefully
-documented emulator observations, bug reports, schema review, research, and
-testing can help MAQ / BiG MAQ Studios extend the unified CLI responsibly to
-more generations and remakes.
+```text
+Pokémon Red physical state
+    → canonical .red.json
+    → semantic Red meaning
+    → evidence-backed bridge policy
+    → Generation I-to-III Pokémon conversion
+    → proposed .fred.json
+    → FireRed sector generation
+    → validated FireRed .sav
+```
 
-## Relationship to the verified Red projects
+When the games cannot represent the same fact identically, the manifest makes
+the chosen policy visible. Unresolved state is never silently guessed.
 
-`pkmn` incorporates proven logic from two completed research engines:
+## Why this is more than a Pokémon transporter
 
-- **Pokemon Red Save Genie** decodes, inspects, validates, safely edits, and exports canonical `.red.json` data.
-- **Pokemon Red Save Generator** creates deterministic gameplay-semantic `.sav` files without using target `physicalImage` as generation authority.
+Tools such as Poké Transporter GB and multi-generation save editors established
+important ways to move or edit individual Pokémon. `pkmn` addresses a different
+problem: continuing the saved **journey**.
 
-The completed engines remain independent research/source-reference projects. `pkmn-cli` adapts the necessary MIT-licensed logic into clean internal modules and will not require their executables after installation. See [the self-contained Red engine plan](docs/SELF_CONTAINED_RED_ENGINE_PLAN.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+FireRed is a remake built on a different generation of technology. It has a
+different save layout, event system, Pokémon format, mechanics, scripts,
+world-state dependencies, and additional story. A Red badge bit alone is not
+enough to reproduce a completed FireRed Gym. The target may also need the
+Leader battle state, dialogue, reward history, map scene, companion flags, and
+trainer-engine state.
 
-## Installation requirements
+That is why `pkmn` uses researched semantic bundles and prerequisite closure
+rather than pretending similarly named flags are interchangeable.
 
-To build and install from source, you need:
+## Verified release status
+
+`pkmn 2.0.0` is the public Red → FireRed conversion release.
+
+### Phase 5 — FireRed generator: PASS
+
+MAQ verified that a complete native `.fred.json` could generate a
+gameplay-equivalent FireRed save without reading or reconstructing the original
+physical save image. The candidate passed deterministic generation, sector and
+checksum validation, independent reanalysis, emulator boot, visible gameplay
+review, in-game saving, complete close, and reload.
+
+See [Phase 5 generator acceptance](docs/PHASE_5_GENERATOR_ACCEPTANCE.md).
+
+### Phase 6 — Red → FireRed conversion: PASS
+
+MAQ verified the complete path:
+
+```text
+Pokémon Red .sav
+    → .red.json
+    → semantic bridge
+    → .fred.json
+    → generated FireRed .sav
+```
+
+The accepted candidate preserved or correctly translated the tested supported
+identity, Pokémon, Pokédex, inventory, badges, trainers, Fly access, story
+progression, and FireRed-only policies. It booted in the emulator and could be
+saved and reloaded normally.
+
+See [Phase 6 conversion acceptance](docs/PHASE_6_CONVERSION_ACCEPTANCE.md).
+
+Static validity is not treated as emulator proof. Earlier verification phases
+found and corrected runtime-only problems involving location state, map layout,
+Oak and Viridian scenes, starter state, Brock's separate battle flag, Fly
+destinations, story prerequisites, and TM/HM Case handling.
+
+## Requirements
 
 - **CMake 3.20 or newer**;
-- a **C++20 compiler**: Apple Clang/Xcode Command Line Tools on macOS, GCC or
-  Clang on Linux, or a modern Visual Studio/MSVC toolchain on Windows;
-- **Python 3.9 or newer** for the bundled FireRed bridge and generator runtime;
-- **Git** when cloning or updating the source repository;
-- enough permission to install to the chosen prefix, or a user-local prefix
-  such as `$HOME/.local`;
-- an approved clean FireRed `.sav` template for physical FireRed generation
-  until a legally distributable template is bundled. A ROM is never required
-  by the CLI itself and is not included.
+- a **C++20 compiler**: Apple Clang/Xcode Command Line Tools, GCC, Clang, or a
+  modern Visual Studio/MSVC toolchain;
+- **Python 3.9 or newer** for the installed FireRed bridge and generator
+  runtime;
+- **Git** when cloning or updating the project;
+- no FireRed ROM or separate template download; a validated clean template is
+  bundled for physical FireRed generation.
 
-No separate Save Genie or Save Generator executable is required. CMake installs
-the Python runtime, bridge data, schemas, documentation, and command-line binary
-together.
+The FireRed template is a save container, not a ROM. A ROM is not required by
+the CLI and is never included. No separate Save Genie or Save Generator
+executable is required after installation.
 
-## Build and install from source
+## Install
+
+### Homebrew development installation
 
 ```sh
+brew tap AAAMAQ/pkmn
+brew install --HEAD AAAMAQ/pkmn/pkmn-cli
+pkmn doctor --deep
+```
+
+To update an existing `--HEAD` installation:
+
+```sh
+brew update
+brew reinstall --HEAD AAAMAQ/pkmn/pkmn-cli
+pkmn --version
+pkmn doctor --deep
+```
+
+### Build from source
+
+```sh
+git clone https://github.com/AAAMAQ/pkmn-cli.git
+cd pkmn-cli
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-Run the development binary:
+Run the development build:
 
 ```sh
-build/pkmn --help
 build/pkmn --version
-build/pkmn doctor
+build/pkmn --help
+build/pkmn doctor --deep
 ```
 
 Install to a chosen prefix:
@@ -122,148 +214,171 @@ Install to a chosen prefix:
 cmake --install build --prefix /your/install/prefix
 ```
 
-For a user-local shell installation, use `--prefix "$HOME/.local"`, add `$HOME/.local/bin` to `PATH`, and run `pkmn doctor`. A real head-only Homebrew formula is included for public-branch testing without fabricated release metadata. See [installation and Homebrew testing](docs/HOMEBREW_INSTALL.md).
+For a user-local installation, use `--prefix "$HOME/.local"` and ensure
+`$HOME/.local/bin` is on `PATH`.
 
-Pre-release Homebrew testing:
+See the [complete Red → FireRed beginner guide](docs/RED_TO_FIRERED_BEGINNER_CONVERSION_GUIDE.md),
+the [general beginner's guide](docs/BEGINNERS_GUIDE.md), and
+[installation/Homebrew guide](docs/HOMEBREW_INSTALL.md) for step-by-step help.
+
+## Command families
+
+`pkmn` is now the unified maintained home for both Pokémon Red and FireRed save
+workflows:
+
+| Command family | Purpose |
+|---|---|
+| `pkmn red` | Identify, inspect, validate, decode, edit, repair, prove, and convert Red saves |
+| `pkmn rjson` | Validate, inspect, migrate, generate, reconstruct, and convert canonical Red JSON |
+| `pkmn fred` | Inspect, validate, decode, summarize, repair, edit, and recheck FireRed saves |
+| `pkmn frjson` | Validate, migrate, reconstruct, and generate FireRed JSON |
+| `pkmn convert` | Preview, plan, inspect, execute, and validate Red → FireRed translation |
+| `pkmn compare` | Compare physical saves, semantic JSON, Pokémon, progression, and bridge results |
+| `pkmn proof` | Produce deterministic generation/conversion evidence and verify proof packages |
+| `pkmn doctor` | Check the installed command router, engines, resources, and deep round trips |
+
+Useful discovery commands:
 
 ```sh
-brew tap AAAMAQ/pkmn
-brew install --HEAD AAAMAQ/pkmn/pkmn-cli
-pkmn doctor --deep
-```
-
-If command-line tools are new to you, start with the step-by-step
-[beginner's guide](docs/BEGINNERS_GUIDE.md).
-
-## Implemented commands
-
-```text
 pkmn --help
-pkmn --version
-pkmn doctor
-pkmn doctor --deep
-pkmn completion zsh
-pkmn config show
 pkmn get-all-cmds
-pkmn red convert input.sav --template clean-fire-red.sav
-pkmn rjson convert input.red.json --template clean-fire-red.sav
-pkmn rjson convert_to_frjson input.red.json
-pkmn rjson update_schema input.red.json
-pkmn frjson update_schema input.fred.json
-pkmn frjson validate input.fred.json
-pkmn frjson schema --format json
-pkmn frjson generate input.fred.json --template clean-fire-red.sav
-pkmn frjson generate-batch one.fred.json two.fred.json --output-dir generated --template clean-fire-red.sav
-pkmn frjson reconstruct input.fred.json
-pkmn fred summary input.sav
-pkmn fred inspect input.sav
-pkmn fred validate input.sav
-pkmn fred decode input.sav
-pkmn fred repair-checksums input.sav
-pkmn fred validate-batch one.sav two.sav
-pkmn fred decode-batch one.sav two.sav --output-dir decoded
-pkmn fred validate-post-emulator before.sav after.sav
-pkmn fred events search brock
-pkmn fred edit input.sav --money 999999
-pkmn fred begin-edit input.sav
-pkmn fred edit-session input.fred-edit-session.json --money 999999 --badge 1:on
-pkmn fred validate-edit input.fred-edit-session.json
-pkmn fred end-edit input.fred-edit-session.json
-pkmn red summary input.sav
-pkmn red decode input.sav
-pkmn red inspect input.sav
-pkmn red validate input.sav
-pkmn rjson inspect input.red.json
-pkmn rjson validate input.red.json
-pkmn rjson schema --format json
-pkmn rjson migrate input.red.json
-pkmn rjson reconstruct input.red.json
-pkmn rjson generate input.red.json [output.sav]
-pkmn rjson generate-batch one.red.json two.red.json --output-dir generated
-pkmn compare physical first.sav second.sav
-pkmn compare progress older-backup.sav newer-backup.sav
-pkmn compare semantic first.red.json second.red.json
-pkmn compare firered-semantic first.fred.json second.fred.json
-pkmn compare firered-pokemon first.fred.json second.fred.json
-pkmn compare bridge game.red.json game.fred.json --manifest conversion-manifest.json
-pkmn proof red input.sav
-pkmn proof fred complete.fred.json --template clean-fire-red.sav
-pkmn proof red-to-firered input.red.json --template clean-fire-red.sav
-pkmn proof red input.sav --zip
-pkmn red validate-post-emulator before.sav after.sav
-pkmn proof post-emulator --before before.sav --after after.sav
-pkmn proof verify input.pkmn-proof
-pkmn red events search starter
-pkmn red repair-checksums input.sav
-pkmn red validate-batch one.sav two.sav --format json
-pkmn red begin-edit input.sav
-pkmn red edit-session input.edit-session.json --money 999999 --trainer-name RED
-pkmn red pokemon input.edit-session.json party 1 level 100
-pkmn red pokemon input.edit-session.json species WARTORTLE move replace 1 FLY
-pkmn red bag input.edit-session.json add "MASTER BALL" 99
-pkmn red progress input.edit-session.json fly-destinations all
-pkmn red pending-edits input.edit-session.json
-pkmn red edit-history input.edit-session.json
-pkmn red undo-edit input.edit-session.json
-pkmn red validate-edit input.edit-session.json
-pkmn red end-edit input.edit-session.json
+pkmn red --help
+pkmn fred --help
+pkmn rjson --help
+pkmn frjson --help
+pkmn convert --help
 ```
 
-`pkmn doctor` reports the modules compiled into the standalone executable. It does not search for or invoke Save Genie or Save Generator. `doctor --deep` uses only the bundled public template for an in-memory deterministic round trip; it never reads a user save, ROM, or evidence file.
+The full command inventory and examples live in:
 
-`pkmn config show` reports immutable compiled safety defaults. Output-producing workflows refuse collisions unless `--auto-suffix` is explicitly requested, in which case numbered alternatives are selected without overwriting data.
+- [complete usage guide](docs/COMPLETE_USAGE_GUIDE.md);
+- [all commands](docs/ALL_COMMANDS.md);
+- [command reference](docs/COMMAND_REFERENCE.md);
+- [editing guide](docs/EDIT_MODE.md);
+- [v2 implementation status](docs/PKMN_V2_IMPLEMENTATION_STATUS.md).
 
-`pkmn red decode`, `pkmn red inspect`, and `pkmn red validate` use the internal reader and require no Save Genie executable. Decode includes the archival `physicalImage` by default; use `--no-physical-image` for a semantic-only export. Existing output files are never overwritten.
+## Canonical JSON and schema updates
 
-`pkmn rjson inspect` and `validate` verify schema `0.1.0`, required semantics, and—when present—the physical image SHA-256 and Red checksums. `pkmn rjson reconstruct` is a separate archival mode that requires `physicalImage`; it is never semantic generation.
+The canonical formats make save meaning inspectable and allow future schema
+migrations without declaring older exports useless.
 
-`pkmn rjson generate` uses only decoded semantic fields. It ignores target `physicalImage`, rewrites supported trainer/core, inventory, Pokédex, party, permanent/current storage, Daycare, Hall of Fame, events/scripts/missables/hidden-state fields, canonicalizes unsafe locations to the verified Red's-house baseline, regenerates all checksums, and writes JSON/Markdown reports. The bundled public template is identity-checked before use.
+```sh
+pkmn red decode game.sav
+pkmn fred decode game_fr.sav
 
-`pkmn compare physical` reports hashes, percentages, first/last differences, and contiguous equal/different ranges mapped to save banks. `compare semantic` provides the complete field classification model and JSON/Markdown output controls. `pkmn proof red` runs decode, generation, re-decode, both comparisons, determinism, and physical-image-isolation checks and creates the complete report set and emulator checklist. Optional deterministic ZIP packages contain save data and require publication review. `proof post-emulator` validates a manual emulator round trip and can explicitly complete the manifest gate; automated proof never claims that gate passed on its own.
+pkmn rjson update_schema game.red.json
+pkmn frjson update_schema game.fred.json
+```
 
-Red editing is copy-first. `red edit` provides a looped interactive editor; `begin-edit` creates a semantic-only session; `edit-session` accumulates named, file-backed, or JSON-pointer edits—including the verified 507-entry event catalog; and semantic `pokemon`, `bag`, and `progress` commands synchronize dependent fields automatically. `validate-edit` performs an in-memory schema/generation/checksum gate, and `end-edit` writes a new save plus JSON/Markdown reports. The source hash is rechecked at every validation. Arbitrary locations are rejected; generated edits use the verified Red's-house preset. See the complete [edit-mode guide](docs/EDIT_MODE.md).
-
-## Command documentation
-
-See the [v2 implementation status](docs/PKMN_V2_IMPLEMENTATION_STATUS.md),
-copy-and-paste [complete usage guide](docs/COMPLETE_USAGE_GUIDE.md),
-[exhaustive command list](docs/ALL_COMMANDS.md),
-[command reference](docs/COMMAND_REFERENCE.md),
-[beginner's guide](docs/BEGINNERS_GUIDE.md), and
-[Red JSON schema](docs/RED_JSON_SCHEMA.md). Focused editing, reconstruction,
-proof, installation, and FireRed verification-gate documents are under `docs/`.
-Public-data-only examples are in [examples/README.md](examples/README.md).
-
-Release evidence summaries are public in the
-[Phase 5 generator acceptance](docs/PHASE_5_GENERATOR_ACCEPTANCE.md) and
-[Phase 6 conversion acceptance](docs/PHASE_6_CONVERSION_ACCEPTANCE.md). Private
-saves, ROMs, screenshots, and proof packages are deliberately excluded.
+From version 2.0 onward, schema evolution and bug fixes are maintained in this
+unified repository rather than released independently through the earlier Save
+Genie and Save Generator research projects.
 
 ## Generation is not reconstruction
 
-This distinction is central to the project:
-
 | Mode | Authority | Purpose |
 |---|---|---|
-| Decode | source `.sav` bytes | Parse and export a real save |
-| Generate | semantic `.red.json` fields only | Create an independent gameplay-equivalent save |
-| Reconstruct | `.red.json physicalImage` | Restore the archived byte image |
-| Edit | a protected working copy | Apply verified changes without overwriting the source |
+| Decode | Source `.sav` bytes | Parse a real save into canonical data |
+| Generate | Semantic JSON fields | Create an independent gameplay-equivalent save |
+| Reconstruct | Archived `physicalImage` | Restore a preserved byte image |
+| Edit | Protected working copy | Apply verified changes without overwriting the source |
+| Convert | Source-game semantics plus bridge policy | Translate a journey into the target game's representation |
 
-Semantic generation must never read `physicalImage` as authority. Reconstruction requires it and must be labeled archival.
+Generation never uses `physicalImage` as hidden authority. Reconstruction is a
+separate archival operation and is labeled accordingly.
 
 ## Safety and privacy
 
 - Inputs and existing outputs are never overwritten by default.
-- ROM files are neither required nor distributed.
-- Saves, ROMs, screenshots, semantic exports, and proof evidence are ignored by default.
-- Arbitrary Pokemon Red location generation/editing remains restricted because valid checksums and parser acceptance do not prove runtime map-state safety.
-- Manual emulator load, interaction, save-again, and reparse remain release gates for generated-save claims.
+- Wrong-game, malformed, wrong-sized, and checksum-invalid inputs are rejected
+  according to explicit policy.
+- Output collisions are refused unless `--auto-suffix` is requested.
+- Ambiguous ordinary trainers default to undefeated.
+- Unsupported FireRed-only progression is not invented from Red.
+- ROMs, progressed private saves, screenshots, semantic exports, arbitrary
+  templates, and emulator evidence are excluded. The two documented clean
+  generation `.bin` resources are the only template exceptions.
+- Every released generation claim requires more than parser acceptance and
+  green checksums; the verification model includes real gameplay testing.
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/PRIVACY_AND_PUBLICATION.md](docs/PRIVACY_AND_PUBLICATION.md), and the preserved planning material in [Pkmn Unified CLI Plan](Pkmn%20Unified%20CLI%20Plan/).
+Read [privacy and publication](docs/PRIVACY_AND_PUBLICATION.md),
+[architecture](docs/ARCHITECTURE.md), and the
+[release checklist](docs/RELEASE_CHECKLIST.md).
 
-Release maintainers should also follow [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md). CI builds, tests, installs, and smoke-tests the standalone executable on macOS, Linux, and Windows. CPack source/binary packaging, a universal-macOS helper, Linux package notes, and an SPDX SBOM are included as release scaffolding.
+## Research foundation and credits
 
-## License
+This release combines the completed work of:
 
-MIT License, copyright MAQ / BiG MAQ Studios, with a non-binding stewardship note. This is an independent research project and is not affiliated with Nintendo, Game Freak, Creatures, or The Pokemon Company.
+- **Pkmn Red Save Genie**;
+- **Pkmn Red Save Generator**;
+- **Pkmn FireRed Save Genie**;
+- **Pkmn Bridge Research**;
+- **Pkmn FireRed Save Generator**;
+- the unified **pkmn CLI**.
+
+The cross-game research uses pinned revisions of:
+
+- `pret/pokered@d70d99ffbd329473d96eaaf19fd97c86d2220b7f`;
+- `pret/pokefirered@df4449a27cd78dd747ce269e47d3ab4a0149d8f4`.
+
+The Pokémon conversion policy is founded on the Pokémon Community Conversion
+Standard `ORIGINAL` profile, with project-specific deterministic decisions and
+overrides recorded in the conversion policy and manifest. Walkthrough research
+used StrategyWiki and Zerokid's detailed Pokémon Red guide as corroboration;
+pinned pret source remained authoritative.
+
+Thanks to:
+
+- the pret Pokémon reverse-engineering community;
+- the Striaton Lab Team, Pokémon Community Conversion Standard, and Poké
+  Transporter GB contributors;
+- StrategyWiki and community walkthrough contributors;
+- Niels Lohmann and JSON for Modern C++ contributors;
+- the Game Boy and Pokémon communities that encouraged the original idea and
+  preserved decades of technical knowledge;
+- OpenAI Codex, used transparently as a research and engineering collaborator
+  while MAQ directed the project, supplied the conversion policy, and performed
+  the final gameplay verification.
+
+See [third-party notices](THIRD_PARTY_NOTICES.md) for incorporated provenance,
+commit references, and licenses.
+
+## Project history
+
+This project began with a public question:
+
+> Could a Pokémon Red save be exported to FireRed so the same journey could
+> continue in the remake?
+
+The answer became a collection of decoders, canonical schemas, independent
+generators, trainer/event/item bridges, deterministic conversion policies,
+manifests, and emulator verification. The complete first-person research story
+is maintained in the bridge repository as **The Journey of Converting Pokémon
+Red Save Data to FireRed**.
+
+## Roadmap
+
+Future candidates include:
+
+- Pokémon Blue support;
+- Pokémon LeafGreen support;
+- Blue → FireRed;
+- Red → LeafGreen;
+- Generation II and corresponding remake paths;
+- additional policies, schemas, platform packages, and community-verified
+  conversion profiles.
+
+Community help is welcome. Useful contributions include legally shareable save
+samples, reproducible emulator observations, bug reports, schema review,
+research corrections, documentation, and testing.
+
+## Legal and license
+
+MIT License, copyright **MAQ / BiG MAQ Studios**.
+
+This is an independent educational, research, archival, and game-preservation
+project. It is not affiliated with, endorsed by, or sponsored by Nintendo,
+Game Freak, Creatures, or The Pokémon Company. Pokémon and related names and
+trademarks belong to their respective owners.
+
+No ROMs or copyrighted game images are included or distributed.

@@ -57,6 +57,11 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/resources/pokemon-red-usa-europe-v1.template.bin"
     COPYONLY
 )
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/pokemon-firered-usa-europe-v1.template.bin"
+    "${CMAKE_CURRENT_BINARY_DIR}/resources/pokemon-firered-usa-europe-v1.template.bin"
+    COPYONLY
+)
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/runtime/"
      DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/runtime")
 
@@ -89,6 +94,7 @@ install(DIRECTORY docs/ DESTINATION "${CMAKE_INSTALL_DOCDIR}/docs"
         FILES_MATCHING PATTERN "*.md")
 install(FILES docs/pkmn.1 DESTINATION "${CMAKE_INSTALL_MANDIR}/man1")
 install(FILES resources/pokemon-red-usa-europe-v1.template.bin
+              resources/pokemon-firered-usa-europe-v1.template.bin
         DESTINATION "${CMAKE_INSTALL_DATADIR}/pkmn/resources")
 install(DIRECTORY runtime/ DESTINATION "${CMAKE_INSTALL_DATADIR}/pkmn/runtime"
         PATTERN "__pycache__" EXCLUDE PATTERN "*.pyc" EXCLUDE)
@@ -116,4 +122,8 @@ if(BUILD_TESTING)
              COMMAND "${Python3_EXECUTABLE}"
                      "${CMAKE_CURRENT_SOURCE_DIR}/runtime/pkmn_v2_runtime.py"
                      --help)
+    add_test(NAME pkmn-firered-template-policy
+             COMMAND "${Python3_EXECUTABLE}"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/tests/firered_template_policy_test.py"
+                     "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()

@@ -11,10 +11,13 @@ pkmn convert inspect event|trainer|item [query]
 pkmn convert validate-manifest conversion-manifest.json
 ```
 
+The clean FireRed template is bundled; `--template` is an optional override for
+a strictly validated equivalent user dump.
+
 Physical conversion validates Red, applies the pinned semantic bridge, writes a
 manifest and report, generates FireRed, and refuses collisions. Set
-`PKMN_FIRERED_TEMPLATE` once to omit `--template` while Phase 5's public-template
-gate remains pending.
+`PKMN_FIRERED_TEMPLATE` only when you want your own validated clean dump to
+replace the bundled default.
 
 Schema migration is copy-first:
 

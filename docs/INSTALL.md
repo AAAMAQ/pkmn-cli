@@ -40,15 +40,16 @@ Linux. Windows CI verifies `pkmn.exe`; the macOS universal helper is under
 `packaging/macos`. The installed packaging documentation includes the SPDX SBOM.
 
 The install step places the executable in `bin`, the identity-checked public Red
-template in `share/pkmn/resources`, and the FireRed bridge runtime in
+and FireRed templates in `share/pkmn/resources`, and the FireRed bridge runtime in
 `share/pkmn/runtime`. Moving only the executable disables resource-backed
 generation, editing, and conversion.
 
-Until a legally distributable public FireRed template is approved, physical FireRed output also
-requires either `--template <approved-save.sav>` or:
+A validated clean FireRed template is bundled and selected automatically.
+Advanced users can select their own strictly validated clean dump with
+`--template <clean-save.sav>` or:
 
 ```sh
-export PKMN_FIRERED_TEMPLATE="/path/to/approved-template.sav"
+export PKMN_FIRERED_TEMPLATE="/path/to/my-clean-template.sav"
 ```
 
 ## Homebrew readiness

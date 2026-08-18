@@ -141,7 +141,7 @@ constexpr std::array<CommandSpec, 92> kCommands{{
      "pkmn frjson migrate <save.fred.json> [--output <migrated.fred.json>] [--auto-suffix]",
      "Apply compatible deterministic FireRed schema enrichment."},
     {"FireRed JSON", "frjson generate-batch",
-     "pkmn frjson generate-batch <save.fred.json>... --output-dir <directory> --template <clean.sav>",
+     "pkmn frjson generate-batch <save.fred.json>... --output-dir <directory> [--template <clean.sav>]",
      "Generate several native or planned FireRed saves."},
 
     {"Pokemon FireRed saves", "fred summary",
@@ -221,7 +221,7 @@ constexpr std::array<CommandSpec, 92> kCommands{{
      "pkmn convert validate-manifest <conversion-manifest.json>",
      "Validate an auditable conversion manifest."},
     {"Pokemon Red to FireRed conversion", "convert batch",
-     "pkmn convert batch <red.sav|red.json>... --output-dir <directory> --template <clean.sav>",
+     "pkmn convert batch <red.sav|red.json>... --output-dir <directory> [--template <clean.sav>]",
      "Convert several Red sources to FireRed."},
 
     {"Comparison", "compare progress",
@@ -268,10 +268,10 @@ constexpr std::array<CommandSpec, 92> kCommands{{
      "pkmn proof verify <proof-directory|proof.zip> [--format json]",
      "Verify proof hashes, schemas, ZIP safety, and generated checksums."},
     {"Proof", "proof fred",
-     "pkmn proof fred <complete.fred.json> --template <clean.sav> [--output-dir <directory>]",
+     "pkmn proof fred <complete.fred.json> [--template <clean.sav>] [--output-dir <directory>]",
      "Run the automated Phase 5 native FireRed generation proof."},
     {"Proof", "proof red-to-firered",
-     "pkmn proof red-to-firered <save.red.json> --template <clean.sav> [--output-dir <directory>]",
+     "pkmn proof red-to-firered <save.red.json> [--template <clean.sav>] [--output-dir <directory>]",
      "Run the automated Phase 6 conversion proof and prepare MAQ verification."},
 }};
 

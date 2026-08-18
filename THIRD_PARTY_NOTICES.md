@@ -43,9 +43,12 @@ repository did not declare a GitHub-detectable license when this notice was
 reviewed, so this project treats it as a cited standard rather than incorporated
 licensed code.
 
-No FireRed ROM, private template save, user save, screenshot, or emulator state
-is incorporated. Until Phase 5 approves a distributable template, users must
-provide their own clean template save for physical FireRed generation.
+No FireRed ROM, progressed user save, screenshot, or emulator state is
+incorporated. The clean pre-starter FireRed save-container baseline supplied by
+MAQ for public project use is incorporated as
+`resources/pokemon-firered-usa-europe-v1.template.bin`; its identity, limited
+state, and purpose are documented in `resources/README.md`. Users may instead
+provide their own strictly validated equivalent clean dump.
 
 ## JSON for Modern C++
 

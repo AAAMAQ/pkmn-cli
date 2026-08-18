@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .binary import (
     FLASH_SIZE, SECTOR_SIZE, SIGNATURE, analyze_slots, assemble_logical,
-    put_u16, put_u32, scatter_logical, section_checksum,
+    put_u16, put_u32, scatter_logical, section_checksum, u16,
     validate_generated_image,
 )
 from .pokemon import encode_box_pokemon, encode_party_pokemon
@@ -66,6 +66,116 @@ class GenerationResult:
     report: dict
 
 
+def validate_clean_template(template_bytes, template_profile):
+    """Accept the bundled template or a privacy-safe equivalent clean dump.
+
+    A user template may vary in trainer identity, play time, options, encryption
+    keys, and sector rotation. Progression-bearing state must match the approved
+    pre-starter bedroom baseline, while the inactive slot and special sectors
+    must be erased. This prevents personal or progressed saves from silently
+    contributing hidden state to generated output.
+    """
+    if len(template_bytes) != FLASH_SIZE:
+        raise ValueError("FireRed template must be exactly 128 KiB")
+
+    template_sha = hashlib.sha256(template_bytes).hexdigest()
+    slot = analyze_slots(template_bytes)
+    sb2, sb1, storage = assemble_logical(template_bytes, slot)
+    expected_sha = template_profile["source"]["saveSha256"]
+    if template_sha == expected_sha:
+        return {
+            "profileId": template_profile["profileId"],
+            "kind": "bundled-standard",
+            "activeSlot": slot.index,
+            "counter": slot.counter,
+        }
+
+    baseline = template_profile["baseline"]
+    problems = []
+    location = baseline["location"]
+    actual_location = {
+        "mapGroup": sb1[4], "mapNumber": sb1[5], "warpId": sb1[6],
+        "x": u16(sb1, 0), "y": u16(sb1, 2),
+        "mapLayoutId": u16(sb1, 0x32),
+    }
+    expected_location = {
+        "mapGroup": int(location["mapGroup"]),
+        "mapNumber": int(location["mapNumber"]),
+        "warpId": int(location["warpId"]) & 0xFF,
+        "x": int(location["x"]), "y": int(location["y"]),
+        "mapLayoutId": int(location["mapLayoutId"]),
+    }
+    if actual_location != expected_location:
+        problems.append("player is not at the approved pre-starter bedroom position")
+
+    heal = location["lastHealLocation"]
+    actual_heal = {
+        "mapGroup": sb1[0x1C], "mapNumber": sb1[0x1D],
+        "warpId": sb1[0x1E], "x": u16(sb1, 0x20), "y": u16(sb1, 0x22),
+    }
+    expected_heal = {
+        "mapGroup": int(heal["mapGroup"]), "mapNumber": int(heal["mapNumber"]),
+        "warpId": int(heal["warpId"]) & 0xFF,
+        "x": int(heal["x"]), "y": int(heal["y"]),
+    }
+    if actual_heal != expected_heal:
+        problems.append("last-heal location is not the approved Pallet Town baseline")
+
+    if sb1[0x34] != 0:
+        problems.append("party is not empty")
+    if any(storage[4:4 + 420 * 80]):
+        problems.append("PC storage contains Pokemon data")
+    if any(sb2[0x28:0x90]) or any(sb1[0x5F8:0x62C]) or any(sb1[0x3A18:0x3A4C]):
+        problems.append("Pokedex seen/owned state is not empty")
+    occupied_items = 0
+    for offset, capacity, _encrypted in POCKETS.values():
+        occupied_items += sum(
+            1 for index in range(capacity)
+            if u16(sb1, offset + index * 4) != 0
+        )
+    if occupied_items != int(baseline["occupiedInventorySlots"]):
+        problems.append("inventory does not match the clean one-slot baseline")
+
+    expected_flags = {int(row["id"]) for row in baseline["setFlags"]}
+    actual_flags = {
+        flag_id for flag_id in range(0x900)
+        if sb1[0xEE0 + flag_id // 8] & (1 << (flag_id % 8))
+    }
+    if actual_flags != expected_flags:
+        problems.append("saved event flags do not match the clean pre-starter baseline")
+
+    expected_vars = {
+        int(row["id"]): int(row["value"])
+        for row in baseline["nonzeroVariables"]
+    }
+    actual_vars = {
+        0x4000 + index: u16(sb1, 0x1000 + index * 2)
+        for index in range(0x100)
+        if u16(sb1, 0x1000 + index * 2) != 0
+    }
+    if actual_vars != expected_vars:
+        problems.append("saved variables do not match the clean pre-starter baseline")
+
+    inactive_start = (1 - slot.index) * 14 * SECTOR_SIZE
+    inactive_end = inactive_start + 14 * SECTOR_SIZE
+    if any(value != 0xFF for value in template_bytes[inactive_start:inactive_end]):
+        problems.append("inactive save slot is not erased; dump immediately after the first save")
+    if any(value != 0xFF for value in template_bytes[28 * SECTOR_SIZE:FLASH_SIZE]):
+        problems.append("Hall of Fame/special sectors are not erased")
+
+    if problems:
+        raise ValueError(
+            "custom FireRed template is not a clean supported dump: "
+            + "; ".join(problems)
+        )
+    return {
+        "profileId": "FIRERED_V1_USER_CLEAN_TEMPLATE",
+        "kind": "user-clean-dump",
+        "activeSlot": slot.index,
+        "counter": slot.counter,
+    }
+
+
 class FireRedTemplateGenerator:
     def __init__(self, metadata, event_authority, event_rules=None, template_profile=None, location_rules=None):
         self.metadata = metadata
@@ -92,12 +202,10 @@ class FireRedTemplateGenerator:
     def generate(self, proposed, template_bytes, template_name=None):
         self._validate_proposed(proposed)
         template_sha = hashlib.sha256(template_bytes).hexdigest()
-        if self.template_profile:
-            expected = self.template_profile["source"]["saveSha256"]
-            if template_sha != expected:
-                raise ValueError(
-                    "template SHA-256 is not the approved FIRERED_V1 clean skeleton"
-                )
+        template_validation = (
+            validate_clean_template(template_bytes, self.template_profile)
+            if self.template_profile else {"profileId": None, "kind": "unprofiled"}
+        )
         image = bytearray(template_bytes)
         slot = analyze_slots(image)
         sb2, sb1, storage = assemble_logical(image, slot)
@@ -131,7 +239,8 @@ class FireRedTemplateGenerator:
             "template": {
                 "fileName": template_name,
                 "sha256": template_sha,
-                "profileId": self.template_profile["profileId"] if self.template_profile else None,
+                "profileId": template_validation["profileId"],
+                "kind": template_validation["kind"],
                 "activeSlot": slot.index,
                 "counter": slot.counter,
                 "inactiveSlotPreserved": True,

@@ -15,6 +15,7 @@
 #include "util/ResourceLocator.hpp"
 #include "util/Sha256.hpp"
 #include "FireRedChecksum.hpp"
+#include "FileManipulation.hpp"
 #include <filesystem>
 
 namespace pkmn::cli::commands::doctor {
@@ -23,7 +24,7 @@ namespace {
 void PrintHelp(std::ostream& output) {
     output
         << "Usage: pkmn doctor [--deep] [--format text|json]\n\n"
-        << "Checks that this standalone executable contains the internal Red foundation.\n"
+        << "Checks the standalone Red/FireRed engines, bridge runtime, and bundled resources.\n"
         << "No Save Genie or Save Generator executable is searched for or required.\n";
 }
 
@@ -74,13 +75,18 @@ int Run(const std::vector<std::string>& arguments,
             if (first.bytes != second.bytes || !generatedIntegrity.Valid())
                 throw std::runtime_error("internal deterministic round trip failed");
             const auto runtime = util::FireRedRuntimeScriptPath();
+            const auto fireRedTemplate = util::FireRedTemplatePath();
             const auto data = runtime.parent_path() / "data";
             const bool bridgeAuthorities =
                 std::filesystem::is_regular_file(data / "event_bridge_red_to_firered.json") &&
                 std::filesystem::is_regular_file(data / "trainer_bridge_red_to_firered.json") &&
                 std::filesystem::is_regular_file(data / "item_bridge_red_to_firered.json");
             const std::array<std::uint8_t, 4> zero{};
-            if (!std::filesystem::is_regular_file(runtime) || !bridgeAuthorities ||
+            if (!std::filesystem::is_regular_file(runtime) ||
+                !std::filesystem::is_regular_file(fireRedTemplate) ||
+                util::Sha256Hex(firered::ReadBinaryFile(fireRedTemplate)) !=
+                    "5fe341091ea41f17ddccaae1aed0ee4802894c94f5281e53dfe795e837a830c0" ||
+                !bridgeAuthorities ||
                 firered::CalculateSectionChecksum(zero) != 0)
                 throw std::runtime_error("FireRed runtime/authority self-test failed");
             deepReport = {{"passed", true},
@@ -91,7 +97,9 @@ int Run(const std::vector<std::string>& arguments,
                           {"fireRedNativeChecksumSelfTest", true},
                           {"fireRedRuntimePresent", true},
                           {"bridgeAuthoritiesPresent", true},
-                          {"fireRedPhysicalSelfTest", "requires PKMN_FIRERED_TEMPLATE"}};
+                          {"fireRedTemplate", fireRedTemplate.filename().string()},
+                          {"fireRedTemplateIdentityValid", true},
+                          {"fireRedPhysicalSelfTest", "bundled-template-ready"}};
         } catch (const std::exception &exception) {
             error << "pkmn doctor --deep: " << exception.what() << '\n';
             return ToInt(ExitCode::GeneralFailure);
@@ -132,6 +140,7 @@ int Run(const std::vector<std::string>& arguments,
         << "[ok] post-emulator validation and proof continuation\n"
         << "[ok] validated copy-first Red editing sessions\n"
         << "[ok] bundled Red-to-FireRed bridge and generator runtime\n"
+        << "[ok] bundled clean FireRed generation template\n"
         << "[ok] FireRed reader, native JSON generator, comparisons, and proof runtime\n"
         << "[ok] FireRed Phase 5 native-generation acceptance\n"
         << "[ok] Red-to-FireRed Phase 6 conversion acceptance\n"

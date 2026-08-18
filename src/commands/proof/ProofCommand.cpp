@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <chrono>
+#include <cstdlib>
 #include <fstream>
 #include <map>
 #include <ostream>
@@ -20,6 +21,7 @@
 #include "util/OutputPath.hpp"
 #include "util/ZipWriter.hpp"
 #include "util/AtomicOutput.hpp"
+#include "util/ResourceLocator.hpp"
 #include "commands/conversion/ConversionCommand.hpp"
 #include "FireRedSectionMap.hpp"
 #include "FileManipulation.hpp"
@@ -308,8 +310,8 @@ int Run(const std::vector<std::string> &args, std::ostream &output,
               "  pkmn proof post-emulator --before <save.sav> --after "
               "<save.sav> [--output-dir <directory>|--proof-dir <directory>]\n"
               "  pkmn proof verify <proof-directory|proof.zip> [--format json]\n";
-    output << "  pkmn proof fred <complete.fred.json> --template <clean.sav> [--output-dir <directory>]\n"
-              "  pkmn proof red-to-firered <save.red.json> --template <clean.sav> [--output-dir <directory>]\n";
+    output << "  pkmn proof fred <complete.fred.json> [--template <clean.sav>] [--output-dir <directory>]\n"
+              "  pkmn proof red-to-firered <save.red.json> [--template <clean.sav>] [--output-dir <directory>]\n";
     return 0;
   }
   if (args[0] == "post-emulator")
@@ -357,14 +359,23 @@ int Run(const std::vector<std::string> &args, std::ostream &output,
     }
     std::vector<std::string> runtime{
         args[0] == "fred" ? "proof-fred" : "proof-red-to-firered", proofInput.string()};
+    bool hasTemplate = false;
     for (std::size_t index = 2; index < args.size(); ++index) {
       if ((args[index] == "--template" || args[index] == "--output-dir" ||
            args[index] == "--salt") && index + 1 < args.size()) {
+        if (args[index] == "--template") hasTemplate = true;
         runtime.push_back(args[index]); runtime.push_back(args[++index]);
       } else {
         error << "pkmn proof " << args[0] << ": invalid arguments\n";
         return ToInt(ExitCode::InvalidArguments);
       }
+    }
+    if (!hasTemplate) {
+      runtime.push_back("--template");
+      if (const char *configured = std::getenv("PKMN_FIRERED_TEMPLATE"))
+        runtime.push_back(configured);
+      else
+        runtime.push_back(util::FireRedTemplatePath().string());
     }
     auto result = commands::conversion::RunRuntimeUtility(runtime, output, error);
     if (result == 0) {

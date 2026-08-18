@@ -46,6 +46,7 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
       {"rawCrossGenerationIdCopying", false},
       {"nativeFireRedGeneration", "implemented; Phase 5 MAQ acceptance passed"},
       {"redToFireRedConversion", "implemented; Phase 6 MAQ acceptance passed"},
+      {"fireRedTemplate", "bundled clean default; strict user override supported"},
       {"environmentVariables",
        nlohmann::ordered_json::array({"PKMN_QUIET=1", "PKMN_VERBOSE=1",
                                       "NO_COLOR", "PKMN_FIRERED_TEMPLATE"})},
@@ -70,6 +71,7 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
               "Environment controls: PKMN_QUIET=1, PKMN_VERBOSE=1, NO_COLOR, "
               "PKMN_FIRERED_TEMPLATE\n"
               "Transactional output writes: enabled\n"
+              "FireRed template: bundled clean default; strict user override supported\n"
               "FireRed generation: Phase 5 accepted\n"
               "Red-to-FireRed conversion: Phase 6 accepted\n";
   return 0;

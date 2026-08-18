@@ -19,6 +19,7 @@ from firered_generator.conversion import (  # noqa: E402
     without_physical_image,
 )
 from firered_generator import FireRedTemplateGenerator  # noqa: E402
+from firered_generator.generator import validate_clean_template  # noqa: E402
 from firered_generator.binary import (  # noqa: E402
     FLASH_SIZE, SECTOR_SIZE, analyze_slots, assemble_logical, scatter_logical,
 )
@@ -147,6 +148,8 @@ def generate_frjson(args):
 def generate_native_frjson(document, template_bytes, template_name=None):
     """Generate from the complete logical-byte authority, never physicalImage."""
     from firered_generator.generator import GenerationResult
+    template_profile = load_json(ROOT / "data" / "firered_v1_clean_template_profile.json")
+    template_validation = validate_clean_template(template_bytes, template_profile)
     decoded = document.get("decoded", {})
     logical = decoded.get("logicalBlocks", {})
     names = ("saveBlock2", "saveBlock1", "pokemonStorage")
@@ -186,7 +189,9 @@ def generate_native_frjson(document, template_bytes, template_name=None):
         "physicalImageUsed": False,
         "template": {"fileName": template_name,
                      "sha256": hashlib.sha256(template_bytes).hexdigest(),
-                     "activeSlot": slot.index},
+                     "activeSlot": slot.index,
+                     "profileId": template_validation["profileId"],
+                     "kind": template_validation["kind"]},
         "output": {"sha256": output_hash, "size": len(image),
                    "activeSlot": generated_slot.index,
                    "mainSectionChecksumsValid": True,

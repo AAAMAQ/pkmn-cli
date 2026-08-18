@@ -2,8 +2,8 @@
   "schemaVersion": "1.1.0",
   "authority": {
     "pret": "pokefirered@df4449a27cd78dd747ce269e47d3ab4a0149d8f4",
-    "rule": "Generator v1 inherits a complete game-produced location tuple from the approved template; it does not synthesize a different map from partial fields.",
-    "emulatorTemplateSha256": "7de66f0e6b9cb224a46a32e6f549cdf42ceb13eebf4b5a41122bbe0055caa8d0",
+    "rule": "Generator v1 writes the complete approved pre-starter bedroom location tuple. The bundled template and accepted user templates must begin at that same coherent baseline.",
+    "emulatorTemplateSha256": "5fe341091ea41f17ddccaae1aed0ee4802894c94f5281e53dfe795e837a830c0",
     "saveGenieSchema": "0.4.0"
   },
   "policies": {
@@ -24,8 +24,8 @@
         "y": 8
       },
       "evidence": [
-        "Decoded directly from MAQ's emulator-produced templateFR.sav",
-        "Player is visibly positioned correctly in this exact template state",
+        "Decoded from the clean FireRed template supplied by MAQ for public bundling",
+        "The baseline matches the previously verified pre-starter bedroom state",
         "The failed outdoor substitution proved that changing a subset of map fields is unsafe for Generator v1"
       ]
     }

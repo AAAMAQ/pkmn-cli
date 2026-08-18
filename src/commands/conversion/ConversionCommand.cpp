@@ -113,9 +113,7 @@ std::filesystem::path ResolveTemplate(const std::filesystem::path &explicitPath)
   if (!explicitPath.empty()) return explicitPath;
   if (const char *configured = std::getenv("PKMN_FIRERED_TEMPLATE"))
     return configured;
-  throw std::runtime_error(
-      "FireRed generation requires --template or PKMN_FIRERED_TEMPLATE until "
-      "a legally distributable bundled template is approved");
+  return util::FireRedTemplatePath();
 }
 
 bool OutputFamilyExists(const std::filesystem::path &output) {
@@ -334,8 +332,8 @@ int RunFrjson(const std::vector<std::string> &arguments,
            << "  pkmn frjson update_schema <save.fred.json> [--output <file>]\n"
            << "  pkmn frjson migrate <save.fred.json> [--output <file>]\n"
            << "  pkmn frjson reconstruct <save.fred.json> [--output <save.sav>]\n"
-           << "  pkmn frjson generate <save.fred.json> [output.sav] --template <save.sav>\n"
-           << "  pkmn frjson generate-batch <save.fred.json>... --output-dir <directory> --template <save.sav>\n";
+           << "  pkmn frjson generate <save.fred.json> [output.sav] [--template <clean.sav>]\n"
+           << "  pkmn frjson generate-batch <save.fred.json>... --output-dir <directory> [--template <clean.sav>]\n";
     return 0;
   }
   if (arguments.front() == "schema") {
@@ -464,7 +462,7 @@ int RunConvert(const std::vector<std::string> &arguments,
            << "  pkmn convert inspect <event|trainer|item> [query]\n"
            << "  pkmn convert explain <event|trainer|item> <query>\n"
            << "  pkmn convert validate-manifest <conversion-manifest.json>\n"
-           << "  pkmn convert batch <red.sav|red.json>... --output-dir <directory> --template <save.sav>\n";
+           << "  pkmn convert batch <red.sav|red.json>... --output-dir <directory> [--template <clean.sav>]\n";
     return 0;
   }
   if ((arguments.front() == "inspect" || arguments.front() == "explain") &&

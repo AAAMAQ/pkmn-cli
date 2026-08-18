@@ -1,12 +1,12 @@
 {
   "format": "pkmn-firered-generator-template-profile",
   "version": "1.0.0",
-  "profileId": "FIRERED_V1_TEMPLATE_MAQ_002",
+  "profileId": "FIRERED_V1_PUBLIC_TEMPLATE_MAQ_003",
   "studio": "BiG MAQ Studios",
   "creator": "MAQ",
-  "privacy": "No filename, player identity, full hex, or save payload is published.",
+  "privacy": "MAQ supplied this clean pre-starter save for use as the public bundled generator baseline. No ROM, progressed journey, Pokemon, proof evidence, or emulator state is included.",
   "source": {
-    "saveSha256": "7de66f0e6b9cb224a46a32e6f549cdf42ceb13eebf4b5a41122bbe0055caa8d0",
+    "saveSha256": "5fe341091ea41f17ddccaae1aed0ee4802894c94f5281e53dfe795e837a830c0",
     "size": 131072,
     "saveGenieSchema": "0.4.0",
     "activeSlot": 1,
@@ -14,8 +14,8 @@
     "mainSections": 14
   },
   "logicalBlockSha256": {
-    "saveBlock2": "6cb9ac813a4873d411462ed44823f04152d38c0f4c0766b5d9335ca3b9948343",
-    "saveBlock1": "302edcb28b1d5e96621a93da0691bc126341ac89265321a31d346ea9148c11db",
+    "saveBlock2": "cd5d3ee27a5b3f6b2ea60e14cd12e5941fb0b1b3fd4249195f3beeab7a87a89d",
+    "saveBlock1": "e1868dc989410517a38ae647e826bd8be83e1d86221081666eecbfb00d373c65",
     "pokemonStorage": "faade62b8927615ebc110cf83881f1ac09fbf6367630ef6f194552c0d4693795"
   },
   "specialSectorSha256": [
@@ -529,6 +529,6 @@
     "staticStructureApproved": true,
     "visualPlayerPositionApprovedByMAQ": true,
     "emulatorBootSaveReloadApproved": false,
-    "allowedUse": "private physical scaffold for generator candidates"
+    "allowedUse": "public bundled physical scaffold and strict clean-template authority"
   }
 }

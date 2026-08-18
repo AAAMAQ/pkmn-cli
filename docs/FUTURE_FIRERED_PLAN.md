@@ -38,13 +38,14 @@ MAQ's exhaustive in-game acceptance checks are complete.
 
 ## Template boundary
 
-Physical FireRed generation currently requires either:
+Physical FireRed generation now selects the bundled clean template by default.
+Advanced users may override it with either:
 
 ```text
 --template /path/to/clean-fire-red.sav
 PKMN_FIRERED_TEMPLATE=/path/to/clean-fire-red.sav
 ```
 
-No ROM is required. Phase 5 proved the template approach sufficient. A public
-template may be bundled only if a separate publication, provenance, licensing,
-and privacy audit approves it.
+No ROM is required. Phase 5 proved the template approach sufficient. MAQ later
+supplied and explicitly approved a clean pre-starter template for public
+bundling after provenance and privacy review.

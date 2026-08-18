@@ -4,7 +4,7 @@
 
 - [ ] Working tree contains only intended release files.
 - [ ] Save Genie and Save Generator reference repositories remain unmodified.
-- [ ] No saves, ROMs, screenshots, videos, PDFs, semantic exports, edit sessions, proof evidence, credentials, or private absolute paths are tracked.
+- [ ] No saves, ROMs, screenshots, videos, PDFs, semantic exports, edit sessions, proof evidence, credentials, or private absolute paths are tracked except the two explicitly approved named `.bin` generation resources.
 - [ ] `scripts/privacy-scan.sh` passes from the release working tree.
 - [ ] Bundled resources match `THIRD_PARTY_NOTICES.md` and their recorded SHA-256.
 - [ ] Version, changelog, license, MAQ / BiG MAQ Studios stewardship note, and independent-project notice are current.
@@ -19,6 +19,7 @@
 - [ ] Run installed `pkmn doctor --deep` and verify deterministic self-test output.
 - [ ] Run installed `pkmn frjson schema --format json` outside the source tree.
 - [ ] Exercise Red JSON to proposed FireRed JSON planning without a private template.
+- [ ] Exercise physical conversion with the installed bundled FireRed template and verify a progressed custom template is rejected.
 - [ ] Exercise decode, validation, generation, reconstruction, comparison, proof, and edit workflows only with synthetic/public fixtures.
 
 ## Packaging
@@ -40,7 +41,7 @@
 - [x] Native `.fred.json` generation passed deterministic, physical-image-isolation, authority, checksum, and MAQ emulator review.
 - [x] Record Phase 6 Red-to-FireRed acceptance without committing private evidence.
 - [x] Red-to-FireRed conversion passed deterministic, bridge, manifest, checksum, proof-package, and MAQ emulator review.
-- [ ] Do not publish or bundle a private template, save, ROM, screenshot, or emulator artifact.
+- [x] Publish only MAQ's explicitly approved clean pre-starter FireRed `.bin` baseline; do not bundle any progressed/private template, ROM, screenshot, or emulator artifact.
 - [ ] Do not describe automated proof as emulator proof.
 - [ ] Keep the semantic-generation versus archival-reconstruction boundary explicit.
 - [ ] Record any emulator-tested public sample separately without committing private evidence.

@@ -51,6 +51,21 @@ std::filesystem::path RedTemplatePath() {
       "installed Pokemon Red template resource was not found");
 }
 
+std::filesystem::path FireRedTemplatePath() {
+  constexpr auto name = "pokemon-firered-usa-europe-v1.template.bin";
+  const auto executable = ExecutablePath();
+  const std::vector<std::filesystem::path> candidates = {
+      executable.parent_path() / "resources" / name,
+      executable.parent_path().parent_path() / "share" / "pkmn" / "resources" /
+          name,
+      std::filesystem::current_path() / "resources" / name};
+  for (const auto &candidate : candidates)
+    if (std::filesystem::is_regular_file(candidate))
+      return candidate;
+  throw std::runtime_error(
+      "installed Pokemon FireRed template resource was not found");
+}
+
 std::filesystem::path FireRedRuntimeScriptPath() {
   constexpr auto name = "pkmn_v2_runtime.py";
   const auto executable = ExecutablePath();

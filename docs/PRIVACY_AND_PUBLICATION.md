@@ -13,7 +13,12 @@ Never commit:
 
 Tests must use synthetic public fixtures created for redistribution, or construct their data in memory. Public reports should use logical artifact names and omit private absolute paths. The project does not require or distribute ROMs.
 
-The bundled Red generation template is a public synthetic/canonical engine resource documented in `THIRD_PARTY_NOTICES.md`; it is not a user save, ROM, or emulator capture. Its identity is checked at runtime.
+The bundled Red generation template is a public synthetic/canonical engine
+resource. The bundled FireRed resource is the explicitly approved clean
+pre-starter save-container baseline supplied by MAQ. Both are documented in
+`THIRD_PARTY_NOTICES.md` and `resources/README.md`, contain no progressed user
+journey or ROM, and are checked at runtime. These two named `.bin` resources are
+the only publication exceptions; arbitrary saves and templates remain private.
 
 Before every commit and release:
 

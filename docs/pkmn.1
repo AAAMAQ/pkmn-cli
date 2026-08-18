@@ -25,8 +25,8 @@ Use the unified converter with preview, plan-only, policy, manifest, and output 
 .B pkmn convert inspect|explain event|trainer|item [QUERY]
 Inspect source-backed bridge decisions.
 .PP
-Until a legally distributable public template is approved, physical generation requires
---template or PKMN_FIRERED_TEMPLATE.
+A validated clean FireRed template is bundled and selected automatically.
+Use --template or PKMN_FIRERED_TEMPLATE to select a strictly validated custom clean dump.
 .SH GENERAL COMMANDS
 .TP
 .B pkmn --help
@@ -107,7 +107,7 @@ Discover pinned pret FireRed flag, variable, trainer, and semantic-event records
 .B pkmn frjson inspect|validate|schema|update_schema ...
 Inspect and maintain native or planned FireRed JSON.
 .TP
-.B pkmn frjson generate FILE [OUTPUT] --template SAVE
+.B pkmn frjson generate FILE [OUTPUT] [--template SAVE]
 Generate from accepted planned or complete native schema 0.4.0 FireRed JSON without physicalImage authority. Native generation passed Phase 5.
 .TP
 .B pkmn frjson reconstruct FILE [--output SAVE]
@@ -138,10 +138,10 @@ Complete the manual emulator proof gate after validating expected drift.
 .B pkmn proof verify DIRECTORY|ZIP
 Verify proof artifact hashes, ZIP safety, JSON, and generated checksums.
 .TP
-.B pkmn proof fred FRED_JSON --template SAVE
+.B pkmn proof fred FRED_JSON [--template SAVE]
 Build the automated Phase 5 deterministic and physical-image-isolation package.
 .TP
-.B pkmn proof red-to-firered RED_JSON --template SAVE
+.B pkmn proof red-to-firered RED_JSON [--template SAVE]
 Build the automated Phase 6 conversion package and MAQ checklist.
 .SH SAFETY
 Inputs and existing outputs are not overwritten. Semantic generation never uses physicalImage as authority. Reconstruction is explicitly archival. Arbitrary runtime location editing is disabled. Proof packages contain save data and require publication review.
@@ -149,11 +149,12 @@ Inputs and existing outputs are not overwritten. Semantic generation never uses 
 Commands that create outputs accept explicit --auto-suffix where documented, producing numbered alternatives without weakening the no-overwrite default.
 .SH VERIFICATION GATES
 FireRed and Red-to-FireRed commands are implemented. Native schema 0.4.0
-generation passed Phase 5. Public-template approval remains a separate
-legal/release decision. The supported Red-to-FireRed conversion policy passed
+generation passed Phase 5. A clean FireRed template is bundled. The supported Red-to-FireRed conversion policy passed
 Phase 6; per-save warnings and policy decisions remain explicit.
 .SH FILES
 Installed Red template: share/pkmn/resources/pokemon-red-usa-europe-v1.template.bin
+.PP
+Installed FireRed template: share/pkmn/resources/pokemon-firered-usa-europe-v1.template.bin
 .PP
 Installed FireRed bridge runtime: share/pkmn/runtime
 .SH LICENSE

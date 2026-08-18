@@ -25,12 +25,13 @@
 - Ambiguous trainer mappings default to undefeated; raw Red event IDs are never
   copied into FireRed.
 
-## Required external input
+## FireRed template input
 
 The CLI includes the public bridge rules and generator code. It does not include
-a ROM or a private FireRed save. Until a legally distributable public
-template, physical FireRed generation requires `--template` or the
-`PKMN_FIRERED_TEMPLATE` environment variable.
+a ROM or a progressed private FireRed save. It now includes the clean
+pre-starter template supplied by MAQ and selects it automatically. Users may
+override it with `--template` or `PKMN_FIRERED_TEMPLATE`; an override must pass
+the strict clean-template policy.
 
 Python 3 is required by the bundled bridge-planning runtime. No Save Genie or
 Save Generator executable is required.

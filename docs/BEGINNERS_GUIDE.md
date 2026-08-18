@@ -9,11 +9,13 @@ conversion passed Phase 6.
 To convert Red directly to FireRed:
 
 ```sh
-pkmn red convert backup.sav --template approved-fire-red-template.sav
+pkmn red convert backup.sav
 ```
 
-Until a legally distributable public template is approved, use your approved local template or
-set `PKMN_FIRERED_TEMPLATE`. Keep both source files untouched.
+A validated clean FireRed template is bundled. Advanced users may override it
+with `--template` or `PKMN_FIRERED_TEMPLATE`. Keep both source files untouched.
+For the complete process from emulator or cartridge dumping through loading the
+converted save, use [the Red → FireRed beginner guide](RED_TO_FIRERED_BEGINNER_CONVERSION_GUIDE.md).
 
 ## 1. Install on a Mac with Homebrew
 

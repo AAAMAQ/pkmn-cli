@@ -3,8 +3,8 @@
 ## Continue Red in FireRed
 
 ```sh
-pkmn red convert game.sav --template clean-fire-red.sav
-pkmn rjson convert game.red.json --template clean-fire-red.sav
+pkmn red convert game.sav
+pkmn rjson convert game.red.json
 pkmn rjson convert_to_frjson game.red.json
 ```
 
@@ -980,7 +980,7 @@ The authoritative 89-endpoint syntax is generated from the executable in
 `docs/ALL_COMMANDS.md`. The principal new workflows are:
 
 ```sh
-pkmn convert red-to-firered backup.sav --template clean-fr.sav
+pkmn convert red-to-firered backup.sav
 pkmn convert red-to-firered backup.sav --plan-only --output-json backup.fred.json
 pkmn convert inspect trainer EVENT_BEAT_VIRIDIAN_GYM_TRAINER_0
 pkmn convert validate-manifest backup_fr.conversion-manifest.json
@@ -993,11 +993,11 @@ pkmn fred edit-session firered.fred-edit-session.json --money 999999 --badge 1:o
 pkmn fred validate-edit firered.fred-edit-session.json
 pkmn fred end-edit firered.fred-edit-session.json
 
-pkmn frjson generate complete.fred.json output.sav --template clean-fr.sav
+pkmn frjson generate complete.fred.json output.sav
 pkmn compare firered-semantic original.fred.json generated.fred.json
 pkmn compare bridge backup.red.json backup.fred.json --manifest conversion-manifest.json
-pkmn proof fred complete.fred.json --template clean-fr.sav
-pkmn proof red-to-firered backup.red.json --template clean-fr.sav
+pkmn proof fred complete.fred.json
+pkmn proof red-to-firered backup.red.json
 ```
 
 The two proof commands complete automated determinism, checksum, authority, and
@@ -1027,9 +1027,9 @@ Do not combine `--quiet` and `--verbose`.
 
 `fred`, `frjson`, `red convert`, and the two `rjson` conversion commands are
 implemented. Physical generation passed Phase 5 and conversion passed Phase 6.
-Generation requires `--template` or
-`PKMN_FIRERED_TEMPLATE` until a distributable public template is approved. The
-CLI never bundles a ROM or a private save.
+A validated clean FireRed template is bundled and used automatically.
+`--template` or `PKMN_FIRERED_TEMPLATE` may select a strictly validated custom
+clean dump. The CLI never bundles a ROM or a progressed private save.
 
 ## Updating and checking the installed catalog
 

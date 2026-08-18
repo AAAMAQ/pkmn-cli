@@ -381,7 +381,7 @@ Apply compatible deterministic FireRed schema enrichment.
 ### `frjson generate-batch`
 
 ```sh
-pkmn frjson generate-batch <save.fred.json>... --output-dir <directory> --template <clean.sav>
+pkmn frjson generate-batch <save.fred.json>... --output-dir <directory> [--template <clean.sav>]
 ```
 
 Generate several native or planned FireRed saves.
@@ -613,7 +613,7 @@ Validate an auditable conversion manifest.
 ### `convert batch`
 
 ```sh
-pkmn convert batch <red.sav|red.json>... --output-dir <directory> --template <clean.sav>
+pkmn convert batch <red.sav|red.json>... --output-dir <directory> [--template <clean.sav>]
 ```
 
 Convert several Red sources to FireRed.
@@ -753,7 +753,7 @@ Verify proof hashes, schemas, ZIP safety, and generated checksums.
 ### `proof fred`
 
 ```sh
-pkmn proof fred <complete.fred.json> --template <clean.sav> [--output-dir <directory>]
+pkmn proof fred <complete.fred.json> [--template <clean.sav>] [--output-dir <directory>]
 ```
 
 Run the automated Phase 5 native FireRed generation proof.
@@ -761,7 +761,7 @@ Run the automated Phase 5 native FireRed generation proof.
 ### `proof red-to-firered`
 
 ```sh
-pkmn proof red-to-firered <save.red.json> --template <clean.sav> [--output-dir <directory>]
+pkmn proof red-to-firered <save.red.json> [--template <clean.sav>] [--output-dir <directory>]
 ```
 
 Run the automated Phase 6 conversion proof and prepare MAQ verification.
