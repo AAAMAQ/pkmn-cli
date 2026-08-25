@@ -79,7 +79,14 @@ int RunRuntime(const std::vector<std::string> &arguments,
       command << ' ' << ShellQuote(argument);
     command << " >" << ShellQuote(stdoutPath.string())
             << " 2>" << ShellQuote(stderrPath.string());
-    const int status = std::system(command.str().c_str());
+    auto shellCommand = command.str();
+#if defined(_WIN32)
+    // cmd.exe strips one outer quote pair before parsing a command. Without
+    // that pair, an installed runtime path quoted together with redirections
+    // is interpreted as an invalid filename instead of an executable.
+    shellCommand = '"' + shellCommand + '"';
+#endif
+    const int status = std::system(shellCommand.c_str());
     const auto runtimeOutput = ReadText(stdoutPath);
     output << runtimeOutput;
     error << ReadText(stderrPath);
