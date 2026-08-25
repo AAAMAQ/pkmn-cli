@@ -81,6 +81,20 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build CPack packages
         run: cpack --config build/release/CPackConfig.cmake -C Release -B build/packages
+      - name: Build self-contained macOS installer
+        if: runner.os == 'macOS'
+        run: >-
+          pkgbuild --root build/install
+          --identifier studios.bigmaq.pkmn-cli
+          --version 3.0.0
+          --install-location /usr/local
+          build/packages/pkmn-cli-3.0.0-${{ matrix.name }}.pkg
+      - name: Verify macOS installer payload
+        if: runner.os == 'macOS'
+        run: |
+          package="build/packages/pkmn-cli-3.0.0-${{ matrix.name }}.pkg"
+          test "$(stat -f%z "$package")" -gt 1000000
+          pkgutil --payload-files "$package" | grep -Eq '(^|/)bin/pkmn$'
       - name: Install AppImage tool
         if: runner.os == 'Linux'
         run: |

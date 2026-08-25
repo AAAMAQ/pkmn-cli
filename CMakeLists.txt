@@ -155,7 +155,11 @@ if(WIN32)
 elseif(APPLE)
     set(CPACK_PACKAGE_FILE_NAME
         "pkmn-cli-${CPACK_PACKAGE_VERSION}-macos-${CMAKE_SYSTEM_PROCESSOR}")
-    set(CPACK_GENERATOR "TGZ;productbuild")
+    # The release workflow builds the macOS installer directly with pkgbuild.
+    # CPack's productbuild generator emits a distribution wrapper whose payload
+    # packages are stored separately, which is unsuitable as a standalone
+    # GitHub Release asset.
+    set(CPACK_GENERATOR "TGZ")
 else()
     set(CPACK_PACKAGE_FILE_NAME
         "pkmn-cli-${CPACK_PACKAGE_VERSION}-linux-${CMAKE_SYSTEM_PROCESSOR}")
