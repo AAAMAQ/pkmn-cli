@@ -34,11 +34,11 @@ def write_new(path, payload, binary=False):
     if binary:
         path.write_bytes(payload)
     else:
-        path.write_text(payload)
+        path.write_text(payload, encoding="utf-8")
 
 
 def load_json(path):
-    return json.loads(Path(path).read_text())
+    return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def source_hash(path):

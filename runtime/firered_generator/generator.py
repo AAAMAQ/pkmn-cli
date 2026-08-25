@@ -192,11 +192,11 @@ class FireRedTemplateGenerator:
         profile_path = root / "data/firered_v1_clean_template_profile.json"
         location_rules_path = root / "data/firered_location_generator_rules.json"
         return cls(
-            json.loads((root / "data/original_v1_conversion_metadata.json").read_text()),
-            json.loads((root / "data/event_bridge_red_to_firered.json").read_text()),
-            json.loads(rules_path.read_text()) if rules_path.exists() else None,
-            json.loads(profile_path.read_text()) if profile_path.exists() else None,
-            json.loads(location_rules_path.read_text()) if location_rules_path.exists() else None,
+            json.loads((root / "data/original_v1_conversion_metadata.json").read_text(encoding="utf-8")),
+            json.loads((root / "data/event_bridge_red_to_firered.json").read_text(encoding="utf-8")),
+            json.loads(rules_path.read_text(encoding="utf-8")) if rules_path.exists() else None,
+            json.loads(profile_path.read_text(encoding="utf-8")) if profile_path.exists() else None,
+            json.loads(location_rules_path.read_text(encoding="utf-8")) if location_rules_path.exists() else None,
         )
 
     def generate(self, proposed, template_bytes, template_name=None):

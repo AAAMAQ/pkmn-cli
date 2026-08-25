@@ -34,7 +34,7 @@ def deterministic_u32(*parts):
 
 
 def load_json(path):
-    return json.loads(Path(path).read_text())
+    return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def value_at(record, *path, default=None):
