@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(pkmn-cli VERSION 2.0.0 LANGUAGES CXX)
+project(pkmn-cli VERSION 3.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -10,7 +10,9 @@ option(PKMN_REPRODUCIBLE_BUILD "Remove local source/build paths from compiler ou
 
 include(GNUInstallDirs)
 include(CTest)
-find_package(Python3 3 REQUIRED COMPONENTS Interpreter)
+
+set(PKMN_BUNDLED_RUNTIME_EXECUTABLE "" CACHE FILEPATH
+    "Prebuilt private pkmn-runtime executable installed with release packages")
 
 add_library(pkmn_cli_core
     src/app/CommandCatalog.cpp
@@ -20,6 +22,8 @@ add_library(pkmn_cli_core
     src/commands/config/ConfigCommand.cpp
     src/commands/doctor/DoctorCommand.cpp
     src/commands/fred/FredCommand.cpp
+    src/commands/interactive/InteractiveCommand.cpp
+    src/commands/paired/PairedCommand.cpp
     src/commands/compare/CompareCommand.cpp
     src/commands/conversion/ConversionCommand.cpp
     src/commands/proof/ProofCommand.cpp
@@ -40,6 +44,7 @@ add_library(pkmn_cli_core
     src/red/reporting/SaveSummary.cpp
     src/red/save/RedSave.cpp
     src/red/validation/SaveValidator.cpp
+    src/conversion/RouteRegistry.cpp
     src/util/Sha256.cpp
     src/util/AtomicOutput.cpp
     src/util/OutputPath.cpp
@@ -87,6 +92,25 @@ add_executable(pkmn src/main.cpp)
 target_link_libraries(pkmn PRIVATE pkmn_cli_core)
 
 install(TARGETS pkmn RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+if(PKMN_BUNDLED_RUNTIME_EXECUTABLE)
+    if(NOT EXISTS "${PKMN_BUNDLED_RUNTIME_EXECUTABLE}")
+        message(FATAL_ERROR
+            "PKMN_BUNDLED_RUNTIME_EXECUTABLE does not exist: ${PKMN_BUNDLED_RUNTIME_EXECUTABLE}")
+    endif()
+    if(WIN32)
+        get_filename_component(PKMN_BUNDLED_RUNTIME_DIRECTORY
+                               "${PKMN_BUNDLED_RUNTIME_EXECUTABLE}" DIRECTORY)
+        install(DIRECTORY "${PKMN_BUNDLED_RUNTIME_DIRECTORY}/"
+                DESTINATION "${CMAKE_INSTALL_LIBEXECDIR}/pkmn/runtime"
+                USE_SOURCE_PERMISSIONS)
+    else()
+        get_filename_component(PKMN_BUNDLED_RUNTIME_DIRECTORY
+                               "${PKMN_BUNDLED_RUNTIME_EXECUTABLE}" DIRECTORY)
+        install(DIRECTORY "${PKMN_BUNDLED_RUNTIME_DIRECTORY}/"
+                DESTINATION "${CMAKE_INSTALL_LIBEXECDIR}/pkmn/runtime"
+                USE_SOURCE_PERMISSIONS)
+    endif()
+endif()
 install(FILES LICENSE README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md
         THIRD_PARTY_NOTICES.md
         DESTINATION "${CMAKE_INSTALL_DOCDIR}")
@@ -100,13 +124,42 @@ install(DIRECTORY runtime/ DESTINATION "${CMAKE_INSTALL_DATADIR}/pkmn/runtime"
         PATTERN "__pycache__" EXCLUDE PATTERN "*.pyc" EXCLUDE)
 install(FILES packaging/sbom/pkmn-cli.spdx.json
         DESTINATION "${CMAKE_INSTALL_DOCDIR}/packaging")
+if(WIN32)
+    install(PROGRAMS packaging/windows/pkmn-interactive.cmd
+            DESTINATION "${CMAKE_INSTALL_BINDIR}")
+elseif(APPLE)
+    install(PROGRAMS packaging/macos/pkmn-interactive.command
+            DESTINATION "${CMAKE_INSTALL_BINDIR}")
+else()
+    install(PROGRAMS packaging/linux/pkmn-interactive
+            DESTINATION "${CMAKE_INSTALL_BINDIR}")
+    install(FILES packaging/linux/pkmn-interactive.desktop
+            DESTINATION "${CMAKE_INSTALL_DATADIR}/applications")
+endif()
 
 set(CPACK_PACKAGE_NAME "pkmn-cli")
 set(CPACK_PACKAGE_VENDOR "MAQ / BiG MAQ Studios")
-set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Pokemon Red to FireRed conversion and save workflow CLI")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_VERSION "3.0.0")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Pokemon Red and Blue to FireRed and LeafGreen save conversion CLI")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
+               "${CMAKE_CURRENT_BINARY_DIR}/LICENSE.txt" COPYONLY)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/LICENSE.txt")
 set(CPACK_GENERATOR "TGZ")
+if(WIN32)
+    set(CPACK_PACKAGE_FILE_NAME "pkmn-cli-${CPACK_PACKAGE_VERSION}-windows-x86_64")
+    set(CPACK_GENERATOR "ZIP;NSIS")
+    set(CPACK_NSIS_DISPLAY_NAME "pkmn 3.0")
+    set(CPACK_NSIS_PACKAGE_NAME "pkmn 3.0")
+    set(CPACK_NSIS_MODIFY_PATH ON)
+    set(CPACK_NSIS_MENU_LINKS "bin/pkmn-interactive.cmd" "pkmn interactive")
+elseif(APPLE)
+    set(CPACK_PACKAGE_FILE_NAME
+        "pkmn-cli-${CPACK_PACKAGE_VERSION}-macos-${CMAKE_SYSTEM_PROCESSOR}")
+    set(CPACK_GENERATOR "TGZ;productbuild")
+else()
+    set(CPACK_PACKAGE_FILE_NAME
+        "pkmn-cli-${CPACK_PACKAGE_VERSION}-linux-${CMAKE_SYSTEM_PROCESSOR}")
+endif()
 if(UNIX AND NOT APPLE)
     set(CPACK_GENERATOR "TGZ;DEB")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "MAQ / BiG MAQ Studios")
@@ -115,6 +168,7 @@ endif()
 include(CPack)
 
 if(BUILD_TESTING)
+    find_package(Python3 3 REQUIRED COMPONENTS Interpreter)
     add_executable(pkmn_cli_tests tests/command_router_tests.cpp)
     target_link_libraries(pkmn_cli_tests PRIVATE pkmn_cli_core)
     add_test(NAME pkmn-cli-command-router COMMAND pkmn_cli_tests)
@@ -125,5 +179,9 @@ if(BUILD_TESTING)
     add_test(NAME pkmn-firered-template-policy
              COMMAND "${Python3_EXECUTABLE}"
                      "${CMAKE_CURRENT_SOURCE_DIR}/tests/firered_template_policy_test.py"
+                     "${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME pkmn-paired-origin-profile
+             COMMAND "${Python3_EXECUTABLE}"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/tests/paired_origin_profile_test.py"
                      "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()

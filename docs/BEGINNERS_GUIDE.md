@@ -1,12 +1,18 @@
 # Beginner's Guide to pkmn
 
-This guide assumes you have never built or used a command-line program. `pkmn`
-works with Pokemon Red and FireRed save workflows. It never needs a game ROM,
-never changes your input save in place, and refuses to overwrite an existing
-output by default. FireRed generation passed Phase 5 and Red-to-FireRed
-conversion passed Phase 6.
+This guide assumes you have never used a command-line program. `pkmn` converts
+Pokémon Red or Blue journeys into FireRed or LeafGreen. It never needs a game
+ROM, never changes the input save in place, and refuses to overwrite existing
+output by default. Red → FireRed passed MAQ's Phase 5/6 emulator acceptance;
+the other three routes are statically validated and open for community testing.
 
-To convert Red directly to FireRed:
+The easiest starting point is:
+
+```sh
+pkmn interactive
+```
+
+Direct Red → FireRed conversion remains:
 
 ```sh
 pkmn red convert backup.sav
@@ -17,32 +23,23 @@ with `--template` or `PKMN_FIRERED_TEMPLATE`. Keep both source files untouched.
 For the complete process from emulator or cartridge dumping through loading the
 converted save, use [the Red → FireRed beginner guide](RED_TO_FIRERED_BEGINNER_CONVERSION_GUIDE.md).
 
-## 1. Install on a Mac with Homebrew
+## 1. Install the release for your computer
 
-Open **Terminal** (Applications > Utilities > Terminal), then paste these lines
-one at a time:
+Download the Windows, macOS, or Linux package from
+[GitHub Releases](https://github.com/AAAMAQ/pkmn-cli/releases). Release packages
+contain the private conversion runtime, schemas, bridge data, and clean target
+template. You do not install Python, CMake, Git, or a compiler.
+
+After installing, open PowerShell/Terminal and run:
 
 ```sh
-brew tap AAAMAQ/pkmn
-brew install --HEAD AAAMAQ/pkmn/pkmn-cli
 pkmn --version
 pkmn doctor --deep
+pkmn interactive
 ```
 
-If `brew` is not installed, first follow the instructions at
-[brew.sh](https://brew.sh/). The current `pkmn` package is a public pre-release
-installed from the latest tested source branch.
-
-To get a later version and its updated command catalog:
-
-```sh
-brew update
-brew upgrade --fetch-HEAD AAAMAQ/pkmn/pkmn-cli
-pkmn get-all-cmds
-```
-
-Windows and Linux users currently build from source; follow
-[INSTALL.md](INSTALL.md). Prebuilt release downloads are not published yet.
+Follow [INSTALL.md](INSTALL.md) for exact Windows installer/ZIP, macOS
+arm64/Intel, Linux AppImage/DEB/archive, uninstall, upgrade, and checksum steps.
 
 ## 2. Put a save in an easy folder
 

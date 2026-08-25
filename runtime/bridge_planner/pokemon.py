@@ -83,13 +83,16 @@ def scaled_evs(stat_exp):
 
 
 class PokemonConverter:
-    def __init__(self, metadata, policy, source_fingerprint, player_name, player_tid, player_sid):
+    def __init__(self, metadata, policy, source_fingerprint, player_name, player_tid, player_sid,
+                 target_game="firered"):
         self.metadata = metadata
         self.policy = policy
         self.source_fingerprint = source_fingerprint
         self.player_name = player_name
         self.player_tid = int(player_tid)
         self.player_sid = int(player_sid)
+        self.target_game = target_game
+        self.target_display_name = "LeafGreen" if target_game == "leafgreen" else "FireRed"
         self.species = metadata["species"]
         self.moves_by_id = {row["redId"]: row for row in metadata["moves"]}
         self.moves_by_name = {row["redName"]: row for row in metadata["moves"]}
@@ -235,7 +238,7 @@ class PokemonConverter:
             "origins": {
                 "metLocation": 255,
                 "metLevel": level,
-                "metGame": "FireRed",
+                "metGame": self.target_display_name,
                 "pokeball": "Poke Ball",
                 "otFemale": False,
                 "fatefulEncounter": False,

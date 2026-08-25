@@ -1,10 +1,10 @@
-name: Release artifact candidates
+name: pkmn 3.0 release packages
 
 on:
   workflow_dispatch:
   push:
     tags:
-      - "v*"
+      - "v3.0.0*"
 
 permissions:
   contents: read
@@ -15,27 +15,103 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             name: linux-x86_64
+            runtime: build/runtime-dist/pkmn-runtime/pkmn-runtime
           - os: macos-14
             name: macos-arm64
+            runtime: build/runtime-dist/pkmn-runtime/pkmn-runtime
           - os: macos-13
             name: macos-x86_64
-          - os: windows-latest
+            runtime: build/runtime-dist/pkmn-runtime/pkmn-runtime
+          - os: windows-2022
             name: windows-x86_64
+            runtime: build/runtime-dist/pkmn-runtime/pkmn-runtime.exe
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install release-build dependencies
+        run: python -m pip install --disable-pip-version-check pyinstaller==6.20.0
+      - name: Install NSIS
+        if: runner.os == 'Windows'
+        run: choco install nsis -y --no-progress
+      - name: Build private conversion runtime
+        run: python scripts/build-bundled-runtime.py --output build/runtime-dist
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        run: >-
+          cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
+          -DPKMN_BUNDLED_RUNTIME_EXECUTABLE=${{ github.workspace }}/${{ matrix.runtime }}
       - name: Build
-        run: cmake --build build --config Release --parallel
+        run: cmake --build build/release --config Release --parallel
       - name: Test
-        run: ctest --test-dir build -C Release --output-on-failure
-      - name: Package
-        run: cpack --config build/CPackConfig.cmake -C Release -B build/packages
+        run: ctest --test-dir build/release -C Release --output-on-failure
+      - name: Install clean prefix
+        run: cmake --install build/release --config Release --prefix build/install
+      - name: Installed smoke test (Unix)
+        if: runner.os != 'Windows'
+        run: scripts/verify-installed-package.sh build/install
+      - name: Installed smoke test (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          & build/install/bin/pkmn.exe --version
+          & build/install/bin/pkmn.exe doctor --deep
+          & build/install/bin/pkmn.exe convert routes --format json
+          $work = Join-Path $env:RUNNER_TEMP "pkmn-installed-smoke"
+          New-Item -ItemType Directory -Force $work | Out-Null
+          & build/install/bin/pkmn.exe red repair-checksums build/install/share/pkmn/resources/pokemon-red-usa-europe-v1.template.bin --output "$work/source.sav"
+          & build/install/bin/pkmn.exe red decode "$work/source.sav" --output "$work/source.red.json"
+          & build/install/bin/pkmn.exe rjson convert_to_frjson "$work/source.red.json" "$work/target.fred.json"
+          & build/install/bin/pkmn.exe frjson validate "$work/target.fred.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build CPack packages
+        run: cpack --config build/release/CPackConfig.cmake -C Release -B build/packages
+      - name: Install AppImage tool
+        if: runner.os == 'Linux'
+        run: |
+          curl -L -o build/appimagetool.AppImage https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x build/appimagetool.AppImage
+      - name: Build AppImage
+        if: runner.os == 'Linux'
+        env:
+          APPIMAGETOOL: ${{ github.workspace }}/build/appimagetool.AppImage
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+        run: scripts/build-appimage.sh build/install build/packages/pkmn-cli-3.0.0-linux-x86_64.AppImage
+      - name: Privacy scan source
+        if: runner.os != 'Windows'
+        run: scripts/privacy-scan.sh
       - uses: actions/upload-artifact@v7
         with:
           name: pkmn-cli-${{ matrix.name }}
           path: build/packages/*
           if-no-files-found: error
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v3.0.0')
+    needs: package
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          path: release-files
+          merge-multiple: true
+      - name: Generate release SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: release-files
+          format: spdx-json
+          output-file: release-files/pkmn-cli-release.spdx.json
+      - name: Generate checksums
+        working-directory: release-files
+        run: sha256sum * > SHA256SUMS
+      - name: Publish tagged GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release-files/*

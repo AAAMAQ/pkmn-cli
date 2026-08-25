@@ -39,8 +39,19 @@ class PlanResult:
 
 
 class BridgePlanner:
-    def __init__(self, root=None, salt=None):
+    def __init__(self, root=None, salt=None, source_game="red", target_game="firered"):
         self.root = Path(root or ROOT)
+        if source_game not in ("red", "blue"):
+            raise ValueError(f"unsupported Gen I source profile: {source_game}")
+        if target_game not in ("firered", "leafgreen"):
+            raise ValueError(f"unsupported Gen III target profile: {target_game}")
+        self.source_game = source_game
+        self.target_game = target_game
+        self.source_display = "Pokemon Blue" if source_game == "blue" else "Pokemon Red"
+        self.target_display = "Pokemon LeafGreen" if target_game == "leafgreen" else "Pokemon FireRed"
+        self.source_profile = "GEN1_BLUE" if source_game == "blue" else "GEN1_RED"
+        self.target_profile = "GEN3_LEAFGREEN" if target_game == "leafgreen" else "GEN3_FIRERED"
+        self.route_id = f"{source_game}-{target_game}"
         self.policy = OriginalV1Policy.load(salt=salt, path=self.root / "data/pokemon_policy_original_v1.json")
         self.metadata = load_json(self.root / "data/original_v1_conversion_metadata.json")
         self.events = load_json(self.root / "data/event_bridge_red_to_firered.json")
@@ -62,7 +73,8 @@ class BridgePlanner:
         player_sid = deterministic_u16(self.policy.salt, source_fingerprint, "player-sid", player_name.upper(), public_tid)
 
         pokemon_converter = PokemonConverter(
-            self.metadata, self.policy, source_fingerprint, player_name, public_tid, player_sid
+            self.metadata, self.policy, source_fingerprint, player_name, public_tid, player_sid,
+            target_game=self.target_game
         )
         converted = []
         pokemon_audits = []
@@ -95,7 +107,7 @@ class BridgePlanner:
         if missing_choice_values:
             warnings.append(
                 "Explicit conversion policy is required for semantic choices not retained by the "
-                f"current Red JSON view: {', '.join(missing_choice_values)}."
+                f"current {self.source_display} JSON view: {', '.join(missing_choice_values)}."
             )
         unknown_events = sum(row["sourceState"] == "unknown" for row in semantic_events)
         if unknown_events:
@@ -134,7 +146,8 @@ class BridgePlanner:
         }
 
         proposed = {
-            "format": "pkmn-firered-planned-save",
+            "format": "pkmn-leafgreen-planned-save" if self.target_game == "leafgreen" else "pkmn-firered-planned-save",
+            "gameProfile": self.target_profile,
             "schemaVersion": PROPOSED_FRED_VERSION,
             "targetMasterSchemaVersion": TARGET_MASTER_SCHEMA_VERSION,
             "planningStatus": planning_status,
@@ -150,9 +163,11 @@ class BridgePlanner:
                 "schemaVersion": source_schema["schemaVersion"],
                 "sha256": source_sha256,
                 "fileName": source_name,
+                "declaredGameProfile": self.source_profile,
             },
             "target": {
-                "game": "Pokemon FireRed",
+                "game": self.target_display,
+                "declaredGameProfile": self.target_profile,
                 "revision": "1.0-policy-default",
                 "template": None,
             },
@@ -187,7 +202,7 @@ class BridgePlanner:
         decisions = event_decisions + trainer_decisions + item_decisions + [fly_decision]
         manifest = {
             "schemaVersion": MANIFEST_VERSION,
-            "manifestType": "pkmn-red-to-firered-conversion-plan",
+            "manifestType": f"pkmn-{self.source_game}-to-{self.target_game}-conversion-plan",
             "planningStatus": planning_status,
             "versions": {
                 "bridgeSpecification": BRIDGE_VERSION,
@@ -683,7 +698,7 @@ class BridgePlanner:
     def _preview(self, manifest, proposed):
         domains = manifest["domains"]
         lines = [
-            "# Pokémon Red → FireRed Conversion Preview", "",
+            f"# {self.source_display} → {self.target_display} Conversion Preview", "",
             f"Status: **{manifest['planningStatus']}**", "",
             f"Policy: `{manifest['versions']['pokemonPolicy']}`  ",
             f"Source fingerprint: `{manifest['source']['sha256']}`  ",
@@ -696,7 +711,7 @@ class BridgePlanner:
             f"- Stored Pokémon: `{sum(len(box['slots']) for box in proposed['semantic']['storage']['boxes'])}`",
             f"- Daycare Pokémon: `{len(proposed['semantic']['daycare']['route5'])}`",
             f"- Defeated ordinary trainer counterparts transferred: `{domains['trainerSummary']['transferred']}`",
-            f"- FireRed-only progression: `locked/defaulted`", "",
+            f"- {self.target_display}-only progression: `locked/defaulted`", "",
             "## Audit", "",
             f"- Pokémon conversion records: `{len(manifest['pokemonConversions'])}`",
             f"- Decisions: `{len(manifest['audit']['decisions'])}`",
@@ -712,6 +727,6 @@ class BridgePlanner:
             ] + [""]
         lines += [
             "## Boundary", "",
-            "This is a deterministic semantic plan. It contains no FireRed sector layout, encrypted Pokémon bytes, checksums, save index, or physical template bytes. Those belong to the later FireRed Save Generator.", "",
+            f"This is a deterministic semantic plan. It contains no {self.target_display} sector layout, encrypted Pokémon bytes, checksums, save index, or physical template bytes. Those belong to the physical target generator.", "",
         ]
         return "\n".join(lines)

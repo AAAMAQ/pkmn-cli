@@ -7,6 +7,7 @@
 
 #include "app/ExitCode.hpp"
 #include "app/Version.hpp"
+#include "conversion/RouteRegistry.hpp"
 #include "red/comparison/Comparison.hpp"
 #include "red/generation/SemanticGenerator.hpp"
 #include "red/json/RedDecoder.hpp"
@@ -74,19 +75,34 @@ int Run(const std::vector<std::string>& arguments,
                 red::save::RedSave(first.bytes));
             if (first.bytes != second.bytes || !generatedIntegrity.Valid())
                 throw std::runtime_error("internal deterministic round trip failed");
-            const auto runtime = util::FireRedRuntimeScriptPath();
+            const auto bundledRuntime = util::BundledRuntimeExecutablePath();
+            const bool usingBundledRuntime = !bundledRuntime.empty();
+            const auto runtime = usingBundledRuntime
+                                     ? bundledRuntime
+                                     : util::FireRedRuntimeScriptPath();
             const auto fireRedTemplate = util::FireRedTemplatePath();
-            const auto data = runtime.parent_path() / "data";
+            const auto data = util::RuntimeDataPath();
             const bool bridgeAuthorities =
                 std::filesystem::is_regular_file(data / "event_bridge_red_to_firered.json") &&
                 std::filesystem::is_regular_file(data / "trainer_bridge_red_to_firered.json") &&
-                std::filesystem::is_regular_file(data / "item_bridge_red_to_firered.json");
+                std::filesystem::is_regular_file(data / "item_bridge_red_to_firered.json") &&
+                std::filesystem::is_regular_file(data / "paired_version_overlays.json");
+            const auto redFireRed = conversion::FindRoute("red-firered");
+            const auto redLeafGreen = conversion::FindRoute("red-leafgreen");
+            const auto blueFireRed = conversion::FindRoute("blue-firered");
+            const auto blueLeafGreen = conversion::FindRoute("blue-leafgreen");
             const std::array<std::uint8_t, 4> zero{};
             if (!std::filesystem::is_regular_file(runtime) ||
                 !std::filesystem::is_regular_file(fireRedTemplate) ||
                 util::Sha256Hex(firered::ReadBinaryFile(fireRedTemplate)) !=
                     "5fe341091ea41f17ddccaae1aed0ee4802894c94f5281e53dfe795e837a830c0" ||
                 !bridgeAuthorities ||
+                !redFireRed ||
+                redFireRed->capability != conversion::Capability::Available ||
+                !redLeafGreen || !blueFireRed || !blueLeafGreen ||
+                redLeafGreen->capability != conversion::Capability::Available ||
+                blueFireRed->capability != conversion::Capability::Available ||
+                blueLeafGreen->capability != conversion::Capability::Available ||
                 firered::CalculateSectionChecksum(zero) != 0)
                 throw std::runtime_error("FireRed runtime/authority self-test failed");
             deepReport = {{"passed", true},
@@ -96,7 +112,12 @@ int Run(const std::vector<std::string>& arguments,
                           {"generatedSha256", util::Sha256Hex(first.bytes)},
                           {"fireRedNativeChecksumSelfTest", true},
                           {"fireRedRuntimePresent", true},
+                          {"runtimeMode", usingBundledRuntime
+                                              ? "bundled-private-executable"
+                                              : "developer-python-fallback"},
+                          {"separatePythonRequired", !usingBundledRuntime},
                           {"bridgeAuthoritiesPresent", true},
+                          {"routeRegistryValid", true},
                           {"fireRedTemplate", fireRedTemplate.filename().string()},
                           {"fireRedTemplateIdentityValid", true},
                           {"fireRedPhysicalSelfTest", "bundled-template-ready"}};
@@ -112,17 +133,28 @@ int Run(const std::vector<std::string>& arguments,
             {"version", std::string(kVersion)},
             {"standaloneReadiness", "ready"},
             {"externalExecutablesRequired", false},
-            {"fireRedPythonRuntimeRequired", true},
+            {"runtimeMode", util::UsesBundledRuntime()
+                                ? "bundled-private-executable"
+                                : "developer-python-fallback"},
+            {"fireRedPythonRuntimeRequired", !util::UsesBundledRuntime()},
             {"fireRedVerificationGate", "phase-5-and-phase-6-passed"},
             {"modules", nlohmann::ordered_json::array({
                 "command-router", "red-save-loader", "red-checksum-validator",
                 "red-json-decoder-validator-reconstructor", "red-semantic-generator",
                 "physical-semantic-comparison", "red-proof",
                 "post-emulator-validation", "red-editing",
+                "shared-gen1-red-blue-engine", "blue-profile-json",
                 "red-to-firered-bridge-planner", "firered-template-generator",
+                "shared-gen3-firered-leafgreen-engine", "leafgreen-profile-json",
                 "firered-native-json-generator", "firered-proof",
-                "red-to-firered-proof", "bridge-inspection",
+                "four-route-conversion-and-proof", "bridge-inspection",
                 "red-and-firered-schema-updater"})}};
+        report["version3Phase"] = "phase-3-complete";
+        report["availableConversionRoutes"] =
+            nlohmann::ordered_json::array({"red-firered", "red-leafgreen",
+                                           "blue-firered", "blue-leafgreen"});
+        report["checksumRepairPolicy"] = "in-memory-source-preserving";
+        report["interactiveMode"] = true;
         report["deepSelfTest"] = deepReport;
         output << report.dump(2) << '\n';
         return ToInt(ExitCode::Success);
@@ -144,8 +176,20 @@ int Run(const std::vector<std::string>& arguments,
         << "[ok] FireRed reader, native JSON generator, comparisons, and proof runtime\n"
         << "[ok] FireRed Phase 5 native-generation acceptance\n"
         << "[ok] Red-to-FireRed Phase 6 conversion acceptance\n"
+        << "[ok] shared Red/Blue Gen I engine and explicit Blue profile\n"
+        << "[ok] shared FireRed/LeafGreen remake engine and explicit LeafGreen profile\n"
+        << "[ok] all four pkmn 3.0 conversion routes and static proof packages\n"
+        << "[ok] source-preserving conversion checksum recovery\n"
+        << "[ok] beginner interactive four-route workflow with evidence labels\n"
+        << (util::UsesBundledRuntime()
+                ? "[ok] private self-contained conversion runtime (no separate Python)\n"
+                : "[dev] Python runtime fallback (source/developer installation)\n")
            << (deep ? "[ok] deep deterministic generation self-test\n" : "")
-           << "\nStandalone readiness: ready\n";
+           << "\nStandalone readiness: ready\n"
+           << "Runtime mode: "
+           << (util::UsesBundledRuntime() ? "bundled-private-executable"
+                                          : "developer-python-fallback")
+           << '\n';
     return ToInt(ExitCode::Success);
 }
 

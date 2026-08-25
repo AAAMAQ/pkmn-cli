@@ -1,0 +1,56 @@
+{
+  "format": "pkmn-paired-version-overlays",
+  "version": "1.0.0",
+  "authority": {
+    "pokered": {
+      "commit": "d70d99ffbd329473d96eaaf19fd97c86d2220b7f",
+      "repository": "https://github.com/pret/pokered",
+      "buildEvidence": "Makefile builds Red and Blue from the paired source using version defines"
+    },
+    "pokefirered": {
+      "commit": "df4449a27cd78dd747ce269e47d3ab4a0149d8f4",
+      "repository": "https://github.com/pret/pokefirered",
+      "buildEvidence": "Makefile selects FireRed or LeafGreen through GAME_VERSION; src/save.c supplies the shared save container"
+    }
+  },
+  "sourceProfiles": {
+    "GEN1_RED": {
+      "binaryEngine": "GEN1_KANTO_SHARED",
+      "jsonExtension": ".red.json",
+      "declarationRequired": true
+    },
+    "GEN1_BLUE": {
+      "binaryEngine": "GEN1_KANTO_SHARED",
+      "jsonExtension": ".blue.json",
+      "declarationRequired": true,
+      "physicalIdentityPolicy": "route-or-command-declaration; never claim byte-only version detection"
+    }
+  },
+  "targetProfiles": {
+    "GEN3_FIRERED": {
+      "binaryEngine": "GEN3_KANTO_REMAKE_SHARED",
+      "jsonExtension": ".fred.json",
+      "pokemonOriginGameCode": 4,
+      "evidence": "EMULATOR_VERIFIED only on red-firered"
+    },
+    "GEN3_LEAFGREEN": {
+      "binaryEngine": "GEN3_KANTO_REMAKE_SHARED",
+      "jsonExtension": ".lg.json",
+      "pokemonOriginGameCode": 5,
+      "evidence": "STATICALLY_VALIDATED_COMMUNITY_TESTING"
+    }
+  },
+  "semanticOverlayPolicy": {
+    "sharedKantoProgression": "reuse evidence-backed semantic event bundles; never copy raw IDs across generations",
+    "sourceVersionExclusiveEncounters": "actual owned Pokemon are converted from the save; do not infer version-exclusive encounters",
+    "targetVersionExclusiveContent": "default or derive only when represented by an explicit target overlay",
+    "remakeOnlyProgression": "locked unless independently derived by a documented semantic rule",
+    "ambiguousState": "default conservatively and record in the manifest"
+  },
+  "routes": {
+    "red-firered": "EMULATOR_VERIFIED",
+    "red-leafgreen": "STATICALLY_VALIDATED_COMMUNITY_TESTING",
+    "blue-firered": "STATICALLY_VALIDATED_COMMUNITY_TESTING",
+    "blue-leafgreen": "STATICALLY_VALIDATED_COMMUNITY_TESTING"
+  }
+}

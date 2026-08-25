@@ -28,5 +28,11 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    return pkmn::cli::CommandRouter{}.Run(arguments, std::cout, std::cerr);
+    const int result =
+        pkmn::cli::CommandRouter{}.Run(arguments, std::cout, std::cerr);
+    if (result != 0) {
+        std::cerr << "If this looks like a pkmn bug, report it at "
+                     "https://github.com/AAAMAQ/pkmn-cli/issues\n";
+    }
+    return result;
 }

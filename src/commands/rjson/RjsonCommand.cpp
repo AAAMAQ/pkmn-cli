@@ -39,6 +39,8 @@ void Help(std::ostream &output) {
          "[--keep-intermediate] [--salt <value>]\n"
       << "  pkmn rjson convert_to_frjson <file.red.json> "
          "[output.fred.json] [--auto-suffix] [--salt <value>]\n"
+      << "  pkmn rjson convert_to_lgjson <file.red.json> "
+         "[output.lg.json] [--auto-suffix] [--salt <value>]\n"
       << "  pkmn rjson update_schema <file.red.json> "
          "[--output <updated.red.json>] [--auto-suffix]\n";
 }
@@ -300,7 +302,25 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
     return RunMigration(arguments, output, error);
   if (arguments.front() == "convert" ||
       arguments.front() == "convert_to_frjson" ||
-      arguments.front() == "update_schema")
+      arguments.front() == "convert_to_lgjson") {
+    std::string route = arguments.front() == "convert_to_lgjson"
+                            ? "red-leafgreen" : "red-firered";
+    const bool plan = arguments.front() != "convert";
+    std::vector<std::string> forwarded{route};
+    for (std::size_t index = 1; index < arguments.size(); ++index) {
+      if (arguments[index] == "--target" && index + 1 < arguments.size()) {
+        const auto target = arguments[++index];
+        if (target == "leafgreen" || target == "lg") route = "red-leafgreen";
+        else if (target == "firered" || target == "fr") route = "red-firered";
+        else return ToInt(ExitCode::InvalidArguments);
+      } else forwarded.push_back(arguments[index]);
+    }
+    forwarded[0] = route;
+    if (plan && forwarded.size() >= 2)
+      forwarded.insert(forwarded.begin() + 2, "--plan-only");
+    return commands::conversion::RunConvert(forwarded, output, error);
+  }
+  if (arguments.front() == "update_schema")
     return commands::conversion::RunRjsonExtension(arguments, output, error);
   if (arguments.front() == "schema")
     return RunSchema(arguments, output, error);

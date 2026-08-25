@@ -33,8 +33,10 @@ pre-starter template supplied by MAQ and selects it automatically. Users may
 override it with `--template` or `PKMN_FIRERED_TEMPLATE`; an override must pass
 the strict clean-template policy.
 
-Python 3 is required by the bundled bridge-planning runtime. No Save Genie or
-Save Generator executable is required.
+In the historical 2.0 source installation, Python 3 was required by the bridge
+runtime. Version 3 release packages freeze that runtime privately and need no
+separate Python installation. No Save Genie or Save Generator executable is
+required in either version.
 
 ## Verification status
 

@@ -23,12 +23,21 @@ pkmn command router
 - `src/red/events` and `src/red/data`: verified named event and Gen I identity catalogs.
 - `src/util`: SHA-256, installed-resource discovery, transactional output publication, and deterministic ZIP handling.
 - `src/firered/native`: native FireRed reading, checksums, schema 0.4.0 export, summaries, and narrow safe edits.
-- `runtime`: bundled deterministic Red-to-FireRed bridge planner, Pokémon conversion policy, generator, schemas, and pinned mapping data.
+- `runtime`: deterministic four-route bridge planner, Pokémon conversion
+  policy, generator, schemas, and pinned mapping data. Release packages freeze
+  this into a private platform-native runtime under `libexec/pkmn/runtime`.
 - command workflows emit deterministic portable JSON/Markdown reports beside collision-safe outputs.
 
 ## Current internal coverage
 
-`red inspect`, validation, repair, decode, event discovery, and batch commands are internal. All `rjson` workflows are internal. Generation uses a hash-validated bundled Red's-house template, ignores target physical bytes, rewrites supported semantics, and repairs all checksums. Native `fred` reading/decoding is compiled into the same executable. Conversion invokes only the installed Python runtime and pinned public authority data—not sibling project executables. Output sets are staged and published transactionally.
+`red inspect`, validation, repair, decode, event discovery, and batch commands
+are internal. All `rjson` workflows are internal. Generation uses a
+hash-validated bundled Red's-house template, ignores target physical bytes,
+rewrites supported semantics, and repairs all checksums. Native remake reading
+and decoding are compiled into the same executable. Conversion invokes the
+private bundled runtime in release packages and never calls sibling project
+executables. Source builds retain a clearly labeled Python fallback. Output
+sets are staged and published transactionally.
 
 Native FireRed JSON generation reads the complete logical-block and
 special-sector authorities retained by schema 0.4.0, validates their hashes,
@@ -45,7 +54,10 @@ passed.
 - Reconstruct requires `physicalImage` and is explicitly archival.
 - Edit writes a collision-safe copy, validates it, and never overwrites the source by default.
 - Unsupported runtime locations fail closed or use only the verified canonical safe-location policy.
-- FireRed commands are implemented under the same executable. Native generation passed Phase 5; conversion continues to fail closed wherever Phase 6 evidence or policy is incomplete.
+- FireRed and LeafGreen commands are implemented under the same executable.
+  Native FireRed generation passed Phase 5 and Red → FireRed conversion passed
+  Phase 6. The other three routes fail closed on unsupported state and retain
+  their static/community-testing evidence labels.
 
 ## Reference projects
 

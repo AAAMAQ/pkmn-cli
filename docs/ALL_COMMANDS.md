@@ -1,6 +1,9 @@
 # Complete pkmn Command Catalog
 
-Generated from the command catalog compiled into `pkmn 2.0.0`. Available command endpoints: **92**.
+Generated from the command catalog compiled into `pkmn 3.0.0`. Available command endpoints: **108**.
+
+Downloaded release packages are self-contained. Start with `pkmn interactive`;
+use `pkmn doctor --deep` to confirm `bundled-private-executable` runtime mode.
 
 ## General
 
@@ -35,6 +38,14 @@ pkmn get-all-cmds [--format text|json|markdown] [--output <file>]
 ```
 
 Print the complete command catalog compiled into this executable.
+
+### `interactive`
+
+```sh
+pkmn interactive
+```
+
+Open the beginner-oriented guided workflow for all four paired conversion routes.
 
 ## Pokemon Red saves
 
@@ -131,7 +142,7 @@ Analyze and classify an emulator round trip.
 ### `red convert`
 
 ```sh
-pkmn red convert <save.sav> [output.sav] [--template <clean-fire-red.sav>] [--salt <value>] [--keep-intermediate] [--auto-suffix]
+pkmn red convert <save.sav> [output.sav] [--auto-repair-checksum] [--write-repaired-source <copy.sav>] [--template <clean-fire-red.sav>] [--salt <value>] [--keep-intermediate] [--auto-suffix]
 ```
 
 Validate and convert a Pokemon Red save into an auditable FireRed save.
@@ -309,6 +320,16 @@ pkmn rjson convert_to_frjson <save.red.json> [output.fred.json] [--salt <value>]
 ```
 
 Translate canonical Red semantics into a proposed FireRed JSON document.
+
+## Kanto remake conversion
+
+### `rjson convert_to_lgjson`
+
+```sh
+pkmn rjson convert_to_lgjson <save.red.json> [output.lg.json] [--salt <value>] [--auto-suffix]
+```
+
+Translate canonical Red semantics into a proposed LeafGreen JSON document.
 
 ## Canonical Red JSON
 
@@ -578,13 +599,129 @@ Show one pinned pret FireRed flag or variable.
 
 ## Pokemon Red to FireRed conversion
 
-### `convert red-to-firered`
+### `convert red-firered`
 
 ```sh
-pkmn convert red-to-firered <red.sav|red.json> [output.sav] [conversion options]
+pkmn convert red-firered <red.sav|red.json> [output.sav] [conversion options]
 ```
 
 Convert either supported Red source form to FireRed.
+
+## Kanto remake conversion
+
+### `convert red-leafgreen`
+
+```sh
+pkmn convert red-leafgreen <red.sav|red.json> [output.sav] [conversion options]
+```
+
+Convert a declared Pokemon Red source to LeafGreen (static/community-test evidence).
+
+### `convert blue-firered`
+
+```sh
+pkmn convert blue-firered <blue.sav|blue.json> [output.sav] [conversion options]
+```
+
+Convert a declared Pokemon Blue source to FireRed (static/community-test evidence).
+
+### `convert blue-leafgreen`
+
+```sh
+pkmn convert blue-leafgreen <blue.sav|blue.json> [output.sav] [conversion options]
+```
+
+Convert a declared Pokemon Blue source to LeafGreen (static/community-test evidence).
+
+## Pokemon Blue saves
+
+### `blue decode`
+
+```sh
+pkmn blue decode <save.sav> [--output <save.blue.json>]
+```
+
+Decode through the shared Gen I engine with an explicit GEN1_BLUE profile.
+
+### `blue convert`
+
+```sh
+pkmn blue convert <save.sav> [output.sav]
+```
+
+Convenience alias for the paired Blue-to-LeafGreen route.
+
+## Pokemon Blue JSON
+
+### `bjson convert`
+
+```sh
+pkmn bjson convert <save.blue.json> [output.sav]
+```
+
+Convert canonical Blue JSON to LeafGreen.
+
+### `bjson convert_to_lgjson`
+
+```sh
+pkmn bjson convert_to_lgjson <save.blue.json> [output.lg.json]
+```
+
+Plan Blue-to-LeafGreen conversion without writing a save.
+
+### `bjson convert_to_frjson`
+
+```sh
+pkmn bjson convert_to_frjson <save.blue.json> [output.fred.json]
+```
+
+Plan Blue-to-FireRed conversion without writing a save.
+
+## Pokemon LeafGreen saves
+
+### `leafgreen decode`
+
+```sh
+pkmn leafgreen decode <save.sav> [--output <save.lg.json>]
+```
+
+Decode through the shared Kanto-remake engine with GEN3_LEAFGREEN profile.
+
+### `leafgreen validate`
+
+```sh
+pkmn leafgreen validate <save.sav> [--format json]
+```
+
+Validate the shared Gen III Kanto-remake save container.
+
+## Pokemon LeafGreen JSON
+
+### `lgjson generate`
+
+```sh
+pkmn lgjson generate <save.lg.json> [output.sav] [--template <clean.sav>]
+```
+
+Generate a LeafGreen-profile save through the shared remake engine.
+
+### `lgjson validate`
+
+```sh
+pkmn lgjson validate <save.lg.json>
+```
+
+Validate native or planned LeafGreen-profile JSON.
+
+## Pokemon Red to FireRed conversion
+
+### `convert routes`
+
+```sh
+pkmn convert routes [--format json]
+```
+
+List typed game profiles, conversion capabilities, and evidence labels.
 
 ### `convert inspect`
 
@@ -613,10 +750,20 @@ Validate an auditable conversion manifest.
 ### `convert batch`
 
 ```sh
-pkmn convert batch <red.sav|red.json>... --output-dir <directory> [--template <clean.sav>]
+pkmn convert batch <source.sav|source.json>... --route <route> --output-dir <directory> [--template <clean.sav>]
 ```
 
-Convert several Red sources to FireRed.
+Convert several declared sources through one selected available route.
+
+## Proof workflows
+
+### `proof convert`
+
+```sh
+pkmn proof convert <route> <source.json> [--output-dir <directory>]
+```
+
+Create a deterministic static proof package for any available conversion route.
 
 ## Comparison
 

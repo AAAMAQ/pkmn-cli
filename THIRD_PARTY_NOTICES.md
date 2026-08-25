@@ -53,3 +53,13 @@ provide their own strictly validated equivalent clean dump.
 ## JSON for Modern C++
 
 This repository vendors JSON for Modern C++ 3.12.0 by Niels Lohmann under the MIT License. Its license is stored at `third_party/nlohmann/LICENSE.MIT`.
+
+## Python and PyInstaller release runtime
+
+Self-contained version 3 release packages include a private CPython runtime
+under the Python Software Foundation License and a PyInstaller 6.20 bootloader
+under the GNU General Public License with PyInstaller's Bootloader Exception.
+The platform build copies the exact Python license and PyInstaller copying terms
+used by that artifact into the private runtime's `_licenses` directory. Python
+and PyInstaller are release-build/runtime packaging components; the pkmn source
+code remains MIT licensed.

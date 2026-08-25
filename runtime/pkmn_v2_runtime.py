@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bundled deterministic FireRed planning/generation runtime for pkmn 2.0."""
+"""Bundled deterministic FireRed planning/generation runtime for pkmn 3.0."""
 
 import argparse
 import copy
@@ -9,7 +9,8 @@ import os
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+TOOL_VERSION = "3.0.0"
 sys.path.insert(0, str(ROOT))
 
 from bridge_planner import BridgePlanner  # noqa: E402
@@ -44,9 +45,24 @@ def source_hash(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def plan_red(path, salt=None, source_name=None, source_sha256=None):
+def plan_red(path, salt=None, source_name=None, source_sha256=None,
+             source_game="red", target_game="firered"):
     source = without_physical_image(load_json(path))
-    result = BridgePlanner(root=ROOT, salt=salt).plan(
+    expected_profile = "GEN1_BLUE" if source_game == "blue" else "GEN1_RED"
+    declared_profile = source.get("schema", {}).get("gameProfile")
+    if declared_profile is not None and declared_profile != expected_profile:
+        raise ValueError(
+            f"JSON gameProfile {declared_profile!r} conflicts with explicit route; "
+            f"expected {expected_profile}"
+        )
+    source.setdefault("schema", {})["gameProfile"] = expected_profile
+    source["sourceDeclaration"] = {
+        "profile": expected_profile,
+        "basis": "explicit-conversion-route",
+        "binaryLayout": "shared-generation-I-save-layout",
+    }
+    result = BridgePlanner(root=ROOT, salt=salt, source_game=source_game,
+                           target_game=target_game).plan(
         source, source_sha256=source_sha256 or source_hash(path),
         source_name=source_name or Path(path).name
     )
@@ -68,14 +84,71 @@ def conversion_sidecars(output):
     )
 
 
+def manifest_v3(manifest, args, template=None):
+    """Add the stable 3.0 audit envelope without changing bridge decisions."""
+    manifest = copy.deepcopy(manifest)
+    repair_applied = str(getattr(args, "source_repair_applied", "false")).lower() == "true"
+    repair_requested = str(getattr(args, "source_repair_requested", "false")).lower() == "true"
+    repaired_source_written = str(getattr(args, "repaired_source_written", "false")).lower() == "true"
+    manifest_source_hash = manifest.get("source", {}).get("sha256")
+    manifest["manifestSchemaVersion"] = "3.0.0"
+    source_game = getattr(args, "source_game", "red")
+    target_game = getattr(args, "target_game", "firered")
+    source_profile = "GEN1_BLUE" if source_game == "blue" else "GEN1_RED"
+    target_profile = "GEN3_LEAFGREEN" if target_game == "leafgreen" else "GEN3_FIRERED"
+    route_id = f"{source_game}-{target_game}"
+    evidence = "EMULATOR_VERIFIED" if route_id == "red-firered" else "STATICALLY_VALIDATED_COMMUNITY_TESTING"
+    manifest["tool"] = {"name": "pkmn", "version": TOOL_VERSION}
+    manifest["route"] = {
+        "id": route_id,
+        "sourceProfile": source_profile,
+        "targetProfile": target_profile,
+        "capability": "AVAILABLE",
+        "evidence": evidence,
+    }
+    manifest["sourceIntegrity"] = {
+        "originalSha256": getattr(args, "source_original_sha256", None)
+            or getattr(args, "source_sha256", None) or manifest_source_hash,
+        "effectiveSha256": getattr(args, "source_repaired_sha256", None)
+            or getattr(args, "source_sha256", None) or manifest_source_hash,
+        "checksumStatus": getattr(args, "source_checksum_status", "VALID_OR_JSON"),
+        "repairRequested": repair_requested,
+        "repairAppliedInMemory": repair_applied,
+        "repairedSourceCopyWritten": repaired_source_written,
+        "originalSourceModified": False,
+    }
+    manifest["templatePolicy"] = {
+        "requiredForPhysicalGeneration": template is not None,
+        "templateFileName": template.name if template is not None else None,
+        "semanticAuthority": False,
+        "contribution": "container-layout-and-safe-baseline-only" if template else "none",
+    }
+    manifest["policyIdentity"] = {
+        "pokemon": "PCCS_ORIGINAL_V1",
+        "story": "KANTO_EQUIVALENT_ONLY",
+        "ambiguousTrainer": "DEFAULT_UNDEFEATED",
+        "fireRedOnlyProgression": "LOCKED_UNLESS_DERIVED",
+    }
+    manifest["versionOverlay"] = {
+        "id": "PKMN_PAIRED_VERSION_OVERLAYS_1.0.0",
+        "sourceProfile": source_profile,
+        "targetProfile": target_profile,
+        "pokeredCommit": "d70d99ffbd329473d96eaaf19fd97c86d2220b7f",
+        "pokefireredCommit": "df4449a27cd78dd747ce269e47d3ab4a0149d8f4",
+        "ambiguousStatePolicy": "DEFAULT_AND_MANIFEST_NEVER_GUESS",
+    }
+    return manifest
+
+
 def convert_to_frjson(args):
     source, planned = plan_red(
-        args.input, args.salt, args.source_name, args.source_sha256
+        args.input, args.salt, args.source_name, args.source_sha256,
+        args.source_game, args.target_game
     )
     proposed = complete_generator_policy(planned.proposed_fred, source)
     proposed["cliContract"] = {
-        "toolVersion": "2.0.0",
-        "command": "rjson convert_to_frjson",
+        "toolVersion": TOOL_VERSION,
+        "command": f"{args.source_game}json convert_to_{args.target_game}json",
         "nativeSchemaGate": "phase-5-accepted",
         "physicalImageUsed": False,
     }
@@ -83,7 +156,8 @@ def convert_to_frjson(args):
     manifest_path = args.manifest or default_manifest
     report_path = args.report or default_report
     write_new(args.output, json.dumps(proposed, indent=2) + "\n")
-    write_new(manifest_path, json.dumps(planned.manifest, indent=2) + "\n")
+    manifest = manifest_v3(planned.manifest, args)
+    write_new(manifest_path, json.dumps(manifest, indent=2) + "\n")
     write_new(report_path, planned.preview_markdown + "\n")
     print(json.dumps({
         "status": planned.manifest["planningStatus"],
@@ -97,7 +171,7 @@ def convert_to_frjson(args):
 def convert_to_save(args):
     template = Path(args.template)
     if not template.is_file():
-        raise FileNotFoundError("an approved FireRed template is required")
+        raise FileNotFoundError("an approved clean Kanto-remake template is required")
     source = load_json(args.input)
     result = convert_red_json(
         ROOT, source, template.read_bytes(),
@@ -105,15 +179,20 @@ def convert_to_save(args):
         source_sha256=args.source_sha256 or source_hash(args.input),
         template_name=template.name,
         salt=args.salt,
+        source_game=args.source_game,
+        target_game=args.target_game,
     )
     default_manifest, default_report = conversion_sidecars(args.output)
     manifest_path = args.manifest or default_manifest
     report_path = args.report or default_report
     write_new(args.output, result.generation.image, binary=True)
-    write_new(manifest_path, json.dumps(result.manifest, indent=2) + "\n")
+    manifest = manifest_v3(result.manifest, args, template)
+    write_new(manifest_path, json.dumps(manifest, indent=2) + "\n")
     write_new(report_path, result.preview_markdown + "\n")
     if args.keep_intermediate:
-        intermediate = Path(args.output).with_suffix(".fred.json")
+        intermediate = Path(args.output).with_suffix(
+            ".lg.json" if args.target_game == "leafgreen" else ".fred.json"
+        )
         write_new(intermediate, json.dumps(result.proposed_fred, indent=2) + "\n")
     print(json.dumps({
         "status": result.generation.report["status"],
@@ -130,7 +209,7 @@ def generate_frjson(args):
     if not template.is_file():
         raise FileNotFoundError("an approved FireRed template is required")
     plan = load_json(args.input)
-    if plan.get("format") == "pkmn-firered-planned-save":
+    if plan.get("format") in ("pkmn-firered-planned-save", "pkmn-leafgreen-planned-save"):
         result = FireRedTemplateGenerator.from_repository(ROOT).generate(
             plan, template.read_bytes(), template.name
         )
@@ -231,6 +310,16 @@ def validate_manifest(args):
     errors = []
     if not isinstance(manifest, dict): errors.append("top level must be an object")
     if not manifest.get("manifestType"): errors.append("manifestType is required")
+    if manifest.get("manifestSchemaVersion") == "3.0.0":
+        for key in ("route", "sourceIntegrity", "templatePolicy", "policyIdentity"):
+            if not isinstance(manifest.get(key), dict):
+                errors.append(f"{key} object is required by Manifest 3.0")
+        route = manifest.get("route", {})
+        if route.get("id") not in ("red-firered", "red-leafgreen", "blue-firered", "blue-leafgreen"):
+            errors.append("Manifest 3.0 route.id must identify a supported conversion route")
+        integrity = manifest.get("sourceIntegrity", {})
+        if integrity.get("originalSourceModified") is not False:
+            errors.append("Manifest 3.0 must record source preservation")
     audit = manifest.get("audit")
     if not isinstance(audit, dict): errors.append("audit object is required")
     else:
@@ -246,7 +335,7 @@ def validate_manifest(args):
         for row in audit.get("decisions", []):
             action = row.get("action") if isinstance(row, dict) else None
             if action and action not in allowed: unknown_actions.append(action)
-    result = {"format": "pkmn-conversion-manifest-validation", "version": "1.0.0",
+    result = {"format": "pkmn-conversion-manifest-validation", "version": "3.0.0",
               "valid": not errors, "errors": errors, "unknownActionLabels": sorted(set(unknown_actions)),
               "decisionCount": len(audit.get("decisions", [])) if isinstance(audit, dict) else 0,
               "pokemonConversionCount": len(conversions) if isinstance(conversions, list) else 0}
@@ -374,24 +463,33 @@ def proof_conversion(args):
     template = Path(args.template).read_bytes()
     first = convert_red_json(ROOT, source, template, source_name=Path(args.input).name,
                              source_sha256=source_hash(args.input), template_name=Path(args.template).name,
-                             salt=args.salt)
+                             salt=args.salt, source_game=args.source_game,
+                             target_game=args.target_game)
     second = convert_red_json(ROOT, source, template, source_name=Path(args.input).name,
                               source_sha256=source_hash(args.input), template_name=Path(args.template).name,
-                              salt=args.salt)
+                              salt=args.salt, source_game=args.source_game,
+                              target_game=args.target_game)
     deterministic = first.generation.image == second.generation.image and first.manifest == second.manifest
     directory = Path(args.output_dir or (str(Path(args.input).with_suffix("")) + ".phase6-proof"))
     if directory.exists(): raise FileExistsError(f"refusing to overwrite {directory}")
     directory.mkdir(parents=True)
-    write_new(directory / "proposed.fred.json", json.dumps(first.proposed_fred, indent=2) + "\n")
+    target_suffix = "lg" if args.target_game == "leafgreen" else "fred"
+    write_new(directory / f"proposed.{target_suffix}.json", json.dumps(first.proposed_fred, indent=2) + "\n")
     write_new(directory / "generated.sav", first.generation.image, binary=True)
     write_new(directory / "conversion-manifest.json", json.dumps(first.manifest, indent=2) + "\n")
     write_new(directory / "conversion-preview.md", first.preview_markdown + "\n")
-    write_new(directory / "MAQ_PHASE_6_CHECKLIST.md", "# Phase 6 MAQ Conversion Verification\n\n- [ ] Every source domain is accounted for\n- [ ] Converted save boots\n- [ ] Story and trainer bridge matches\n- [ ] Save, close, reload and reanalysis pass\n")
+    route = f"{args.source_game}-{args.target_game}"
+    evidence = "EMULATOR_VERIFIED" if route == "red-firered" else "STATICALLY_VALIDATED_COMMUNITY_TESTING"
+    write_new(directory / "ROUTE_EVIDENCE.md",
+              f"# {route} proof\n\nEvidence: `{evidence}`\n\n"
+              "Phase 2 does not require a new MAQ in-game verification campaign. "
+              "Community emulator observations and reproducible GitHub issues are welcome.\n")
     artifacts = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in directory.iterdir()}
-    proof = {"tool": "pkmn", "toolVersion": "2.0.0", "proofType": "red-to-firered-phase6",
-             "proofManifestVersion": "2.0.0", "status": "AUTOMATED_PASS_MANUAL_GATE_PENDING",
+    proof = {"tool": "pkmn", "toolVersion": TOOL_VERSION, "proofType": f"{route}-static-proof",
+             "proofManifestVersion": "3.0.0", "status": "AUTOMATED_PASS_STATIC_COMMUNITY_TESTING",
              "deterministic": deterministic, "artifactSha256": artifacts,
-             "emulatorValidation": "required-manual-gate"}
+             "routeEvidence": evidence,
+             "emulatorValidation": "completed" if route == "red-firered" else "not-required-for-phase2-community-reports-welcome"}
     write_new(directory / "proof-manifest.json", json.dumps(proof, indent=2) + "\n")
     print(json.dumps({"status": proof["status"], "output": str(directory),
                       "deterministic": deterministic}, indent=2))
@@ -414,7 +512,7 @@ def update_schema(args):
         document.setdefault("schema", {})["schemaVersion"] = "0.1.0"
         target = "0.1.0"
     else:
-        if document.get("format") == "pkmn-firered-planned-save":
+        if document.get("format") in ("pkmn-firered-planned-save", "pkmn-leafgreen-planned-save"):
             version = document.get("schemaVersion")
             if version not in (None, "1.0.0"):
                 raise ValueError(
@@ -425,7 +523,7 @@ def update_schema(args):
             document["schemaVersion"] = "1.0.0"
             target = "planned-1.0.0"
             document["schemaUpdate"] = {
-                "tool": "pkmn", "toolVersion": "2.0.0",
+                "tool": "pkmn", "toolVersion": TOOL_VERSION,
                 "targetSchemaVersion": target,
                 "semanticValuesChanged": False,
             }
@@ -448,7 +546,7 @@ def update_schema(args):
             document["schemaVersion"] = "0.4.0"
         target = "0.4.0"
     document["schemaUpdate"] = {
-        "tool": "pkmn", "toolVersion": "2.0.0", "targetSchemaVersion": target,
+        "tool": "pkmn", "toolVersion": TOOL_VERSION, "targetSchemaVersion": target,
         "semanticValuesChanged": False,
     }
     write_new(args.output, json.dumps(document, indent=2) + "\n")
@@ -464,11 +562,11 @@ def validate_frjson(args):
         errors.append("top level must be an object")
     schema = document.get("schema", {}) if isinstance(document, dict) else {}
     version = schema.get("schemaVersion") or document.get("schemaVersion")
-    planned = document.get("format") == "pkmn-firered-planned-save"
+    planned = document.get("format") in ("pkmn-firered-planned-save", "pkmn-leafgreen-planned-save")
     native = (document.get("format") == "pkmn-firered-master-save" and
               version == "0.4.0")
     if not planned and not native:
-        errors.append("expected native schema 0.4.0 or a planned FireRed document")
+        errors.append("expected native schema 0.4.0 or a planned Kanto-remake document")
     if planned:
         if document.get("schemaVersion") != "1.0.0":
             errors.append("planned FireRed schemaVersion must be 1.0.0")
@@ -482,6 +580,10 @@ def validate_frjson(args):
             errors.append("planned JSON must assert physical save bytes are absent")
         if "physicalImage" in document:
             errors.append("planned conversion JSON must not contain physicalImage")
+        expected_profile = ("GEN3_LEAFGREEN" if document.get("format") ==
+                            "pkmn-leafgreen-planned-save" else "GEN3_FIRERED")
+        if document.get("gameProfile") != expected_profile:
+            errors.append(f"planned gameProfile must be {expected_profile}")
     if native:
         if not isinstance(document.get("decoded"), dict):
             errors.append("native decoded object is required")
@@ -518,8 +620,16 @@ def parser():
         command.add_argument("--salt")
         command.add_argument("--source-name")
         command.add_argument("--source-sha256")
+        command.add_argument("--source-checksum-status")
+        command.add_argument("--source-repair-requested", default="false")
+        command.add_argument("--source-repair-applied", default="false")
+        command.add_argument("--repaired-source-written", default="false")
+        command.add_argument("--source-original-sha256")
+        command.add_argument("--source-repaired-sha256")
         command.add_argument("--manifest", type=Path)
         command.add_argument("--report", type=Path)
+        command.add_argument("--source-game", choices=("red", "blue"), default="red")
+        command.add_argument("--target-game", choices=("firered", "leafgreen"), default="firered")
         if name == "convert-to-save":
             command.add_argument("--template", required=True, type=Path)
             command.add_argument("--keep-intermediate", action="store_true")
@@ -566,6 +676,8 @@ def parser():
     command.add_argument("--template", required=True, type=Path)
     command.add_argument("--output-dir", type=Path)
     command.add_argument("--salt")
+    command.add_argument("--source-game", choices=("red", "blue"), default="red")
+    command.add_argument("--target-game", choices=("firered", "leafgreen"), default="firered")
     command.set_defaults(function=proof_conversion)
     return result
 

@@ -34,6 +34,14 @@ std::filesystem::path ExecutablePath() {
                    : std::filesystem::path(std::string(buffer.data(), size));
 #endif
 }
+
+std::filesystem::path FirstRegularFile(
+    const std::vector<std::filesystem::path> &candidates) {
+  for (const auto &candidate : candidates)
+    if (std::filesystem::is_regular_file(candidate))
+      return candidate;
+  return {};
+}
 } // namespace
 
 std::filesystem::path RedTemplatePath() {
@@ -78,5 +86,42 @@ std::filesystem::path FireRedRuntimeScriptPath() {
     if (std::filesystem::is_regular_file(candidate))
       return candidate;
   throw std::runtime_error("installed pkmn 2.0 FireRed runtime was not found");
+}
+
+std::filesystem::path BundledRuntimeExecutablePath() {
+#if defined(_WIN32)
+  constexpr auto name = "pkmn-runtime.exe";
+#else
+  constexpr auto name = "pkmn-runtime";
+#endif
+  const auto executable = ExecutablePath();
+  return FirstRegularFile({
+      executable.parent_path() / name,
+      executable.parent_path() / "libexec" / "pkmn" / name,
+      executable.parent_path() / "libexec" / "pkmn" / "runtime" / name,
+      executable.parent_path().parent_path() / "libexec" / "pkmn" / name,
+      executable.parent_path().parent_path() / "libexec" / "pkmn" / "runtime" /
+          name,
+      std::filesystem::current_path() / "runtime-dist" / name,
+  });
+}
+
+std::filesystem::path RuntimeDataPath() {
+  const auto executable = ExecutablePath();
+  const auto result = FirstRegularFile({
+      executable.parent_path() / "runtime" / "data" /
+          "event_bridge_red_to_firered.json",
+      executable.parent_path().parent_path() / "share" / "pkmn" / "runtime" /
+          "data" / "event_bridge_red_to_firered.json",
+      std::filesystem::current_path() / "runtime" / "data" /
+          "event_bridge_red_to_firered.json",
+  });
+  if (result.empty())
+    throw std::runtime_error("installed pkmn bridge authority data was not found");
+  return result.parent_path();
+}
+
+bool UsesBundledRuntime() {
+  return !BundledRuntimeExecutablePath().empty();
 }
 } // namespace pkmn::cli::util

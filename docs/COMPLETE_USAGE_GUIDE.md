@@ -1,5 +1,25 @@
 # Complete pkmn Usage Guide
 
+## Start with any supported Kanto remake route
+
+Downloaded 3.0 packages are self-contained. Beginners can start with:
+
+```sh
+pkmn interactive
+```
+
+The explicit routes are:
+
+```sh
+pkmn convert red-firered game.sav
+pkmn convert red-leafgreen game.sav
+pkmn convert blue-firered game.sav
+pkmn convert blue-leafgreen game.sav
+```
+
+Red → FireRed retains MAQ emulator verification. The other three routes are
+statically validated and community-testing.
+
 ## Continue Red in FireRed
 
 ```sh
@@ -23,7 +43,7 @@ pkmn frjson validate game_fr.fred.json
 pkmn frjson reconstruct game_fr.fred.json
 ```
 
-### Complete v2 command additions
+### Compatible v2 command additions
 
 Direct and JSON conversion:
 
@@ -73,8 +93,10 @@ Safe edit options are `--player-name`, `--rival-name`, `--money`, `--coins`,
 and repeatable `--badge N:on|off`. The event catalog is pinned pret reference
 data; event discovery itself does not mutate a save.
 
-This guide explains every command endpoint available in `pkmn 2.0.0`. It
-assumes your Pokemon Red save is named `backup.sav`.
+This guide explains the established Red/FireRed endpoints retained in `pkmn`
+3.0. The exhaustive four-game syntax is generated from the current executable
+in [ALL_COMMANDS.md](ALL_COMMANDS.md). Examples below use a Red save named
+`backup.sav` unless stated otherwise.
 
 `pkmn` never needs a ROM. Commands that create files refuse to replace an
 existing file by default. Keep an untouched copy of every important save.
@@ -974,9 +996,9 @@ checksums.
 pkmn proof verify backup.pkmn-proof --format json
 ```
 
-## Version 2.0 FireRed and conversion command expansion
+## Version 2 compatibility and version 3 route expansion
 
-The authoritative 89-endpoint syntax is generated from the executable in
+The authoritative 108-endpoint syntax is generated from the executable in
 `docs/ALL_COMMANDS.md`. The principal new workflows are:
 
 ```sh
@@ -1000,10 +1022,10 @@ pkmn proof fred complete.fred.json
 pkmn proof red-to-firered backup.red.json
 ```
 
-The two proof commands complete automated determinism, checksum, authority, and
-physical-image-isolation checks and produce MAQ checklists. They deliberately
-report the emulator gate as pending until the corresponding Phase 5 or Phase 6
-master verification is completed.
+The two historical proof commands complete automated determinism, checksum,
+authority, and physical-image-isolation checks. MAQ's Phase 5 and Phase 6
+master verification is complete for Red → FireRed. New routes generate
+route-specific static proof and remain community-testing.
 
 ## Global controls
 
@@ -1023,24 +1045,25 @@ pkmn --no-color red summary backup.sav
 
 Do not combine `--quiet` and `--verbose`.
 
-## FireRed and conversion verification status
+## Route verification and packaged runtime status
 
-`fred`, `frjson`, `red convert`, and the two `rjson` conversion commands are
-implemented. Physical generation passed Phase 5 and conversion passed Phase 6.
-A validated clean FireRed template is bundled and used automatically.
+All four routes and paired JSON domains are implemented. FireRed physical
+generation passed Phase 5 and Red → FireRed conversion passed Phase 6. The
+other routes remain statically validated and community-testing. A validated
+clean target template is bundled and used automatically.
 `--template` or `PKMN_FIRERED_TEMPLATE` may select a strictly validated custom
 clean dump. The CLI never bundles a ROM or a progressed private save.
 
 ## Updating and checking the installed catalog
 
-For the current Homebrew HEAD package:
+For a downloaded package, install the newer package over the old version, then
+run:
 
 ```sh
-brew update
-brew upgrade --fetch-HEAD AAAMAQ/pkmn/pkmn-cli
+pkmn --version
 pkmn doctor --deep
 pkmn get-all-cmds
 ```
 
-If Homebrew reports that the package is already up to date, your installed
-compiled command catalog is current.
+For the development Homebrew HEAD formula, use `brew update` followed by
+`brew upgrade --fetch-HEAD AAAMAQ/pkmn/pkmn-cli`.

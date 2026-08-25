@@ -1,5 +1,6 @@
 #include "app/CommandRouter.hpp"
 
+#include <iostream>
 #include <ostream>
 #include <sstream>
 #include <cstdlib>
@@ -14,6 +15,8 @@
 #include "commands/config/ConfigCommand.hpp"
 #include "commands/doctor/DoctorCommand.hpp"
 #include "commands/fred/FredCommand.hpp"
+#include "commands/interactive/InteractiveCommand.hpp"
+#include "commands/paired/PairedCommand.hpp"
 #include "commands/compare/CompareCommand.hpp"
 #include "commands/conversion/ConversionCommand.hpp"
 #include "commands/proof/ProofCommand.hpp"
@@ -111,6 +114,10 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
         return commands::catalog::Run(
             {arguments.begin() + 1, arguments.end()}, output, error);
     }
+    if (arguments.front() == "interactive") {
+        return commands::interactive::Run(
+            {arguments.begin() + 1, arguments.end()}, std::cin, output, error);
+    }
     if (arguments.front() == "compare") {
         return commands::compare::Run({arguments.begin() + 1, arguments.end()}, output, error);
     }
@@ -125,6 +132,14 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
     if (arguments.front() == "red") {
         return commands::red::Run({arguments.begin() + 1, arguments.end()}, output, error);
     }
+    if (arguments.front() == "blue") {
+        return commands::paired::RunBlue(
+            {arguments.begin() + 1, arguments.end()}, output, error);
+    }
+    if (arguments.front() == "bjson") {
+        return commands::paired::RunBlueJson(
+            {arguments.begin() + 1, arguments.end()}, output, error);
+    }
     if (arguments.front() == "rjson") {
         return commands::rjson::Run({arguments.begin() + 1, arguments.end()}, output, error);
     }
@@ -134,6 +149,14 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
     }
     if (arguments.front() == "frjson") {
         return commands::conversion::RunFrjson(
+            {arguments.begin() + 1, arguments.end()}, output, error);
+    }
+    if (arguments.front() == "leafgreen" || arguments.front() == "lg") {
+        return commands::paired::RunLeafGreen(
+            {arguments.begin() + 1, arguments.end()}, output, error);
+    }
+    if (arguments.front() == "lgjson") {
+        return commands::paired::RunLeafGreenJson(
             {arguments.begin() + 1, arguments.end()}, output, error);
     }
 
@@ -148,11 +171,15 @@ void CommandRouter::PrintVersion(std::ostream& output) {
 
 void CommandRouter::PrintHelp(std::ostream& output) {
     output
-        << "pkmn 2.0 - continue a Pokemon Red journey in Pokemon FireRed\n\n"
+        << "pkmn 3.0 - translate Red/Blue journeys into FireRed/LeafGreen\n\n"
         << "Conversion:\n"
-        << "  pkmn red convert game.sav\n"
-        << "  pkmn rjson convert game.red.json\n"
-        << "  pkmn rjson convert_to_frjson game.red.json\n\n"
+        << "  pkmn convert red-firered game.sav\n"
+        << "  pkmn convert red-leafgreen game.sav\n"
+        << "  pkmn convert blue-firered game.sav\n"
+        << "  pkmn convert blue-leafgreen game.sav\n\n"
+        << "Game domains: red, blue, fred, leafgreen, rjson, bjson, frjson, lgjson\n\n"
+        << "Beginner mode:\n"
+        << "  pkmn interactive\n\n"
         << "Usage:\n"
         << "  pkmn <domain> <command> [arguments] [options]\n"
         << "  pkmn doctor\n"
@@ -191,6 +218,8 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  pkmn compare progress older.sav newer.sav\n"
         << "  pkmn get-all-cmds\n"
         << "  pkmn doctor\n";
+    output << "\nReport pkmn 3.0 issues: "
+              "https://github.com/AAAMAQ/pkmn-cli/issues\n";
 }
 
 }  // namespace pkmn::cli

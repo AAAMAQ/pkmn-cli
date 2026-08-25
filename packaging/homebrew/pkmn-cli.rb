@@ -1,9 +1,10 @@
 # typed: strict
 # frozen_string_literal: true
 
-# Homebrew formula for the Pokemon Red to FireRed workflow CLI.
+# Development source formula. Stable 3.0 bottles are added only after the
+# immutable release archive and real bottle checksums exist.
 class PkmnCli < Formula
-  desc "Convert Pokemon Red saves to FireRed with auditable manifests"
+  desc "Translate Pokemon Red or Blue saves into FireRed or LeafGreen"
   homepage "https://github.com/AAAMAQ/pkmn-cli"
   license "MIT"
   head "https://github.com/AAAMAQ/pkmn-cli.git", branch: "main"

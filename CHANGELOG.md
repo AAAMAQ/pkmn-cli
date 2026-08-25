@@ -1,5 +1,50 @@
 # Changelog
 
+## 3.0.0 — Phase 3 and public release
+
+- Added a private PyInstaller one-directory conversion runtime so downloaded
+  packages require no separate Python installation.
+- Added executable-relative bundled-runtime discovery with an explicit
+  developer Python fallback and doctor/config reporting.
+- Added Windows ZIP/installer, macOS arm64/x86-64 archive/package, and Linux
+  archive/DEB/AppImage release automation.
+- Added clean-prefix installed smoke tests, SHA-256 release sums, SPDX release
+  SBOM generation, privacy scanning, licenses, and tagged release publication.
+- Added Windows, macOS, and Linux interactive launchers.
+- Rewrote the README, installation, Homebrew, troubleshooting, release, and
+  beginner-facing distribution documentation for self-contained downloads.
+- Preserved Red → FireRed's MAQ emulator evidence and the three new routes'
+  statically validated community-testing labels.
+
+## 3.0.0-alpha.2 — Phase 2
+
+- Enabled all four typed routes: Red/Blue to FireRed/LeafGreen.
+- Added explicit `GEN1_BLUE`/`GEN3_LEAFGREEN` profiles, `.blue.json` and
+  `.lg.json` command surfaces, and conflict-safe source declarations.
+- Added `blue`, `bjson`, `leafgreen`/`lg`, and `lgjson` domains over the two
+  shared paired-game engines.
+- Made planner output, Manifest 3.0, default filenames, intermediate JSON,
+  generation reports, and Pokémon origin metadata route-aware.
+- Added beginner interactive selection for all four routes with evidence labels.
+- Added pinned paired-version overlay data and a Phase 2 evidence record.
+- Added four-route output/checksum/manifest regression coverage while retaining
+  `EMULATOR_VERIFIED` only for Red → FireRed.
+
+## 3.0.0-alpha.1 — Phase 1
+
+- Added typed Red, Blue, FireRed, and LeafGreen game profiles.
+- Added a four-route registry with capability and evidence discovery through
+  `pkmn convert routes`.
+- Added the canonical `pkmn convert red-firered` spelling while retaining the
+  v2 `red-to-firered` alias.
+- Added safe `--auto-repair-checksum`/`--auto_repair_checksum` conversion and
+  explicit `--write-repaired-source` output.
+- Added Manifest 3.0 route, evidence, integrity, repair, template, and policy
+  fields.
+- Added `pkmn interactive` with the emulator-verified Red → FireRed workflow.
+- Added deterministic regression, semantic-corruption rejection,
+  source-preservation, and direct/interactive equivalence coverage.
+
 ## 2.0.0 - Unreleased
 
 - Put Red → FireRed conversion at the top of the product and help experience.

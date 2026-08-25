@@ -44,6 +44,8 @@ void PrintHelp(std::ostream& output) {
            << "  pkmn red validate-post-emulator <before.sav> <after.sav> "
               "[--output-dir <directory>]\n"
            << "  pkmn red convert <input.sav> [output.sav] "
+              "[--auto-repair-checksum] "
+              "[--write-repaired-source <copy.sav>] "
               "[--template <clean-fire-red.sav>] [--auto-suffix] "
               "[--keep-intermediate] [--salt <value>]\n"
            << "  pkmn red edit <input.sav>\n"
@@ -520,8 +522,22 @@ int Run(const std::vector<std::string>& arguments, std::ostream& output, std::os
     }
     if (arguments.front() == "summary")
         return RunSummary(arguments, output, error);
-    if (arguments.front() == "convert")
-        return commands::conversion::RunRedConvert(arguments, output, error);
+    if (arguments.front() == "convert") {
+        std::string route = "red-firered";
+        std::vector<std::string> forwarded{route};
+        for (std::size_t index = 1; index < arguments.size(); ++index) {
+            if (arguments[index] == "--target" && index + 1 < arguments.size()) {
+                const auto target = arguments[++index];
+                if (target == "leafgreen" || target == "lg") route = "red-leafgreen";
+                else if (target != "firered" && target != "fr")
+                    return ToInt(ExitCode::InvalidArguments);
+                continue;
+            }
+            forwarded.push_back(arguments[index]);
+        }
+        forwarded[0] = route;
+        return commands::conversion::RunConvert(forwarded, output, error);
+    }
     if (arguments.front() == "decode") return RunDecode(arguments, output, error);
     if (arguments.front() == "events") return RunEvents(arguments, output, error);
     if (arguments.front() == "repair-checksums")

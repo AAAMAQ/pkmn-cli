@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from pathlib import Path
+import sys
 
 from .util import load_json
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[1]))
 
 
 @dataclass(frozen=True)

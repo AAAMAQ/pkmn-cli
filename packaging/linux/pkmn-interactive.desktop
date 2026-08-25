@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=pkmn interactive
+Comment=Beginner Pokémon save conversion workflow
+Exec=pkmn interactive
+Icon=pkmn
+Terminal=true
+Categories=Utility;Game;

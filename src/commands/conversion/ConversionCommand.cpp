@@ -7,7 +7,11 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <nlohmann/json.hpp>
+
 #include "app/ExitCode.hpp"
+#include "conversion/RouteRegistry.hpp"
+#include "red/generation/SemanticGenerator.hpp"
 #include "red/json/RedDecoder.hpp"
 #include "red/json/RedJsonDocument.hpp"
 #include "red/save/RedSave.hpp"
@@ -60,23 +64,32 @@ int RunRuntime(const std::vector<std::string> &arguments,
   const auto stderrPath = UniqueTemporary(".stderr");
   try {
     std::ostringstream command;
+    const auto bundledRuntime = util::BundledRuntimeExecutablePath();
+    if (!bundledRuntime.empty()) {
+      command << ShellQuote(bundledRuntime.string());
+    } else {
 #if defined(_WIN32)
-    command << "python ";
+      command << "python ";
 #else
-    command << "python3 ";
+      command << "python3 ";
 #endif
-    command
-            << ShellQuote(util::FireRedRuntimeScriptPath().string());
+      command << ShellQuote(util::FireRedRuntimeScriptPath().string());
+    }
     for (const auto &argument : arguments)
       command << ' ' << ShellQuote(argument);
     command << " >" << ShellQuote(stdoutPath.string())
             << " 2>" << ShellQuote(stderrPath.string());
     const int status = std::system(command.str().c_str());
-    output << ReadText(stdoutPath);
+    const auto runtimeOutput = ReadText(stdoutPath);
+    output << runtimeOutput;
     error << ReadText(stderrPath);
     std::error_code ignored;
     std::filesystem::remove(stdoutPath, ignored);
     std::filesystem::remove(stderrPath, ignored);
+    if (status == 0 &&
+        runtimeOutput.find("WITH_WARNINGS") != std::string::npos)
+      error << "Report reproducible pkmn problems: "
+               "https://github.com/AAAMAQ/pkmn-cli/issues\n";
     return status == 0 ? ToInt(ExitCode::Success) : ToInt(failure);
   } catch (const std::exception &exception) {
     std::error_code ignored;
@@ -95,12 +108,25 @@ std::string BaseName(const std::filesystem::path &input,
   return name;
 }
 
-std::filesystem::path DefaultSaveOutput(const std::filesystem::path &input) {
-  return input.parent_path() / (BaseName(input, ".red.json") + "_fr.sav");
+std::filesystem::path DefaultSaveOutput(const std::filesystem::path &input,
+                                        pkmn::cli::conversion::GameId source,
+                                        pkmn::cli::conversion::GameId target) {
+  const auto sourceSuffix = source == pkmn::cli::conversion::GameId::Blue
+                                ? ".blue.json" : ".red.json";
+  const auto targetSuffix = target == pkmn::cli::conversion::GameId::LeafGreen
+                                ? "_lg.sav" : "_fr.sav";
+  return input.parent_path() / (BaseName(input, sourceSuffix) + targetSuffix);
 }
 
-std::filesystem::path DefaultFrjsonOutput(const std::filesystem::path &input) {
-  return input.parent_path() / (BaseName(input, ".red.json") + ".fred.json");
+std::filesystem::path DefaultTargetJsonOutput(
+    const std::filesystem::path &input,
+    pkmn::cli::conversion::GameId source,
+    pkmn::cli::conversion::GameId target) {
+  const auto sourceSuffix = source == pkmn::cli::conversion::GameId::Blue
+                                ? ".blue.json" : ".red.json";
+  const auto targetSuffix = target == pkmn::cli::conversion::GameId::LeafGreen
+                                ? ".lg.json" : ".fred.json";
+  return input.parent_path() / (BaseName(input, sourceSuffix) + targetSuffix);
 }
 
 std::filesystem::path DefaultUpdated(const std::filesystem::path &input,
@@ -147,15 +173,26 @@ struct ConversionOptions {
   std::filesystem::path reportPath;
   bool autoSuffix = false;
   bool keepIntermediate = false;
+  bool autoRepairChecksum = false;
+  std::filesystem::path repairedSourcePath;
+  bool sourceRepairApplied = false;
+  std::string sourceOriginalSha256;
+  std::string sourceRepairedSha256;
+  pkmn::cli::conversion::GameId sourceGame = pkmn::cli::conversion::GameId::Red;
+  pkmn::cli::conversion::GameId targetGame = pkmn::cli::conversion::GameId::FireRed;
 };
 
 ConversionOptions ParseConversion(const std::vector<std::string> &arguments,
-                                  bool toFrjson) {
+                                  bool toFrjson,
+                                  pkmn::cli::conversion::GameId sourceGame = pkmn::cli::conversion::GameId::Red,
+                                  pkmn::cli::conversion::GameId targetGame = pkmn::cli::conversion::GameId::FireRed) {
   if (arguments.size() < 2) throw std::runtime_error("input is required");
   ConversionOptions options;
+  options.sourceGame = sourceGame;
+  options.targetGame = targetGame;
   options.input = arguments[1];
-  options.output = toFrjson ? DefaultFrjsonOutput(options.input)
-                            : DefaultSaveOutput(options.input);
+  options.output = toFrjson ? DefaultTargetJsonOutput(options.input, sourceGame, targetGame)
+                            : DefaultSaveOutput(options.input, sourceGame, targetGame);
   std::size_t index = 2;
   if (index < arguments.size() && !arguments[index].starts_with("--"))
     options.output = arguments[index++];
@@ -179,23 +216,49 @@ ConversionOptions ParseConversion(const std::vector<std::string> &arguments,
       options.autoSuffix = true;
     else if (!toFrjson && arguments[index] == "--keep-intermediate")
       options.keepIntermediate = true;
+    else if (!toFrjson &&
+             (arguments[index] == "--auto-repair-checksum" ||
+              arguments[index] == "--auto_repair_checksum"))
+      options.autoRepairChecksum = true;
+    else if (!toFrjson && arguments[index] == "--write-repaired-source" &&
+             index + 1 < arguments.size())
+      options.repairedSourcePath = arguments[++index];
     else
       throw std::runtime_error("invalid conversion option");
   }
+  if (!options.repairedSourcePath.empty())
+    options.autoRepairChecksum = true;
   options.output = SelectOutput(options.output, options.autoSuffix);
   return options;
 }
 
 int ConvertJson(const ConversionOptions &options, bool toFrjson,
                 std::ostream &output, std::ostream &error) {
+  if (options.sourceName.empty() &&
+      (options.autoRepairChecksum || !options.repairedSourcePath.empty()))
+    throw std::runtime_error(
+        "checksum repair applies to physical Pokemon Red saves, not JSON");
   const auto loaded = red::json::LoadAndValidate(options.input);
   if (!loaded.validation.Valid()) {
     error << "pkmn conversion: Red JSON validation failed\n";
     return ToInt(ExitCode::InvalidInput);
   }
+  const auto expectedProfile = options.sourceGame == pkmn::cli::conversion::GameId::Blue
+                                   ? "GEN1_BLUE" : "GEN1_RED";
+  if (loaded.root.contains("schema") &&
+      loaded.root["schema"].contains("gameProfile") &&
+      loaded.root["schema"]["gameProfile"].get<std::string>() != expectedProfile) {
+    error << "pkmn conversion: JSON gameProfile conflicts with the explicit route; expected "
+          << expectedProfile << '\n';
+    return ToInt(ExitCode::InvalidInput);
+  }
   std::vector<std::string> runtime = {
       toFrjson ? "convert-to-frjson" : "convert-to-save",
       options.input.string(), "--output", options.output.string()};
+  runtime.push_back("--source-game");
+  runtime.push_back(options.sourceGame == pkmn::cli::conversion::GameId::Blue ? "blue" : "red");
+  runtime.push_back("--target-game");
+  runtime.push_back(options.targetGame == pkmn::cli::conversion::GameId::LeafGreen ? "leafgreen" : "firered");
   if (!options.salt.empty()) {
     runtime.push_back("--salt");
     runtime.push_back(options.salt);
@@ -207,6 +270,25 @@ int ConvertJson(const ConversionOptions &options, bool toFrjson,
   if (!options.sourceSha256.empty()) {
     runtime.push_back("--source-sha256");
     runtime.push_back(options.sourceSha256);
+  }
+  runtime.push_back("--source-checksum-status");
+  runtime.push_back(options.sourceName.empty()
+                        ? "JSON_VALIDATED"
+                        : (options.sourceRepairApplied ? "REPAIRED_IN_MEMORY"
+                                                       : "VALID"));
+  runtime.push_back("--source-repair-requested");
+  runtime.push_back(options.autoRepairChecksum ? "true" : "false");
+  runtime.push_back("--source-repair-applied");
+  runtime.push_back(options.sourceRepairApplied ? "true" : "false");
+  runtime.push_back("--repaired-source-written");
+  runtime.push_back(options.repairedSourcePath.empty() ? "false" : "true");
+  if (!options.sourceOriginalSha256.empty()) {
+    runtime.push_back("--source-original-sha256");
+    runtime.push_back(options.sourceOriginalSha256);
+  }
+  if (!options.sourceRepairedSha256.empty()) {
+    runtime.push_back("--source-repaired-sha256");
+    runtime.push_back(options.sourceRepairedSha256);
   }
   if (!options.manifestPath.empty()) {
     runtime.push_back("--manifest"); runtime.push_back(options.manifestPath.string());
@@ -264,27 +346,71 @@ int RunUpdate(const std::vector<std::string> &arguments, std::string kind,
 
 } // namespace
 
-int RunRedConvert(const std::vector<std::string> &arguments,
-                  std::ostream &output, std::ostream &error) {
+int RunGen1Convert(const std::vector<std::string> &arguments,
+                   pkmn::cli::conversion::GameId sourceGame,
+                   pkmn::cli::conversion::GameId targetGame,
+                   std::ostream &output, std::ostream &error) {
   try {
-    auto options = ParseConversion(arguments, false);
-    const auto save = red::save::RedSave::Read(options.input);
-    const auto integrity = red::validation::SaveValidator::Validate(save);
-    if (!integrity.expectedSize) {
-      error << "pkmn red convert: input is not a standard Pokemon Red save\n";
+    auto options = ParseConversion(arguments, false, sourceGame, targetGame);
+    const auto sourceLabel = sourceGame == pkmn::cli::conversion::GameId::Blue ? "blue" : "red";
+    const auto sourceDisplay = sourceGame == pkmn::cli::conversion::GameId::Blue ? "Blue" : "Red";
+    const auto originalSave = red::save::RedSave::Read(options.input);
+    const auto originalIntegrity =
+        red::validation::SaveValidator::Validate(originalSave);
+    if (!originalIntegrity.expectedSize) {
+      error << "pkmn " << sourceLabel << " convert: input is not a standard Pokemon "
+            << sourceDisplay << " save\n";
       return ToInt(ExitCode::InvalidInput);
     }
-    if (!integrity.Valid()) {
-      error << "pkmn red convert: Red checksum validation failed\n";
+    auto save = originalSave;
+    auto integrity = originalIntegrity;
+    options.sourceOriginalSha256 = util::Sha256Hex(originalSave.BytesView());
+    if (!integrity.Valid() && !options.autoRepairChecksum) {
+      error << "pkmn " << sourceLabel << " convert: Gen I checksum validation failed\n";
       return ToInt(ExitCode::ChecksumFailure);
+    }
+    if (!integrity.Valid()) {
+      auto repaired = originalSave.BytesView();
+      red::generation::RepairChecksums(repaired);
+      save = red::save::RedSave(std::move(repaired));
+      integrity = red::validation::SaveValidator::Validate(save);
+      if (!integrity.Valid()) {
+        error << "pkmn " << sourceLabel << " convert: checksum repair did not produce a valid "
+                 "source\n";
+        return ToInt(ExitCode::ChecksumFailure);
+      }
+      options.sourceRepairApplied = true;
+      options.sourceRepairedSha256 = util::Sha256Hex(save.BytesView());
     }
     const auto temporary = UniqueTemporary(".red.json");
     const auto document = red::json::Decode(
         save, options.input.filename().string(), integrity,
         {.includePhysicalImage = false});
-    util::WriteTextAtomic(temporary, red::json::Serialize(document));
+    const auto semanticValidation = red::json::ValidateDocument(document);
+    if (!semanticValidation.Valid()) {
+      error << "pkmn red convert: source contains invalid semantic save data; "
+               "checksum repair cannot make it convertible\n";
+      for (const auto &message : semanticValidation.errors)
+        error << "  - " << message << '\n';
+      return ToInt(ExitCode::InvalidInput);
+    }
+    if (!options.repairedSourcePath.empty()) {
+      util::WriteBinaryAtomic(options.repairedSourcePath, save.BytesView());
+    }
+    auto profiledDocument = document;
+    profiledDocument["schema"]["gameProfile"] =
+        sourceGame == pkmn::cli::conversion::GameId::Blue ? "GEN1_BLUE" : "GEN1_RED";
+    profiledDocument["sourceDeclaration"] = {
+        {"game", sourceGame == pkmn::cli::conversion::GameId::Blue ? "Pokemon Blue" : "Pokemon Red"},
+        {"profile", profiledDocument["schema"]["gameProfile"]},
+        {"basis", "explicit-conversion-route"},
+        {"binaryLayout", "shared-generation-I-save-layout"},
+    };
+    util::WriteTextAtomic(temporary, red::json::Serialize(profiledDocument));
     options.sourceName = options.input.filename().string();
-    options.sourceSha256 = util::Sha256Hex(save.BytesView());
+    // The source identity remains the original user's file. The repaired hash
+    // is recorded separately in Manifest 3.0.
+    options.sourceSha256 = options.sourceOriginalSha256;
     options.input = temporary;
     int result = 0;
     try {
@@ -298,9 +424,15 @@ int RunRedConvert(const std::vector<std::string> &arguments,
     std::filesystem::remove(temporary, ignored);
     return result;
   } catch (const std::exception &exception) {
-    error << "pkmn red convert: " << exception.what() << '\n';
+    error << "pkmn Gen I convert: " << exception.what() << '\n';
     return ToInt(ExitCode::InvalidInput);
   }
+}
+
+int RunRedConvert(const std::vector<std::string> &arguments,
+                  std::ostream &output, std::ostream &error) {
+  return RunGen1Convert(arguments, pkmn::cli::conversion::GameId::Red,
+                        pkmn::cli::conversion::GameId::FireRed, output, error);
 }
 
 int RunRjsonExtension(const std::vector<std::string> &arguments,
@@ -459,10 +591,46 @@ int RunConvert(const std::vector<std::string> &arguments,
       arguments.front() == "--help") {
     output << "Usage:\n"
            << "  pkmn convert red-to-firered <red.sav|red.json> [output.sav] [conversion options]\n"
+           << "  pkmn convert red-firered <red.sav|red.json> [output.sav] [conversion options]\n"
+           << "  pkmn convert red-leafgreen <red.sav|red.json> [output.sav] [conversion options]\n"
+           << "  pkmn convert blue-firered <blue.sav|blue.json> [output.sav] [conversion options]\n"
+           << "  pkmn convert blue-leafgreen <blue.sav|blue.json> [output.sav] [conversion options]\n"
+           << "  pkmn convert routes [--format json]\n"
            << "  pkmn convert inspect <event|trainer|item> [query]\n"
            << "  pkmn convert explain <event|trainer|item> <query>\n"
            << "  pkmn convert validate-manifest <conversion-manifest.json>\n"
-           << "  pkmn convert batch <red.sav|red.json>... --output-dir <directory> [--template <clean.sav>]\n";
+           << "  pkmn convert batch <source.sav|source.json>... --route <route> --output-dir <directory> [--template <clean.sav>]\n";
+    return 0;
+  }
+  if (arguments.front() == "routes") {
+    const bool json = arguments.size() == 3 && arguments[1] == "--format" &&
+                      arguments[2] == "json";
+    if (arguments.size() != 1 && !json)
+      return ToInt(ExitCode::InvalidArguments);
+    if (json) {
+      nlohmann::ordered_json records = nlohmann::ordered_json::array();
+      for (const auto &route : pkmn::cli::conversion::Routes()) {
+        records.push_back({
+            {"route", route.key},
+            {"sourceProfile", pkmn::cli::conversion::Profile(route.source).key},
+            {"targetProfile", pkmn::cli::conversion::Profile(route.target).key},
+            {"capability", pkmn::cli::conversion::CapabilityName(route.capability)},
+            {"evidence", route.evidence},
+            {"policy", route.conversionPolicy},
+        });
+      }
+      output << nlohmann::ordered_json({{"format", "pkmn-route-registry"},
+                                        {"version", "3.0.0"},
+                                        {"routes", records}})
+                    .dump(2)
+             << '\n';
+    } else {
+      output << "pkmn conversion routes\n";
+      for (const auto &route : pkmn::cli::conversion::Routes())
+        output << "  " << route.key << "  "
+               << pkmn::cli::conversion::CapabilityName(route.capability) << "  "
+               << route.evidence << '\n';
+    }
     return 0;
   }
   if ((arguments.front() == "inspect" || arguments.front() == "explain") &&
@@ -474,7 +642,16 @@ int RunConvert(const std::vector<std::string> &arguments,
   if (arguments.front() == "validate-manifest" && arguments.size() == 2)
     return RunRuntime({"validate-manifest", arguments[1]}, output, error,
                       ExitCode::InvalidInput);
-  if (arguments.front() == "red-to-firered" && arguments.size() >= 2) {
+  const auto selectedRoute = pkmn::cli::conversion::FindRoute(arguments.front());
+  if (selectedRoute && selectedRoute->capability ==
+                           pkmn::cli::conversion::Capability::Planned) {
+    error << "pkmn convert: route '" << selectedRoute->key
+          << "' is declared but not available in this build\n";
+    return ToInt(ExitCode::UnsupportedOperation);
+  }
+  if (selectedRoute && arguments.size() >= 2) {
+    const auto sourceGame = selectedRoute->source;
+    const auto targetGame = selectedRoute->target;
     const std::filesystem::path input = arguments[1];
     bool planOnly = false;
     std::filesystem::path explicitOutput;
@@ -482,7 +659,8 @@ int RunConvert(const std::vector<std::string> &arguments,
     for (std::size_t index = 2; index < arguments.size(); ++index) {
       if (arguments[index] == "--preview" || arguments[index] == "--plan-only")
         planOnly = true;
-      else if ((arguments[index] == "--output-json" || arguments[index] == "--output-save") &&
+      else if ((arguments[index] == "--output-json" || arguments[index] == "--output-save" ||
+                arguments[index] == "--output") &&
                index + 1 < arguments.size()) {
         planOnly = planOnly || arguments[index] == "--output-json";
         explicitOutput = arguments[++index];
@@ -499,7 +677,9 @@ int RunConvert(const std::vector<std::string> &arguments,
         if (!omitForPlan) options.push_back(optionName);
         if ((arguments[index] == "--template" || arguments[index] == "--salt" ||
              arguments[index] == "--manifest" || arguments[index] == "--report" ||
-             arguments[index] == "--policy") && index + 1 < arguments.size()) {
+             arguments[index] == "--policy" ||
+             arguments[index] == "--write-repaired-source") &&
+            index + 1 < arguments.size()) {
           const auto value = arguments[++index];
           if (!omitForPlan) options.push_back(value);
         }
@@ -512,32 +692,40 @@ int RunConvert(const std::vector<std::string> &arguments,
       if (!inputJson && planOnly) {
         const auto save = red::save::RedSave::Read(input);
         const auto integrity = red::validation::SaveValidator::Validate(save);
-        if (!integrity.Valid()) throw std::runtime_error("Red save validation failed");
+        if (!integrity.Valid()) throw std::runtime_error("Gen I save validation failed");
         temporary = UniqueTemporary(".red.json");
-        const auto document = red::json::Decode(save, input.filename().string(), integrity,
-                                                {.includePhysicalImage = false});
+        auto document = red::json::Decode(save, input.filename().string(), integrity,
+                                          {.includePhysicalImage = false});
+        document["schema"]["gameProfile"] =
+            sourceGame == pkmn::cli::conversion::GameId::Blue ? "GEN1_BLUE" : "GEN1_RED";
         util::WriteTextAtomic(temporary, red::json::Serialize(document));
         jsonInput = temporary;
       }
       std::vector<std::string> forwarded{planOnly ? "convert_to_frjson" : "convert",
                                          (planOnly ? jsonInput : input).string()};
-      if (planOnly && explicitOutput.empty()) explicitOutput = DefaultFrjsonOutput(input);
+      if (planOnly && explicitOutput.empty())
+        explicitOutput = DefaultTargetJsonOutput(input, sourceGame, targetGame);
       if (!explicitOutput.empty()) forwarded.push_back(explicitOutput.string());
       forwarded.insert(forwarded.end(), options.begin(), options.end());
       int result = 0;
-      if (planOnly || inputJson) result = RunRjsonExtension(forwarded, output, error);
-      else result = RunRedConvert(forwarded, output, error);
+      if (planOnly || inputJson) {
+        const auto parsed = ParseConversion(forwarded, planOnly, sourceGame, targetGame);
+        result = ConvertJson(parsed, planOnly, output, error);
+      } else {
+        result = RunGen1Convert(forwarded, sourceGame, targetGame, output, error);
+      }
       if (!temporary.empty()) { std::error_code ignored; std::filesystem::remove(temporary, ignored); }
       return result;
     } catch (const std::exception &exception) {
       if (!temporary.empty()) { std::error_code ignored; std::filesystem::remove(temporary, ignored); }
-      error << "pkmn convert red-to-firered: " << exception.what() << '\n';
+      error << "pkmn convert " << selectedRoute->key << ": " << exception.what() << '\n';
       return ToInt(ExitCode::InvalidInput);
     }
   }
   if (arguments.front() == "batch") {
     std::filesystem::path directory, templatePath;
     std::string salt;
+    auto batchRoute = pkmn::cli::conversion::FindRoute("red-firered");
     std::vector<std::filesystem::path> inputs;
     for (std::size_t index = 1; index < arguments.size(); ++index) {
       if (arguments[index] == "--output-dir" && index + 1 < arguments.size())
@@ -546,6 +734,12 @@ int RunConvert(const std::vector<std::string> &arguments,
         templatePath = arguments[++index];
       else if (arguments[index] == "--salt" && index + 1 < arguments.size())
         salt = arguments[++index];
+      else if (arguments[index] == "--route" && index + 1 < arguments.size()) {
+        batchRoute = pkmn::cli::conversion::FindRoute(arguments[++index]);
+        if (!batchRoute || batchRoute->capability !=
+                               pkmn::cli::conversion::Capability::Available)
+          return ToInt(ExitCode::UnsupportedOperation);
+      }
       else if (arguments[index].starts_with("--"))
         return ToInt(ExitCode::InvalidArguments);
       else inputs.emplace_back(arguments[index]);
@@ -557,13 +751,17 @@ int RunConvert(const std::vector<std::string> &arguments,
     try {
       std::filesystem::create_directories(temporaryDirectory);
       for (const auto &input : inputs) {
-        const auto destination = temporaryDirectory / (BaseName(input, ".red.json") + "_fr.sav");
+        const auto destination = temporaryDirectory /
+            DefaultSaveOutput(input, batchRoute->source, batchRoute->target).filename();
         std::vector<std::string> forwarded{"convert", input.string(), destination.string(),
                                            "--template", ResolveTemplate(templatePath).string()};
         if (!salt.empty()) { forwarded.push_back("--salt"); forwarded.push_back(salt); }
         const auto result = input.filename().string().ends_with(".json")
-            ? RunRjsonExtension(forwarded, output, error)
-            : RunRedConvert(forwarded, output, error);
+            ? ConvertJson(ParseConversion(forwarded, false, batchRoute->source,
+                                          batchRoute->target),
+                          false, output, error)
+            : RunGen1Convert(forwarded, batchRoute->source, batchRoute->target,
+                             output, error);
         if (result != 0) throw std::runtime_error("batch conversion failed for " + input.filename().string());
       }
       std::filesystem::rename(temporaryDirectory, directory);

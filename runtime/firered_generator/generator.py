@@ -232,8 +232,10 @@ class FireRedTemplateGenerator:
             image, semantic.get("hallOfFame"), semantic["party"], changes
         )
         validate_generated_image(image, slot)
+        target_game = proposed.get("target", {}).get("game", "Pokemon FireRed")
+        target_key = "leafgreen" if target_game == "Pokemon LeafGreen" else "firered"
         report = {
-            "format": "pkmn-firered-template-generation-report",
+            "format": f"pkmn-{target_key}-template-generation-report",
             "version": "1.0.0",
             "status": "CANDIDATE_REQUIRES_EMULATOR" if warnings else "STATIC_VALIDATION_PASS",
             "template": {
@@ -263,7 +265,7 @@ class FireRedTemplateGenerator:
             "changes": changes,
             "warnings": warnings,
             "verificationRequired": [
-                "Boot generated save in a FireRed v1.0-compatible emulator.",
+                f"Boot generated save in a {target_game} v1.0-compatible emulator.",
                 "Inspect converted Pokémon, inventory, badges, mapped trainers and major story objects.",
                 "Save in game, close emulator, reload, and reanalyze the result with Save Genie.",
             ],
@@ -271,8 +273,12 @@ class FireRedTemplateGenerator:
         return GenerationResult(bytes(image), report)
 
     def _validate_proposed(self, proposed):
-        if proposed.get("format") != "pkmn-firered-planned-save" or proposed.get("schemaVersion") != "1.0.0":
-            raise ValueError("generator requires pkmn-firered-planned-save@1.0.0")
+        if proposed.get("format") not in ("pkmn-firered-planned-save", "pkmn-leafgreen-planned-save") or proposed.get("schemaVersion") != "1.0.0":
+            raise ValueError("generator requires a supported Kanto-remake planned save @1.0.0")
+        expected_profile = ("GEN3_LEAFGREEN" if proposed.get("format") ==
+                            "pkmn-leafgreen-planned-save" else "GEN3_FIRERED")
+        if proposed.get("gameProfile") != expected_profile:
+            raise ValueError(f"planned gameProfile must be {expected_profile}")
         if proposed.get("planningStatus") == "REJECTED" or not proposed.get("generatorReady"):
             raise ValueError("refusing a rejected/non-generator-ready plan")
         if not proposed.get("doesNotContainPhysicalSaveBytes"):

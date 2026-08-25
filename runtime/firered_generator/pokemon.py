@@ -70,7 +70,12 @@ def encode_box_pokemon(mon):
 
     misc[0] = int(mon.get("pokerus", {}).get("raw", 0)) & 0xFF
     misc[1] = int(mon["origins"]["metLocation"]) & 0xFF
-    origins = (int(mon["origins"]["metLevel"]) & 0x7F) | (4 << 7) | (4 << 11)
+    game_codes = {"FireRed": 4, "LeafGreen": 5}
+    met_game = mon["origins"].get("metGame", "FireRed")
+    if met_game not in game_codes:
+        raise ValueError(f"unsupported Gen III origin game: {met_game}")
+    origins = ((int(mon["origins"]["metLevel"]) & 0x7F)
+               | (game_codes[met_game] << 7) | (4 << 11))
     if mon["origins"].get("otFemale"): origins |= 1 << 15
     put_u16(misc, 2, origins)
     iv_word = 0

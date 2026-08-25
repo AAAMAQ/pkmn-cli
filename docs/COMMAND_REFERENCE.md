@@ -1,14 +1,21 @@
 # Command Reference
 
-## Pokémon Red to FireRed conversion
+## Kanto remake conversion
 
 ```sh
 pkmn red convert game.sav [--output game_fr.sav] [--template clean-fr.sav]
+pkmn red convert game.sav --auto-repair-checksum
+pkmn red convert game.sav --auto-repair-checksum --write-repaired-source repaired.sav
 pkmn rjson convert game.red.json [--output game_fr.sav] [--template clean-fr.sav]
 pkmn rjson convert_to_frjson game.red.json [--output game.fred.json]
-pkmn convert red-to-firered game.sav [--plan-only] [--output-json game.fred.json]
+pkmn convert red-firered game.sav [--plan-only] [--output-json game.fred.json]
+pkmn convert red-leafgreen game.sav
+pkmn convert blue-firered game.sav
+pkmn convert blue-leafgreen game.sav
+pkmn convert routes [--format json]
 pkmn convert inspect event|trainer|item [query]
 pkmn convert validate-manifest conversion-manifest.json
+pkmn proof convert blue-leafgreen game.blue.json
 ```
 
 The clean FireRed template is bundled; `--template` is an optional override for
@@ -27,11 +34,17 @@ pkmn frjson update_schema game.fred.json
 ```
 
 All currently implemented workflows are internal to `pkmn`. Save Genie and Save Generator executables are not runtime dependencies.
+Downloaded 3.0 packages also include the private conversion runtime and need no
+separate Python installation. `pkmn doctor --deep` reports the selected runtime
+mode; ordinary source builds retain a developer Python fallback.
 
 ## General
 
 - `pkmn --help` prints the supported and reserved command domains.
 - `pkmn --version` prints the stable tool version.
+- `pkmn interactive` opens the beginner workflow for all four routes. It shows
+  `EMULATOR_VERIFIED` for Red → FireRed and
+  `STATICALLY_VALIDATED_COMMUNITY_TESTING` for the three new routes.
 - `pkmn doctor` checks internal readiness; `doctor --deep` runs an internal deterministic generation round trip.
 - `pkmn completion <bash|zsh|fish>` prints shell completion source.
 - `pkmn config show [--format text|json]` prints immutable compiled safety and default policy; no external engine paths are configured.

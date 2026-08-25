@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "app/ExitCode.hpp"
+#include "util/ResourceLocator.hpp"
 
 namespace pkmn::cli::commands::config {
 
@@ -46,16 +47,24 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
       {"rawCrossGenerationIdCopying", false},
       {"nativeFireRedGeneration", "implemented; Phase 5 MAQ acceptance passed"},
       {"redToFireRedConversion", "implemented; Phase 6 MAQ acceptance passed"},
+      {"version3Phase", "phase-3-complete"},
+      {"conversionRouteRegistry", "typed; all four routes available"},
+      {"checksumRepairDuringConversion", "in-memory; source unchanged by default"},
+      {"interactiveMode", "implemented; all four routes with evidence labels"},
       {"fireRedTemplate", "bundled clean default; strict user override supported"},
       {"environmentVariables",
        nlohmann::ordered_json::array({"PKMN_QUIET=1", "PKMN_VERBOSE=1",
                                       "NO_COLOR", "PKMN_FIRERED_TEMPLATE"})},
-      {"pythonRuntimeRequiredForFireRedConversion", true},
+      {"runtimeMode", util::UsesBundledRuntime()
+                          ? "bundled-private-executable"
+                          : "developer-python-fallback"},
+      {"pythonRuntimeRequiredForFireRedConversion",
+       !util::UsesBundledRuntime()},
       {"transactionalOutputWrites", true},
       {"fireRedSupport", "phase-5-and-phase-6-accepted"}};
-  if (json)
+  if (json) {
     output << policy.dump(2) << '\n';
-  else
+  } else {
     output << "pkmn compiled policy\n"
               "External engines: not required\n"
               "Input/output overwrite: disabled\n"
@@ -74,6 +83,15 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
               "FireRed template: bundled clean default; strict user override supported\n"
               "FireRed generation: Phase 5 accepted\n"
               "Red-to-FireRed conversion: Phase 6 accepted\n";
+    output << "Version 3 status: Phase 3 complete\n"
+              "Route registry: all four Red/Blue-to-FireRed/LeafGreen routes available\n"
+              "Conversion checksum repair: in-memory; source unchanged by default\n"
+              "Interactive mode: available for all four routes\n"
+           << "Runtime mode: "
+           << (util::UsesBundledRuntime() ? "bundled-private-executable"
+                                          : "developer-python-fallback")
+           << '\n';
+  }
   return 0;
 }
 

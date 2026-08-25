@@ -1,6 +1,7 @@
 #include "commands/proof/ProofCommand.hpp"
 
 #include <filesystem>
+#include <algorithm>
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
@@ -23,6 +24,7 @@
 #include "util/AtomicOutput.hpp"
 #include "util/ResourceLocator.hpp"
 #include "commands/conversion/ConversionCommand.hpp"
+#include "conversion/RouteRegistry.hpp"
 #include "FireRedSectionMap.hpp"
 #include "FileManipulation.hpp"
 #include "FireRedMasterJson.hpp"
@@ -152,7 +154,8 @@ int VerifyPackage(const std::vector<std::string> &args, std::ostream &output,
         throw std::runtime_error("unhashed artifact is present: " + name);
     }
     const auto proofType = manifest.value("proofType", "pokemon-red-semantic-generation");
-    if (proofType == "firered-phase5" || proofType == "red-to-firered-phase6") {
+    if (proofType == "firered-phase5" || proofType == "red-to-firered-phase6" ||
+        proofType.ends_with("-static-proof")) {
       if (!files.contains("generated.sav"))
         throw std::runtime_error("generated.sav is missing");
       const auto analysis = firered::AnalyzeSave(files.at("generated.sav"));
@@ -311,13 +314,58 @@ int Run(const std::vector<std::string> &args, std::ostream &output,
               "<save.sav> [--output-dir <directory>|--proof-dir <directory>]\n"
               "  pkmn proof verify <proof-directory|proof.zip> [--format json]\n";
     output << "  pkmn proof fred <complete.fred.json> [--template <clean.sav>] [--output-dir <directory>]\n"
-              "  pkmn proof red-to-firered <save.red.json> [--template <clean.sav>] [--output-dir <directory>]\n";
+              "  pkmn proof red-to-firered <save.red.json> [--template <clean.sav>] [--output-dir <directory>]\n"
+              "  pkmn proof convert <route> <source.json> [--template <clean.sav>] [--output-dir <directory>]\n";
     return 0;
   }
   if (args[0] == "post-emulator")
     return RunPostEmulator({args.begin() + 1, args.end()}, output, error);
   if (args[0] == "verify")
     return VerifyPackage({args.begin() + 1, args.end()}, output, error);
+  if (args[0] == "convert" && args.size() >= 3) {
+    const auto route = pkmn::cli::conversion::FindRoute(args[1]);
+    if (!route || route->capability != pkmn::cli::conversion::Capability::Available)
+      return ToInt(ExitCode::UnsupportedOperation);
+    const std::filesystem::path source = args[2];
+    if (!source.filename().string().ends_with(".json")) {
+      error << "pkmn proof convert: canonical source JSON is required\n";
+      return ToInt(ExitCode::InvalidArguments);
+    }
+    const auto sourceGame = route->source == pkmn::cli::conversion::GameId::Blue ? "blue" : "red";
+    const auto targetGame = route->target == pkmn::cli::conversion::GameId::LeafGreen ? "leafgreen" : "firered";
+    std::filesystem::path directory = source.parent_path() /
+        (source.stem().string() + "." + std::string(route->key) + ".proof");
+    std::vector<std::string> runtime{"proof-red-to-firered", source.string(),
+                                     "--source-game", sourceGame,
+                                     "--target-game", targetGame};
+    bool templateSeen = false;
+    for (std::size_t index = 3; index < args.size(); ++index) {
+      if ((args[index] == "--template" || args[index] == "--output-dir" ||
+           args[index] == "--salt") && index + 1 < args.size()) {
+        if (args[index] == "--template") templateSeen = true;
+        if (args[index] == "--output-dir") directory = args[index + 1];
+        runtime.push_back(args[index]);
+        runtime.push_back(args[++index]);
+      } else return ToInt(ExitCode::InvalidArguments);
+    }
+    if (!templateSeen) {
+      runtime.push_back("--template");
+      runtime.push_back(util::FireRedTemplatePath().string());
+    }
+    if (std::find(runtime.begin(), runtime.end(), "--output-dir") == runtime.end()) {
+      runtime.push_back("--output-dir");
+      runtime.push_back(directory.string());
+    }
+    auto result = commands::conversion::RunRuntimeUtility(runtime, output, error);
+    if (result == 0) {
+      try { AugmentFireRedProof(directory, source, false, output, error); }
+      catch (const std::exception &exception) {
+        error << "pkmn proof convert: " << exception.what() << '\n';
+        return ToInt(ExitCode::SemanticMismatch);
+      }
+    }
+    return result;
+  }
   if ((args[0] == "fred" || args[0] == "red-to-firered") && args.size() >= 2) {
     std::filesystem::path proofInput = args[1];
     std::filesystem::path temporaryRedJson;

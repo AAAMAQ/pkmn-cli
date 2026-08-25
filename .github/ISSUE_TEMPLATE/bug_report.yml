@@ -20,6 +20,20 @@ body:
       options: [macOS, Linux, Windows, Other]
     validations:
       required: true
+  - type: dropdown
+    id: route
+    attributes:
+      label: Conversion route
+      options: [Red to FireRed, Red to LeafGreen, Blue to FireRed, Blue to LeafGreen, Not a conversion]
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime mode
+      description: Copy the Runtime mode line from `pkmn doctor --deep`.
+    validations:
+      required: true
   - type: textarea
     id: command
     attributes:

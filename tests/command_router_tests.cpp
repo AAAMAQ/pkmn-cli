@@ -18,6 +18,7 @@
 #include "red/save/RedSave.hpp"
 #include "red/validation/SaveValidator.hpp"
 #include "util/Sha256.hpp"
+#include "FileManipulation.hpp"
 
 namespace {
 
@@ -55,8 +56,16 @@ std::vector<std::uint8_t> ValidSyntheticSave() {
   using Validator = pkmn::cli::red::validation::SaveValidator;
   std::vector<std::uint8_t> bytes(pkmn::cli::red::save::RedSave::ExpectedSize,
                                   0);
-  bytes[0x2598] = 0x50;
-  bytes[0x25F6] = 0x50;
+  // RED and BLUE in the Generation I text encoding.
+  bytes[0x2598] = 0x91;
+  bytes[0x2599] = 0x84;
+  bytes[0x259A] = 0x83;
+  bytes[0x259B] = 0x50;
+  bytes[0x25F6] = 0x81;
+  bytes[0x25F7] = 0x8B;
+  bytes[0x25F8] = 0x94;
+  bytes[0x25F9] = 0x84;
+  bytes[0x25FA] = 0x50;
   bytes[Validator::MainStored] =
       InvertedSum(bytes, Validator::MainStart, Validator::MainEnd);
   for (std::size_t bank = 0; bank < 2; ++bank) {
@@ -112,14 +121,15 @@ int main() {
              commandCatalog.output ==
                  Run({"get-all-cmds", "--format", "json"}).output &&
              nlohmann::ordered_json::parse(commandCatalog.output)
-                     .at("commandCount") == 92 &&
+                     .at("commandCount") == 108 &&
              nlohmann::ordered_json::parse(commandCatalog.output)
                      .at("commands").at(0).contains("usage"),
          "get-all-cmds should expose the complete compiled command catalog");
 
   const auto version = Run({"--version"});
   Expect(version.code == 0, "--version should succeed");
-  Expect(version.output == "pkmn 2.0.0\n", "version output should be stable");
+  Expect(version.output == "pkmn 3.0.0\n",
+         "Phase 2 version output should be stable");
   Expect(Run({"--quiet", "--version"}).output.empty() &&
              Run({"--verbose", "--no-color", "--version"})
                      .output.find("standalone=true") != std::string::npos &&
@@ -186,6 +196,23 @@ int main() {
              bridgeHelp.output.find("red-to-firered") != std::string::npos &&
              bridgeHelp.output.find("validate-manifest") != std::string::npos,
          "unified conversion help should expose planning and audit workflows");
+  const auto routeRegistry = Run({"convert", "routes", "--format", "json"});
+  const auto routeDocument =
+      nlohmann::ordered_json::parse(routeRegistry.output);
+  Expect(routeRegistry.code == 0 && routeDocument.at("routes").size() == 4 &&
+             routeDocument.at("routes").at(0).at("sourceProfile") ==
+                 "GEN1_RED" &&
+             routeDocument.at("routes").at(0).at("evidence") ==
+                 "EMULATOR_VERIFIED" &&
+             routeDocument.at("routes").at(1).at("capability") == "AVAILABLE" &&
+             routeDocument.at("routes").at(2).at("evidence") ==
+                 "STATICALLY_VALIDATED_COMMUNITY_TESTING" &&
+             routeDocument.at("routes").at(3).at("capability") == "AVAILABLE",
+         "Phase 2 should expose all four typed routes with honest evidence labels");
+  Expect(Run({"interactive", "--help"}).code == 0 &&
+             Run({"interactive", "--help"})
+                     .output.find("All four") != std::string::npos,
+         "interactive mode should advertise the Phase 2 route matrix");
   const auto bridgeTrainer =
       Run({"convert", "inspect", "trainer", "EVENT_BEAT_VIRIDIAN_GYM_TRAINER_0"});
   Expect(bridgeTrainer.code == 0 &&
@@ -243,6 +270,153 @@ int main() {
          "internal Red validator should accept a synthetic valid save");
   Expect(validation.boxes.size() == 12,
          "internal Red validator should check all 12 boxes");
+
+  auto checksumDamaged = validSave;
+  checksumDamaged[pkmn::cli::red::validation::SaveValidator::MainStored] ^= 1;
+  const fs::path checksumDamagedPath = temp / "checksum-damaged.sav";
+  {
+    std::ofstream output(checksumDamagedPath, std::ios::binary);
+    output.write(reinterpret_cast<const char *>(checksumDamaged.data()),
+                 static_cast<std::streamsize>(checksumDamaged.size()));
+  }
+  const auto damagedHashBefore = pkmn::cli::util::Sha256Hex(checksumDamaged);
+  const fs::path repairedSourcePath = temp / "explicit-repaired-copy.sav";
+  const fs::path repairedConversionPath = temp / "repaired-conversion.sav";
+  const auto repairedConversion =
+      Run({"convert", "red-firered", checksumDamagedPath.string(),
+           repairedConversionPath.string(), "--auto-repair-checksum",
+           "--write-repaired-source", repairedSourcePath.string()});
+  const auto damagedHashAfter = pkmn::cli::util::Sha256Hex(
+      pkmn::cli::red::save::RedSave::Read(checksumDamagedPath).BytesView());
+  const fs::path repairedManifest =
+      temp / "repaired-conversion.conversion-manifest.json";
+  nlohmann::ordered_json repairedManifestDocument;
+  if (fs::exists(repairedManifest)) {
+    std::ifstream input(repairedManifest);
+    input >> repairedManifestDocument;
+  }
+  const auto repairedManifestValidation =
+      fs::exists(repairedManifest)
+          ? Run({"convert", "validate-manifest", repairedManifest.string()})
+          : Result{1, {}, {}};
+  if (repairedConversion.code != 0)
+    std::cerr << "repair conversion stderr: " << repairedConversion.error
+              << "\nrepair conversion stdout: " << repairedConversion.output
+              << '\n';
+  Expect(repairedConversion.code == 0 && fs::exists(repairedConversionPath) &&
+             fs::exists(repairedSourcePath) &&
+             pkmn::cli::red::validation::SaveValidator::Validate(
+                 pkmn::cli::red::save::RedSave::Read(repairedSourcePath))
+                 .Valid() &&
+             damagedHashBefore == damagedHashAfter &&
+             repairedManifestDocument.at("manifestSchemaVersion") == "3.0.0" &&
+             repairedManifestDocument.at("route").at("id") ==
+                 "red-firered" &&
+             repairedManifestDocument.at("sourceIntegrity")
+                     .at("repairAppliedInMemory") == true &&
+             repairedManifestDocument.at("sourceIntegrity")
+                     .at("repairRequested") == true &&
+             repairedManifestDocument.at("sourceIntegrity")
+                     .at("repairedSourceCopyWritten") == true &&
+             repairedManifestDocument.at("sourceIntegrity")
+                     .at("originalSha256") !=
+                 repairedManifestDocument.at("sourceIntegrity")
+                     .at("effectiveSha256") &&
+             repairedManifestDocument.at("sourceIntegrity")
+                     .at("originalSourceModified") == false &&
+             repairedManifestValidation.code == 0 &&
+             nlohmann::ordered_json::parse(repairedManifestValidation.output)
+                     .at("valid") == true,
+         "checksum repair should be in-memory, explicit-copy-only, and audited");
+
+  const fs::path compatibilityConversionPath =
+      temp / "compatibility-repaired-conversion.sav";
+  const auto compatibilityConversion =
+      Run({"convert", "red-to-firered", checksumDamagedPath.string(),
+           compatibilityConversionPath.string(), "--auto_repair_checksum"});
+  Expect(compatibilityConversion.code == 0 &&
+             pkmn::cli::red::save::RedSave::Read(compatibilityConversionPath)
+                     .BytesView() ==
+                 pkmn::cli::red::save::RedSave::Read(repairedConversionPath)
+                     .BytesView(),
+         "v2 route spelling and underscore repair alias should remain compatible");
+
+  for (const auto &route : {"red-firered", "red-leafgreen",
+                            "blue-firered", "blue-leafgreen"}) {
+    const auto destination = temp / (std::string("phase2-") + route + ".sav");
+    const auto deterministicDestination =
+        temp / (std::string("phase2-deterministic-") + route + ".sav");
+    const auto converted =
+        Run({"convert", route, validSavePath.string(), destination.string()});
+    const auto convertedAgain = Run(
+        {"convert", route, validSavePath.string(), deterministicDestination.string()});
+    const auto manifestPath = temp /
+        (std::string("phase2-") + route + ".conversion-manifest.json");
+    nlohmann::ordered_json manifest;
+    if (fs::exists(manifestPath)) {
+      std::ifstream manifestInput(manifestPath);
+      manifestInput >> manifest;
+    }
+    Expect(converted.code == 0 && convertedAgain.code == 0 &&
+               fs::exists(destination) && fs::exists(deterministicDestination) &&
+               ::firered::ReadBinaryFile(destination) ==
+                   ::firered::ReadBinaryFile(deterministicDestination) &&
+               Run({"fred", "validate", destination.string()}).code == 0 &&
+               manifest.at("route").at("id") == route &&
+               manifest.at("sourceIntegrity").at("originalSourceModified") == false,
+           std::string("Phase 2 route should generate a statically valid audited save: ") + route);
+  }
+
+  const fs::path interactiveConversionPath =
+      temp / "interactive-repaired-conversion.sav";
+  std::istringstream interactiveAnswers(
+      "1\nR\nFR\nY\n" + checksumDamagedPath.string() + "\nY\n" +
+      interactiveConversionPath.string() + "\n");
+  auto *phase1InteractiveInputBuffer =
+      std::cin.rdbuf(interactiveAnswers.rdbuf());
+  const auto interactiveConversion = Run({"interactive"});
+  std::cin.rdbuf(phase1InteractiveInputBuffer);
+  Expect(interactiveConversion.code == 0 &&
+             fs::exists(interactiveConversionPath) &&
+             pkmn::cli::red::save::RedSave::Read(interactiveConversionPath)
+                     .BytesView() ==
+                 pkmn::cli::red::save::RedSave::Read(repairedConversionPath)
+                     .BytesView(),
+         "interactive and direct conversion should produce identical saves");
+
+  const fs::path interactiveBlueLeafGreen = temp / "interactive-blue-lg.sav";
+  std::istringstream phase2InteractiveAnswers(
+      "1\nB\nLG\nY\n" + validSavePath.string() + "\n" +
+      interactiveBlueLeafGreen.string() + "\n");
+  auto *phase2InteractiveInputBuffer =
+      std::cin.rdbuf(phase2InteractiveAnswers.rdbuf());
+  const auto phase2InteractiveConversion = Run({"interactive"});
+  std::cin.rdbuf(phase2InteractiveInputBuffer);
+  Expect(phase2InteractiveConversion.code == 0 &&
+             fs::exists(interactiveBlueLeafGreen) &&
+             ::firered::ReadBinaryFile(interactiveBlueLeafGreen) ==
+                 ::firered::ReadBinaryFile(temp / "phase2-blue-leafgreen.sav") &&
+             phase2InteractiveConversion.output.find(
+                 "STATICALLY_VALIDATED_COMMUNITY_TESTING") != std::string::npos,
+         "Phase 2 interactive Blue-to-LeafGreen must use the direct route and show its evidence label");
+
+  auto impossibleParty = validSave;
+  impossibleParty[0x2F2C] = 7;
+  const fs::path impossiblePartyPath = temp / "impossible-party.sav";
+  {
+    std::ofstream output(impossiblePartyPath, std::ios::binary);
+    output.write(reinterpret_cast<const char *>(impossibleParty.data()),
+                 static_cast<std::streamsize>(impossibleParty.size()));
+  }
+  const auto impossibleConversion =
+      Run({"convert", "red-firered", impossiblePartyPath.string(),
+           (temp / "impossible-output.sav").string(),
+           "--auto-repair-checksum"});
+  Expect(impossibleConversion.code ==
+                 pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidInput) &&
+             impossibleConversion.error.find("semantic") != std::string::npos &&
+             !fs::exists(temp / "impossible-output.sav"),
+         "checksum repair must not conceal impossible semantic payload data");
   Expect(pkmn::cli::util::Sha256Hex({}) ==
              "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
          "portable SHA-256 should match the empty-message standard vector");
@@ -271,6 +445,16 @@ int main() {
     std::ifstream input(includedJson);
     input >> includedDocument;
   }
+  const fs::path declaredRedJson = temp / "declared-red.red.json";
+  includedDocument["schema"]["gameProfile"] = "GEN1_RED";
+  {
+    std::ofstream output(declaredRedJson);
+    output << includedDocument.dump(2) << '\n';
+  }
+  Expect(Run({"convert", "blue-leafgreen", declaredRedJson.string(),
+              (temp / "profile-conflict.sav").string()}).code ==
+             pkmn::cli::ToInt(pkmn::cli::ExitCode::InvalidInput),
+         "explicit route must reject a conflicting canonical source profile");
   Expect(includedDocument.at("schema").at("format") == "pkmn-red-master-save" &&
              includedDocument.at("schema").at("schemaVersion") == "0.1.0",
          "decode should emit canonical schema identity");

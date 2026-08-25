@@ -33,6 +33,12 @@ xcuserdata/
 *.7z
 *.tar
 *.tar.gz
+*.pkg
+*.dmg
+*.deb
+*.AppImage
+*.msi
+*.exe
 *.png
 *.jpg
 *.jpeg

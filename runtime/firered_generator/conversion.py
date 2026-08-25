@@ -91,10 +91,12 @@ def complete_generator_policy(proposed, source=None):
 
 
 def convert_red_json(root, red_document, template_bytes, source_name=None, source_sha256=None,
-                     template_name=None, salt=None, generator=None):
-    """Plan and physically generate one deterministic FireRed save."""
+                     template_name=None, salt=None, generator=None,
+                     source_game="red", target_game="firered"):
+    """Plan and physically generate one deterministic Kanto-remake save."""
     source = without_physical_image(red_document)
-    planned = BridgePlanner(root=root, salt=salt).plan(
+    planned = BridgePlanner(root=root, salt=salt, source_game=source_game,
+                            target_game=target_game).plan(
         source, source_sha256=source_sha256, source_name=source_name
     )
     if planned.manifest["planningStatus"] == "REJECTED":
@@ -105,18 +107,20 @@ def convert_red_json(root, red_document, template_bytes, source_name=None, sourc
 
     proposed = complete_generator_policy(planned.proposed_fred, source)
     source_hof_count = int(source.get("decoded", {}).get("hallOfFame", {}).get("recordCount", 0) or 0)
+    source_display = "Blue" if source_game == "blue" else "Red"
+    target_display = "LeafGreen" if target_game == "leafgreen" else "FireRed"
     hof_warning = None
     if source_hof_count > 1:
         hof_warning = (
-            f"Source Red contains {source_hof_count} Hall of Fame records; Generator v1 creates one "
-            "FireRed Hall of Fame team from the converted current party and records this historical reduction."
+            f"Source {source_display} contains {source_hof_count} Hall of Fame records; Generator v1 creates one "
+            f"{target_display} Hall of Fame team from the converted current party and records this historical reduction."
         )
         proposed["warnings"].append(hof_warning)
     generation = (generator or FireRedTemplateGenerator.from_repository(root)).generate(
         proposed, template_bytes, template_name
     )
     manifest = copy.deepcopy(planned.manifest)
-    manifest["manifestType"] = "pkmn-red-to-firered-completed-conversion"
+    manifest["manifestType"] = f"pkmn-{source_game}-to-{target_game}-completed-conversion"
     manifest["output"] = {
         "proposedFredSha256": sha256_json(proposed),
         "writesSaveImage": True,
@@ -139,8 +143,10 @@ def convert_red_json(root, red_document, template_bytes, source_name=None, sourc
         })
     preview = planned.preview_markdown.replace(
         "Physical `.sav` written: **no**", "Physical `.sav` written: **yes**"
-    ).replace(
-        "This is a deterministic semantic plan. It contains no FireRed sector layout, encrypted Pokémon bytes, checksums, save index, or physical template bytes. Those belong to the later FireRed Save Generator.",
-        "This conversion was materialized by the emulator-proven FireRed generator. The Red source physical image was not used; an approved clean FireRed template supplied only the container baseline.",
+    )
+    preview += (
+        f"\n\nThis conversion was materialized by the shared Kanto-remake generator for "
+        f"{planned.proposed_fred['target']['game']}. The Gen I source physical image was not "
+        "used; the approved clean template supplied only the container baseline."
     )
     return ConversionResult(source, proposed, manifest, preview, generation)

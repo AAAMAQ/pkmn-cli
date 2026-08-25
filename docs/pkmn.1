@@ -1,16 +1,16 @@
-.TH PKMN 1 "August 2026" "pkmn 2.0.0" "User Commands"
+.TH PKMN 1 "August 2026" "pkmn 3.0.0" "User Commands"
 .SH NAME
-pkmn \- Pokemon Red to FireRed conversion and save workflow command line
+pkmn \- translate Pokemon Red or Blue saves into FireRed or LeafGreen
 .SH SYNOPSIS
 .B pkmn
 .I domain command
 [arguments] [options]
 .SH DESCRIPTION
 .B pkmn
-provides Pokemon Red to FireRed conversion plus internal Red and FireRed decoding, inspection, validation, canonical JSON, archival reconstruction, semantic generation, comparison, proof, post-emulator validation, and copy-first editing. It does not require a ROM.
+provides four-route Red/Blue to FireRed/LeafGreen conversion plus decoding, inspection, validation, canonical JSON, generation, archival reconstruction, comparison, proof, and copy-first editing. Downloaded packages need no separate Python, CMake, Git, compiler, or ROM.
 .SH CONVERSION
 .TP
-.B pkmn red convert game.sav [--output game_fr.sav] [--template clean-fr.sav]
+.B pkmn red convert game.sav [--auto-repair-checksum] [--write-repaired-source COPY] [--output game_fr.sav] [--template clean-fr.sav]
 Validate and convert a Pokemon Red save. The default output is game_fr.sav.
 .TP
 .B pkmn rjson convert game.red.json [--output game_fr.sav] [--template clean-fr.sav]
@@ -19,8 +19,14 @@ Convert canonical Red JSON directly to a FireRed save.
 .B pkmn rjson convert_to_frjson game.red.json [--output game.fred.json]
 Translate Red semantics into FireRed JSON without writing a physical save.
 .TP
-.B pkmn convert red-to-firered RED [--preview|--plan-only] [--output-json FILE|--output-save SAVE]
+.B pkmn convert red-firered RED [--preview|--plan-only] [--output-json FILE|--output-save SAVE]
 Use the unified converter with preview, plan-only, policy, manifest, and output controls.
+.TP
+.B pkmn convert red-leafgreen|blue-firered|blue-leafgreen SAVE
+Run one of the three statically validated community-testing routes. Red to FireRed remains emulator verified.
+.TP
+.B pkmn convert routes [--format json]
+List typed game profiles, route capabilities, and verification evidence.
 .TP
 .B pkmn convert inspect|explain event|trainer|item [QUERY]
 Inspect source-backed bridge decisions.
@@ -28,6 +34,9 @@ Inspect source-backed bridge decisions.
 A validated clean FireRed template is bundled and selected automatically.
 Use --template or PKMN_FIRERED_TEMPLATE to select a strictly validated custom clean dump.
 .SH GENERAL COMMANDS
+.TP
+.B pkmn interactive
+Open the beginner guided workflow for all four Red/Blue to FireRed/LeafGreen routes.
 .TP
 .B pkmn --help
 Show available and reserved commands.
