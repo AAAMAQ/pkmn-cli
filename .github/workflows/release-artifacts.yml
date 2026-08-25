@@ -2,6 +2,16 @@ name: pkmn 3.0 release packages
 
 on:
   workflow_dispatch:
+    inputs:
+      release_ref:
+        description: "Git ref to package; leave empty to package the selected branch"
+        required: false
+        default: ""
+      publish_release:
+        description: "Publish the packaged ref as a GitHub Release"
+        required: false
+        type: boolean
+        default: false
   push:
     tags:
       - "v3.0.0*"
@@ -30,6 +40,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.release_ref || github.ref }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -97,13 +109,17 @@ jobs:
           if-no-files-found: error
 
   publish:
-    if: startsWith(github.ref, 'refs/tags/v3.0.0')
+    if: >-
+      startsWith(github.ref, 'refs/tags/v3.0.0') ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish_release)
     needs: package
     runs-on: ubuntu-22.04
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.release_ref || github.ref }}
       - uses: actions/download-artifact@v8
         with:
           path: release-files
@@ -122,5 +138,6 @@ jobs:
       - name: Publish tagged GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.release_ref || github.ref_name }}
           generate_release_notes: true
           files: release-files/*
