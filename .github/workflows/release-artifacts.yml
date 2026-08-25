@@ -86,7 +86,14 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: pkmn-cli-${{ matrix.name }}
-          path: build/packages/*
+          path: |
+            build/packages/*.AppImage
+            build/packages/*.deb
+            build/packages/*.exe
+            build/packages/*.msi
+            build/packages/*.pkg
+            build/packages/*.tar.gz
+            build/packages/*.zip
           if-no-files-found: error
 
   publish:
@@ -109,7 +116,9 @@ jobs:
           output-file: release-files/pkmn-cli-release.spdx.json
       - name: Generate checksums
         working-directory: release-files
-        run: sha256sum * > SHA256SUMS
+        run: >-
+          find . -maxdepth 1 -type f ! -name SHA256SUMS -print0 |
+          sort -z | xargs -0 sha256sum > SHA256SUMS
       - name: Publish tagged GitHub Release
         uses: softprops/action-gh-release@v2
         with:
