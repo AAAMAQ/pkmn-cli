@@ -120,22 +120,24 @@ with the exact filename you downloaded; see [installation details](INSTALL.md).
 
 ### Homebrew on macOS
 
-If you already use Homebrew, the existing tap offers a development source build:
+If you already use Homebrew, install the versioned release from the tap:
 
 ```sh
 brew tap AAAMAQ/pkmn
-brew install --HEAD AAAMAQ/pkmn/pkmn-cli
+brew install AAAMAQ/pkmn/pkmn-cli
 ```
 
-For an existing HEAD installation, check published repository changes with:
+For an existing stable installation, update with:
 
 ```sh
 brew update
-brew upgrade --fetch-HEAD AAAMAQ/pkmn/pkmn-cli
+brew upgrade AAAMAQ/pkmn/pkmn-cli
 ```
 
-These commands use the tap and published source. They cannot install local,
-uncommitted additions. Check the actual menu after an update. See
+For a previous `--HEAD` installation, use
+`brew reinstall AAAMAQ/pkmn/pkmn-cli` to switch to stable.
+These commands build published source and install Homebrew Python automatically.
+Check `pkmn --version` after an update. See
 [Homebrew status and instructions](HOMEBREW_INSTALL.md).
 
 ### Using the newest development checkout

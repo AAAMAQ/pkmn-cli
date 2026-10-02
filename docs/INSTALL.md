@@ -24,7 +24,7 @@ project. Back up your save before doing any conversion.
 ### Installer
 
 1. Open the [pkmn releases page](https://github.com/AAAMAQ/pkmn-cli/releases).
-2. Download the Windows x86-64 installer from the newest 3.0 release.
+2. Download the Windows x86-64 installer from the 3.1.0 release (or newer).
 3. Run the installer and keep “add pkmn to PATH” selected.
 4. Open `pkmn interactive` from the Start Menu, or open PowerShell and run:
 
@@ -171,11 +171,12 @@ The result must equal the matching line in `SHA256SUMS`.
 
 ## Homebrew
 
-Stable bottles are enabled after immutable 3.0 release artifacts and checksums
-exist. Until then, the source formula is for contributors:
+The tap provides a versioned source build with a verified archive checksum.
+Homebrew installs the build tools and Python dependency automatically:
 
 ```sh
-brew install --HEAD --build-from-source ./packaging/homebrew/pkmn-cli.rb
+brew tap AAAMAQ/pkmn
+brew install AAAMAQ/pkmn/pkmn-cli
 ```
 
 See [Homebrew installation](HOMEBREW_INSTALL.md).

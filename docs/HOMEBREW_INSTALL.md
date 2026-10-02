@@ -4,37 +4,43 @@ The preferred non-developer installation is a self-contained package from
 [GitHub Releases](https://github.com/AAAMAQ/pkmn-cli/releases). It needs no
 separate Python installation.
 
-The checked-in Homebrew formula remains a source-build formula until an
-immutable stable 3.0 source archive, SHA-256, and bottles exist. It never uses a
-fabricated checksum.
+The stable tap formula builds version 3.1.0 from its versioned GitHub archive
+and verifies its real SHA-256. This is a source build, not a prebuilt bottle.
+Homebrew installs the build tools and Python runtime automatically.
 
-Test the current source formula with:
-
-```sh
-brew style packaging/homebrew/pkmn-cli.rb
-brew install --HEAD --build-from-source ./packaging/homebrew/pkmn-cli.rb
-brew test pkmn-cli
-pkmn doctor --deep
-```
-
-The HEAD formula may use Homebrew Python as a developer runtime dependency.
-This does not apply to the downloadable Phase 3 packages, which contain a
-private bundled runtime.
-
-For a tap:
+Install and start guided mode:
 
 ```sh
 brew tap AAAMAQ/pkmn
-brew install --HEAD AAAMAQ/pkmn/pkmn-cli
+brew install AAAMAQ/pkmn/pkmn-cli
+pkmn --version
+pkmn doctor --deep
+pkmn interactive
 ```
 
-Stable publication procedure:
+The version should be `pkmn 3.1.0` or newer. Downloadable release packages
+contain a private bundled runtime and need no separate Python installation.
 
-1. create the signed `v3.0.0` tag;
+Update an existing stable installation:
+
+```sh
+brew update
+brew upgrade AAAMAQ/pkmn/pkmn-cli
+pkmn --version
+```
+
+For a previous development `--HEAD` installation, use
+`brew reinstall AAAMAQ/pkmn/pkmn-cli` to switch to stable. If the executable is
+not linked, run `brew link pkmn-cli`. Inspect any reported conflicts before
+replacing files; do not use blanket overwrite flags.
+
+Maintainer publication procedure:
+
+1. create the immutable release tag (sign it if a signing key is configured);
 2. let the release workflow build/test all platform packages;
 3. download the immutable GitHub source archive and calculate its SHA-256;
 4. update the formula’s `url`, `sha256`, and `version`;
-5. publish arm64 and x86-64 bottles with their real checksums;
+5. optionally publish arm64 and x86-64 bottles with their real checksums;
 6. run `brew audit --strict --new-formula`, `brew style`, install, test, and
    `pkmn doctor --deep` before merging the formula.
 
