@@ -214,6 +214,11 @@ class FireRedTemplateGenerator:
         changes = []
 
         self._identity(sb2, sb1, semantic, changes)
+        if semantic["trainer"].get("playerNameLanguage") == "Japanese":
+            warnings.append(
+                "Experimental Japanese player name is byte-encoded in an English FireRed "
+                "identity field; in-game font rendering is unverified."
+            )
         self._location(sb1, semantic["location"], changes)
         self._pokedex(sb2, sb1, semantic["pokedex"], changes)
         self._inventory(sb2, sb1, semantic["inventory"], changes)
@@ -286,7 +291,10 @@ class FireRedTemplateGenerator:
 
     def _identity(self, sb2, sb1, semantic, changes):
         trainer = semantic["trainer"]
-        sb2[0:8] = encode_name(trainer["playerName"], 8)
+        sb2[0:8] = encode_name(
+            trainer["playerName"], 8,
+            language=trainer.get("playerNameLanguage", "English")
+        )
         sb1[0x3A4C:0x3A54] = encode_name(trainer["rivalName"], 8)
         sb2[8] = 0
         put_u16(sb2, 0xA, trainer["publicTrainerId"])
@@ -467,7 +475,21 @@ class FireRedTemplateGenerator:
             put_u32(payload, offset + 4, mon["personality"])
             packed = (int(mon["species"]["internalId"]) & 0x1FF) | ((int(mon["level"]) & 0x7F) << 9)
             put_u16(payload, offset + 8, packed)
-            payload[offset + 10:offset + 20] = encode_name(mon["nickname"], 10, allow_full=True)
+            if mon.get("language", "English") == "Japanese":
+                # GetMonData(MON_DATA_NICKNAME) wraps a Japanese nickname in
+                # font controls. Hall of Fame stores that returned string but
+                # has no separate language byte (pret/pokefirered hall_of_fame.c).
+                encoded = encode_name(mon["nickname"], 10, language="Japanese")
+                glyphs = encoded[:encoded.index(0xFF)]
+                displayed = bytearray([0xFF] * 10)
+                displayed[:2] = bytes([0xFC, 0x15])
+                displayed[2:2 + len(glyphs)] = glyphs
+                displayed[2 + len(glyphs):4 + len(glyphs)] = bytes([0xFC, 0x16])
+                payload[offset + 10:offset + 20] = displayed
+            else:
+                payload[offset + 10:offset + 20] = encode_name(
+                    mon["nickname"], 10, allow_full=True,
+                )
         self._write_hof_sector(image, 28, payload[:0xF80])
         self._write_hof_sector(image, 29, payload[0xF80:])
         changes.append(f"hall-of-fame:single-team,party={min(len(party), 6)}")

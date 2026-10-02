@@ -1,11 +1,11 @@
-# pkmn 3.0
+# pkmn 3.1
 
 `pkmn` translates complete Pokémon Red and Blue save journeys into Pokémon
 FireRed or LeafGreen. It carries forward supported Pokémon, identity, Pokédex,
 inventory, badges, trainers, story progression, world state, and other save
 semantics instead of moving only individual Pokémon.
 
-The version 3 release packages are self-contained. Ordinary Windows, macOS,
+The version 3.1 release packages are self-contained. Ordinary Windows, macOS,
 and Linux users do **not** need Python, CMake, Git, a compiler, the earlier Save
 Genie projects, or a separately downloaded template.
 
@@ -27,9 +27,15 @@ After installation, open a terminal and run:
 pkmn interactive
 ```
 
-The guided mode asks for the source game, target game, save path, output path,
-and checksum-repair choice before showing a final confirmation. It calls the
-same conversion engine as the direct commands.
+Guided mode opens a task menu for conversion, save inspection, JSON, editing,
+comparison, proof, and general tools. New users can follow the
+[complete interactive player's manual](docs/INTERACTIVE_USER_MANUAL.md).
+Its searchable command browser covers
+the 124 current catalog endpoints, with typed questions and advanced options
+for each runnable command. Type `?` for help, `B` to go back, or `Q` to quit.
+Paths with spaces can be pasted as one answer. File-writing tasks show a review
+and require confirmation; they call the same handlers as direct commands.
+Future roadmap commands remain unavailable until implemented.
 
 Verify any installation with:
 
@@ -63,7 +69,7 @@ pkmn blue convert game.sav      # Blue -> LeafGreen; writes game_lg.sav
 Choose the other remake explicitly:
 
 ```sh
-pkmn red convert game.sav --target leafgreen
+pkmn convert red-leafgreen game.sav
 pkmn blue convert game.sav --target firered
 ```
 
@@ -125,6 +131,22 @@ Gen I .sav
 
 ## JSON workflows
 
+Japanese Green **1.0** now has an experimental route:
+`pkmn green-jp convert game-jp.sav --profile JP_GREEN_REV0`.
+It is also source choice 4 in simple interactive conversion. It currently
+targets FireRed only. See the [Green implementation and limits](docs/JAPANESE_GREEN_IMPLEMENTATION.md).
+
+An experimental Japanese Red route is available with an explicit revision:
+`pkmn red-jp convert game-jp.sav --profile JP_RED_REV0`. It archives the
+Japanese source, projects an English-shaped bridge JSON with original name
+provenance, and writes an international FireRed save with Japanese Pokémon
+nicknames where encodable. This route has synthetic round-trip tests but not
+real-save or emulator acceptance; keep the original save and review the
+[Japanese bridge limitations](docs/JAPANESE_RED_JSON_SCHEMA.md) before use.
+The optional `--retain-playername` flag writes the source Japanese player name
+into the international FireRed identity field as an experimental byte-preserving
+choice. Its in-game font display has not been verified.
+
 Canonical JSON remains inspectable and migratable:
 
 ```sh
@@ -166,7 +188,7 @@ progressed or unexpected templates.
 
 ## Commands and compatibility
 
-Discover the 100+ endpoints with:
+Discover all 124 current endpoints with:
 
 ```sh
 pkmn --help
@@ -174,8 +196,9 @@ pkmn get-all-cmds
 pkmn convert routes
 ```
 
-Main domains are `red`, `blue`, `fred`, `leafgreen`, `rjson`, `bjson`,
-`frjson`, `lgjson`, `convert`, `compare`, `proof`, and `doctor`. Existing pkmn
+Main domains are `red`, `red-jp`, `blue`, `fred`, `leafgreen`, `rjson`,
+`rjpjson`, `bjson`, `frjson`, `lgjson`, `convert`, `compare`, `proof`, and
+`doctor`. Existing pkmn
 2.0 Red → FireRed commands and accepted behavior remain supported, including
 the compatibility spelling `pkmn convert red-to-firered`.
 
@@ -184,9 +207,17 @@ See:
 - [installation on Windows, macOS, and Linux](docs/INSTALL.md);
 - [complete usage guide](docs/COMPLETE_USAGE_GUIDE.md);
 - [all commands](docs/ALL_COMMANDS.md);
+- [future planned commands](docs/FUTURE_COMMANDS.md) (roadmap only; not available in the current executable);
+- [Version 3.0 interactive experience guide](docs/INTERACTIVE_V3_GUIDE.md);
+- [interactive examples for every command](docs/INTERACTIVE_COMMAND_EXAMPLES.md);
 - [command reference](docs/COMMAND_REFERENCE.md);
 - [troubleshooting](docs/TROUBLESHOOTING.md);
 - [privacy and publication](docs/PRIVACY_AND_PUBLICATION.md);
+- [Japanese Red save research and source citations](docs/JAPANESE_RED_SAVE_RESEARCH.md);
+- [experimental Japanese archive and bridge schema](docs/JAPANESE_RED_JSON_SCHEMA.md);
+- [Japanese fixture and evidence ledger](docs/JAPANESE_RED_FIXTURE_LEDGER.md);
+- [Japanese Red implementation record and acceptance gates](docs/JAPANESE_RED_IMPLEMENTATION_PLAN.md);
+- [Japanese Red implementation and analysis walkthrough](docs/JAPANESE_RED_IMPLEMENTATION_WALKTHROUGH.md);
 - [pkmn 3.0 implementation record](docs/PKMN_3_0_PHASE_3_IMPLEMENTATION.md).
 
 ## Build from source
@@ -229,6 +260,8 @@ research pins:
 
 - `pret/pokered@d70d99ffbd329473d96eaaf19fd97c86d2220b7f`;
 - `pret/pokefirered@df4449a27cd78dd747ce269e47d3ab4a0149d8f4`.
+- `Narishma-gb/pokegreen@953f41b34108621b2bf13c3b1e53abfc9c3e5aec`
+  for the experimental Japanese Red SRAM and text layout.
 
 Pokémon conversion uses the Pokémon Community Conversion Standard `ORIGINAL`
 profile as its foundation, with deterministic project policy recorded in each

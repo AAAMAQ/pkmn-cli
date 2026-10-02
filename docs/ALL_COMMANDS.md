@@ -1,9 +1,12 @@
 # Complete pkmn Command Catalog
 
-Generated from the command catalog compiled into `pkmn 3.0.0`. Available command endpoints: **108**.
+Based on the command catalog compiled into `pkmn 3.1.0`, with supplemental
+release and Japanese Red notes. Available command endpoints: **124**.
 
 Downloaded release packages are self-contained. Start with `pkmn interactive`;
 use `pkmn doctor --deep` to confirm `bundled-private-executable` runtime mode.
+The [interactive guide](INTERACTIVE_V3_GUIDE.md) explains navigation and
+[command examples](INTERACTIVE_COMMAND_EXAMPLES.md) cover every current endpoint.
 
 ## General
 
@@ -45,7 +48,7 @@ Print the complete command catalog compiled into this executable.
 pkmn interactive
 ```
 
-Open the beginner-oriented guided workflow for all four paired conversion routes.
+Open guided tasks and a searchable browser for all current commands.
 
 ## Pokemon Red saves
 
@@ -88,6 +91,95 @@ pkmn red decode <save.sav> [--output <file.red.json>|-] [--include-physical-imag
 ```
 
 Export deterministic canonical Red JSON.
+
+## Japanese Pokemon Green (experimental, original release 1.0)
+
+See [implementation and evidence](JAPANESE_GREEN_IMPLEMENTATION.md).
+
+```text
+pkmn green-jp validate <save.sav> --profile JP_GREEN_REV0 [--format json]
+pkmn green-jp decode <save.sav> --profile JP_GREEN_REV0 [--output <file.green.jp.json>] [--no-physical-image]
+pkmn green-jp convert <save.sav> --profile JP_GREEN_REV0 [--output <file_fr.sav>] [--template <clean.sav>] [--salt <value>] [--retain-playername]
+pkmn gjpjson inspect <file.green.jp.json>
+pkmn gjpjson validate <file.green.jp.json>
+pkmn gjpjson reconstruct <file.green.jp.json> [--output <save.sav>]
+pkmn gjpjson project <file.green.jp.json> [--output <file.red.json>] [--retain-playername]
+pkmn gjpjson compare <file.green.jp.json> <file.red.json>
+```
+
+## Japanese Pokemon Red
+
+### `red-jp validate`
+
+```sh
+pkmn red-jp validate <save.sav> --profile JP_RED_REV0|JP_RED_REV1 [--format json]
+```
+
+Validate Japanese Red layout and main checksum.
+
+### `red-jp decode`
+
+```sh
+pkmn red-jp decode <save.sav> --profile JP_RED_REV0|JP_RED_REV1 [--output <file.red.jp.json>] [--no-physical-image]
+```
+
+Archive a Japanese Red save with exact Japanese name bytes.
+
+### `red-jp convert`
+
+```sh
+pkmn red-jp convert <save.sav> --profile JP_RED_REV0|JP_RED_REV1 [--output <file_fr.sav>] [--template <clean.sav>] [--salt <value>] [--retain-playername]
+```
+
+Archive, project, and convert Japanese Red into international FireRed.
+`--retain-playername` experimentally writes the Japanese source player name to
+the target identity field; English FireRed display remains unverified.
+
+## Japanese Red JSON
+
+### `rjpjson inspect`
+
+```sh
+pkmn rjpjson inspect <file.red.jp.json>
+```
+
+Inspect a Japanese Red archive.
+
+### `rjpjson validate`
+
+```sh
+pkmn rjpjson validate <file.red.jp.json>
+```
+
+Validate Japanese archive structure and physical provenance.
+
+### `rjpjson reconstruct`
+
+```sh
+pkmn rjpjson reconstruct <file.red.jp.json> [--output <save.sav>]
+```
+
+Reconstruct the original Japanese Red save bytes.
+
+### `rjpjson project`
+
+```sh
+pkmn rjpjson project <file.red.jp.json> [--output <file.red.json>] [--retain-playername]
+```
+
+Make an English-shaped bridge projection retaining Japanese name provenance.
+The optional player-name flag records an experimental target policy without
+changing the English-compatible name in the projected Red state.
+
+### `rjpjson compare`
+
+```sh
+pkmn rjpjson compare <file.red.jp.json> <file.red.json>
+```
+
+Compare a projection against its Japanese archive and slot mapping.
+
+## Pokemon Red saves
 
 ### `red events list`
 
@@ -916,3 +1008,5 @@ Run the automated Phase 6 conversion proof and prepare MAQ verification.
 ## Global controls
 
 `--quiet`, `--verbose`, and `--no-color` must appear before the command. FireRed physical generation passed Phase 5; Red-to-FireRed conversion passed Phase 6.
+
+Future, not-yet-implemented command proposals are tracked in [`FUTURE_COMMANDS.md`](FUTURE_COMMANDS.md); they are not part of this executable catalog.

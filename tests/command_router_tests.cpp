@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -10,7 +11,10 @@
 #include <nlohmann/json.hpp>
 
 #include "app/CommandRouter.hpp"
+#include "app/CommandCatalog.hpp"
 #include "app/ExitCode.hpp"
+#include "commands/interactive/InteractiveCommand.hpp"
+#include "commands/interactive/options/Workflow.hpp"
 #include "red/codec/Gen1Codec.hpp"
 #include "red/json/RedDecoder.hpp"
 #include "red/generation/SemanticGenerator.hpp"
@@ -41,6 +45,15 @@ Result Run(std::vector<std::string> arguments) {
   std::ostringstream output;
   std::ostringstream error;
   const int code = pkmn::cli::CommandRouter{}.Run(arguments, output, error);
+  return {code, output.str(), error.str()};
+}
+
+Result RunInteractive(const std::string &answers) {
+  std::istringstream input(answers);
+  std::ostringstream output;
+  std::ostringstream error;
+  const int code = pkmn::cli::commands::interactive::Run(
+      {}, input, output, error);
   return {code, output.str(), error.str()};
 }
 
@@ -121,14 +134,124 @@ int main() {
              commandCatalog.output ==
                  Run({"get-all-cmds", "--format", "json"}).output &&
              nlohmann::ordered_json::parse(commandCatalog.output)
-                     .at("commandCount") == 108 &&
+                     .at("commandCount") == 124 &&
              nlohmann::ordered_json::parse(commandCatalog.output)
                      .at("commands").at(0).contains("usage"),
          "get-all-cmds should expose the complete compiled command catalog");
 
+  const auto &guidedWorkflows =
+      pkmn::cli::commands::interactive::options::AllWorkflows();
+  std::set<std::string> guidedPaths;
+  bool allGuidesHaveFields = true;
+  for (const auto &workflow : guidedWorkflows) {
+    guidedPaths.insert(workflow.path);
+    if (workflow.path != "interactive" && workflow.fields.empty())
+      allGuidesHaveFields = false;
+  }
+  bool everyEndpointGuided =
+      guidedWorkflows.size() == pkmn::cli::AvailableCommands().size() &&
+      guidedPaths.size() == pkmn::cli::AvailableCommands().size() &&
+      allGuidesHaveFields;
+  for (const auto &command : pkmn::cli::AvailableCommands())
+    everyEndpointGuided &= guidedPaths.contains(std::string(command.path));
+  Expect(everyEndpointGuided,
+         "every active catalog endpoint must have exactly one guided workflow");
+
+  for (const std::string route : {"red-firered", "red-leafgreen",
+                                   "blue-firered", "blue-leafgreen"}) {
+    const auto workflow = std::find_if(
+        guidedWorkflows.begin(), guidedWorkflows.end(),
+        [&](const auto &candidate) { return candidate.path == "convert " + route; });
+    bool planBeforeOutput = workflow != guidedWorkflows.end();
+    if (planBeforeOutput) {
+      const auto plan = std::find_if(workflow->fields.begin(), workflow->fields.end(),
+          [](const auto &field) { return field.key == "planOnly"; });
+      const auto destination = std::find_if(workflow->fields.begin(), workflow->fields.end(),
+          [](const auto &field) { return field.key == "output"; });
+      planBeforeOutput = plan != workflow->fields.end() &&
+                         destination != workflow->fields.end() &&
+                         plan < destination && !plan->advanced && !plan->optional;
+      for (const std::string key : {"template", "keepIntermediate", "repair",
+                                    "repairedSource"}) {
+        const auto field = std::find_if(workflow->fields.begin(), workflow->fields.end(),
+            [&](const auto &item) { return item.key == key; });
+        planBeforeOutput &= field != workflow->fields.end() &&
+                            field->visibleWhenKey == "planOnly" &&
+                            field->visibleWhenValue == "no";
+      }
+      const std::string jsonSuffix = route.ends_with("leafgreen")
+                                         ? ".lg.json" : ".fred.json";
+      pkmn::cli::commands::interactive::options::Answers planAnswers{
+          {"source", "/tmp/source.sav"}, {"planOnly", "yes"},
+          {"output", "/tmp/proposed" + jsonSuffix},
+          {"template", "/tmp/clean.sav"}, {"keepIntermediate", "yes"},
+          {"repair", "yes"}, {"repairedSource", "/tmp/repaired.sav"}};
+      const auto planArguments = workflow->buildArguments(planAnswers);
+      planBeforeOutput &= std::find(planArguments.begin(), planArguments.end(),
+                                    "--plan-only") != planArguments.end();
+      for (const std::string flag : {"--template", "--keep-intermediate",
+                                      "--auto-repair-checksum",
+                                      "--write-repaired-source"})
+        planBeforeOutput &= std::find(planArguments.begin(), planArguments.end(),
+                                      flag) == planArguments.end();
+      planAnswers["output"] = "/tmp/wrong.sav";
+      bool rejectedWrongExtension = false;
+      try { static_cast<void>(workflow->buildArguments(planAnswers)); }
+      catch (const std::exception &) { rejectedWrongExtension = true; }
+      planBeforeOutput &= rejectedWrongExtension;
+    }
+    Expect(planBeforeOutput,
+           "paired-route plans must ask before output, hide save-only flags, and require target JSON: " + route);
+  }
+
+  const auto interactiveQuit = RunInteractive("Q\n");
+  const auto interactiveEof = RunInteractive("");
+  const auto interactiveHelp = RunInteractive("?\nQ\n");
+  const auto interactiveBack = RunInteractive("B\nQ\n");
+  const auto interactiveInvalid = RunInteractive("9999\nQ\n");
+  const auto interactiveFlowBack = RunInteractive("1\nB\nQ\n");
+  const auto interactiveFlowQuit = RunInteractive("1\nQ\n");
+  const auto interactiveFlowEof = RunInteractive("1\n");
+  Expect(interactiveQuit.code == 0 && interactiveEof.code == 0,
+         "interactive Quit and EOF should cancel without an error");
+  Expect(interactiveHelp.code == 0 &&
+             interactiveHelp.output.size() > interactiveQuit.output.size(),
+         "interactive Help should explain the current menu and continue");
+  Expect(interactiveBack.code == 0 &&
+             interactiveBack.output.size() > interactiveQuit.output.size(),
+         "interactive Back from the main menu should return to that menu");
+  Expect(interactiveInvalid.code == 0 &&
+             interactiveInvalid.output.size() > interactiveQuit.output.size(),
+         "an invalid interactive menu choice should explain and retry");
+  Expect(interactiveFlowBack.code == 0 &&
+             interactiveFlowBack.output.size() > interactiveBack.output.size(),
+         "Back from a task group should return to the main menu");
+  Expect(interactiveFlowQuit.code == 0,
+         "Quit from a task group should cancel the session cleanly");
+  Expect(interactiveFlowEof.code == 0,
+         "EOF inside a task group should cancel the session cleanly");
+  const auto directDoctorGuidedParity = Run({"doctor"});
+  const auto guidedDoctor = RunInteractive(
+      "8\nS\ndoctor\n1\n1\nNo\nText\nYES\nQ\n");
+  Expect(directDoctorGuidedParity.code == 0 && guidedDoctor.code == 0 &&
+             guidedDoctor.output.find(directDoctorGuidedParity.output) !=
+                 std::string::npos,
+         "a guided read-only doctor run should use the direct command handler");
+  const auto guidedCatalogToTerminal = RunInteractive(
+      "8\nS\nget-all-cmds\n1\n1\n1\n\nQ\n");
+  Expect(guidedCatalogToTerminal.code == 0 &&
+             guidedCatalogToTerminal.output.find(
+                 "This task reads data and displays its result.") !=
+                 std::string::npos &&
+             guidedCatalogToTerminal.output.find(
+                 "Run this read-only task?") != std::string::npos &&
+             guidedCatalogToTerminal.output.find(
+                 "Run and write these outputs?") == std::string::npos,
+         "guided catalog output to the terminal must be presented as read-only");
+
   const auto version = Run({"--version"});
   Expect(version.code == 0, "--version should succeed");
-  Expect(version.output == "pkmn 3.0.0\n",
+  Expect(version.output == "pkmn 3.1.0\n",
          "Phase 2 version output should be stable");
   Expect(Run({"--quiet", "--version"}).output.empty() &&
              Run({"--verbose", "--no-color", "--version"})
@@ -209,10 +332,14 @@ int main() {
                  "STATICALLY_VALIDATED_COMMUNITY_TESTING" &&
              routeDocument.at("routes").at(3).at("capability") == "AVAILABLE",
          "Phase 2 should expose all four typed routes with honest evidence labels");
-  Expect(Run({"interactive", "--help"}).code == 0 &&
-             Run({"interactive", "--help"})
-                     .output.find("All four") != std::string::npos,
-         "interactive mode should advertise the Phase 2 route matrix");
+  const auto interactiveUsage = Run({"interactive", "--help"});
+  Expect(interactiveUsage.code == 0 &&
+             interactiveUsage.output.find("interactive") != std::string::npos &&
+             (interactiveUsage.output.find("Back") != std::string::npos ||
+              interactiveUsage.output.find("back") != std::string::npos) &&
+             (interactiveUsage.output.find("Quit") != std::string::npos ||
+              interactiveUsage.output.find("quit") != std::string::npos),
+         "interactive help should explain the guided controls");
   const auto bridgeTrainer =
       Run({"convert", "inspect", "trainer", "EVENT_BEAT_VIRIDIAN_GYM_TRAINER_0"});
   Expect(bridgeTrainer.code == 0 &&
@@ -255,6 +382,31 @@ int main() {
   fs::remove_all(temp);
   fs::create_directories(temp);
 
+  const fs::path editValueFile = temp / "bag value.json";
+  {
+    std::ofstream file(editValueFile);
+    file << "{}\n";
+  }
+  const auto namedEdit = std::find_if(
+      guidedWorkflows.begin(), guidedWorkflows.end(), [](const auto &workflow) {
+        return workflow.path == "red edit-session";
+      });
+  bool normalizedEditFile = false;
+  if (namedEdit != guidedWorkflows.end()) {
+    pkmn::cli::commands::interactive::options::Answers answers{
+        {"session", (temp / "session.json").string()},
+        {"edit", "bag-file"},
+        {"value", "\"" + editValueFile.string() + "\""}};
+    const auto arguments = namedEdit->buildArguments(answers);
+    normalizedEditFile = arguments.size() == 5 &&
+                         arguments[0] == "red" &&
+                         arguments[1] == "edit-session" &&
+                         arguments[3] == "--bag-file" &&
+                         arguments[4] == editValueFile.string();
+  }
+  Expect(normalizedEditFile,
+         "guided Red JSON-file edits should normalize quoted paths with spaces");
+
   const fs::path validSavePath = temp / "synthetic-valid.sav";
   auto validSave = ValidSyntheticSave();
   {
@@ -270,6 +422,47 @@ int main() {
          "internal Red validator should accept a synthetic valid save");
   Expect(validation.boxes.size() == 12,
          "internal Red validator should check all 12 boxes");
+
+  const auto guidedProofFolder = temp / "guided-proof";
+  const auto occupiedProofZip = temp / "guided-proof.zip";
+  { std::ofstream zip(occupiedProofZip); zip << "occupied"; }
+  const auto guidedProofPreview = RunInteractive(
+      "8\nS\nproof red\n1\n1\n" + validSavePath.string() + "\n" +
+      guidedProofFolder.string() + "\nYes\nNo\nQ\n");
+  Expect(guidedProofPreview.code == 0 &&
+             guidedProofPreview.output.find(occupiedProofZip.string()) !=
+                 std::string::npos &&
+             guidedProofPreview.output.find("An output already exists") !=
+                 std::string::npos &&
+             !fs::exists(guidedProofFolder),
+         "guided proof must preview and reject an occupied implicit ZIP");
+
+  const auto guidedRepair = temp / "guided-repaired.sav";
+  const auto occupiedRepairReport =
+      fs::path(guidedRepair.string() + ".repair-report.json");
+  { std::ofstream report(occupiedRepairReport); report << "occupied"; }
+  const auto guidedRepairPreview = RunInteractive(
+      "8\nS\nred repair-checksums\n1\n1\n" + validSavePath.string() +
+      "\n" + guidedRepair.string() + "\nNo\nQ\n");
+  Expect(guidedRepairPreview.code == 0 &&
+             guidedRepairPreview.output.find(occupiedRepairReport.string()) !=
+                 std::string::npos &&
+             guidedRepairPreview.output.find("An output already exists") !=
+                 std::string::npos &&
+             !fs::exists(guidedRepair),
+         "guided checksum repair must detect a sidecar collision before writing");
+
+  const auto conversionWithIntermediate = temp / "intermediate-family.sav";
+  const auto occupiedIntermediate = temp / "intermediate-family.fred.json";
+  { std::ofstream intermediate(occupiedIntermediate); intermediate << "occupied"; }
+  const auto conversionSuffix = Run(
+      {"convert", "red-firered", validSavePath.string(),
+       conversionWithIntermediate.string(), "--keep-intermediate", "--auto-suffix"});
+  Expect(conversionSuffix.code == 0 &&
+             !fs::exists(conversionWithIntermediate) &&
+             fs::exists(temp / "intermediate-family_2.sav") &&
+             fs::exists(temp / "intermediate-family_2.fred.json"),
+         "conversion auto-suffix must reserve an occupied intermediate JSON");
 
   auto checksumDamaged = validSave;
   checksumDamaged[pkmn::cli::red::validation::SaveValidator::MainStored] ^= 1;
@@ -369,13 +562,10 @@ int main() {
 
   const fs::path interactiveConversionPath =
       temp / "interactive-repaired-conversion.sav";
-  std::istringstream interactiveAnswers(
-      "1\nR\nFR\nY\n" + checksumDamagedPath.string() + "\nY\n" +
-      interactiveConversionPath.string() + "\n");
-  auto *phase1InteractiveInputBuffer =
-      std::cin.rdbuf(interactiveAnswers.rdbuf());
-  const auto interactiveConversion = Run({"interactive"});
-  std::cin.rdbuf(phase1InteractiveInputBuffer);
+  const auto interactiveConversion = RunInteractive(
+      "8\nconvert red-firered\n1\n" + checksumDamagedPath.string() + "\n" +
+      "No\n" + interactiveConversionPath.string() +
+      "\nYes\n\n\n\n\n\nYes\n\n\n\nYES\nQ\n");
   Expect(interactiveConversion.code == 0 &&
              fs::exists(interactiveConversionPath) &&
              pkmn::cli::red::save::RedSave::Read(interactiveConversionPath)
@@ -385,13 +575,9 @@ int main() {
          "interactive and direct conversion should produce identical saves");
 
   const fs::path interactiveBlueLeafGreen = temp / "interactive-blue-lg.sav";
-  std::istringstream phase2InteractiveAnswers(
-      "1\nB\nLG\nY\n" + validSavePath.string() + "\n" +
-      interactiveBlueLeafGreen.string() + "\n");
-  auto *phase2InteractiveInputBuffer =
-      std::cin.rdbuf(phase2InteractiveAnswers.rdbuf());
-  const auto phase2InteractiveConversion = Run({"interactive"});
-  std::cin.rdbuf(phase2InteractiveInputBuffer);
+  const auto phase2InteractiveConversion = RunInteractive(
+      "8\nconvert blue-leafgreen\n1\n" + validSavePath.string() + "\n" +
+      "No\n" + interactiveBlueLeafGreen.string() + "\nNo\nYes\nQ\n");
   Expect(phase2InteractiveConversion.code == 0 &&
              fs::exists(interactiveBlueLeafGreen) &&
              ::firered::ReadBinaryFile(interactiveBlueLeafGreen) ==
@@ -400,7 +586,64 @@ int main() {
                  "STATICALLY_VALIDATED_COMMUNITY_TESTING") != std::string::npos,
          "Phase 2 interactive Blue-to-LeafGreen must use the direct route and show its evidence label");
 
+  const fs::path spacedSource = temp / "Pkmn Red Eng.sav";
+  fs::copy_file(validSavePath, spacedSource);
+  const fs::path directSpacedOutput = temp / "direct spaced source.sav";
+  const fs::path guidedSpacedOutput = temp / "guided spaced source.sav";
+  const auto directSpaced = Run({"convert", "red-firered",
+                                 spacedSource.string(), directSpacedOutput.string()});
+  const auto guidedSpaced = RunInteractive(
+      "8\nconvert red-firered\n1\n\"" + spacedSource.string() + "\"\n" +
+      "No\n" + guidedSpacedOutput.string() + "\nNo\nYES\nQ\n");
+  Expect(directSpaced.code == 0 && guidedSpaced.code == 0 &&
+             fs::exists(guidedSpacedOutput) &&
+             ::firered::ReadBinaryFile(directSpacedOutput) ==
+                 ::firered::ReadBinaryFile(guidedSpacedOutput),
+         "quoted paths containing spaces should give direct and guided conversion parity");
+  const auto originalOutputBytes = ::firered::ReadBinaryFile(directSpacedOutput);
+  const auto refusedCollision = RunInteractive(
+      "8\nconvert red-firered\n1\n" + spacedSource.string() + "\n" +
+      "No\n" + directSpacedOutput.string() + "\nNo\nQ\n");
+  Expect(refusedCollision.code == 0 &&
+             refusedCollision.output.find("An output already exists") !=
+                 std::string::npos &&
+             ::firered::ReadBinaryFile(directSpacedOutput) == originalOutputBytes,
+         "guided conversion should explain an output collision and preserve the existing file");
+  const fs::path wrongPlanExtension = temp / "not-a-json-plan.sav";
+  const auto rejectedPlanExtension = RunInteractive(
+      "8\nconvert red-firered\n1\n" + validSavePath.string() + "\nYes\n" +
+      wrongPlanExtension.string() + "\nNo\nQ\n");
+  Expect(rejectedPlanExtension.code == 0 &&
+             rejectedPlanExtension.output.find("needs an output ending in .fred.json") !=
+                 std::string::npos &&
+             !fs::exists(wrongPlanExtension),
+         "guided plan-only conversion must reject a save extension before writing");
+
   auto impossibleParty = validSave;
+  const auto simpleSourceBytes = ::firered::ReadBinaryFile(spacedSource);
+  const auto simpleOutput = temp / "Pkmn Red Eng_lg.sav";
+  const auto simpleCancelled = RunInteractive(
+      "1\n1\n" + spacedSource.string() + "\n2\nQ\n");
+  Expect(!fs::exists(simpleOutput), "simple conversion cancellation must not write");
+  const auto simpleRun = RunInteractive(
+      "1\n1\n\"" + spacedSource.string() + "\"\n2\nYES\nQ\n");
+  const auto simpleRepeat = RunInteractive(
+      "1\n1\n" + spacedSource.string() + "\n2\nYES\nQ\n");
+  const auto simpleDirect = Run({"convert", "red-leafgreen", spacedSource.string(),
+      (temp / "simple-direct-lg.sav").string(), "--auto-repair-checksum"});
+  Expect(simpleRun.code == 0 && simpleRepeat.code == 0 &&
+             simpleDirect.code == 0 &&
+             fs::exists(simpleOutput) && fs::exists(temp / "Pkmn Red Eng_lg_2.sav") &&
+             ::firered::ReadBinaryFile(spacedSource) == simpleSourceBytes &&
+             ::firered::ReadBinaryFile(simpleOutput) ==
+                 ::firered::ReadBinaryFile(temp / "simple-direct-lg.sav") &&
+             simpleRun.output.find("JSON plan") == std::string::npos,
+         "simple conversion must preserve input, match the engine, and number collisions");
+  const auto japaneseUnknown = RunInteractive(
+      "1\n3\n" + spacedSource.string() + "\n3\nQ\n");
+  Expect(japaneseUnknown.output.find("cannot safely choose") != std::string::npos &&
+             japaneseUnknown.output.find("LeafGreen\n 2") == std::string::npos,
+         "simple Japanese conversion must require a known revision");
   impossibleParty[0x2F2C] = 7;
   const fs::path impossiblePartyPath = temp / "impossible-party.sav";
   {

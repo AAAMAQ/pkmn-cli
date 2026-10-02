@@ -12,6 +12,17 @@ The easiest starting point is:
 pkmn interactive
 ```
 
+Choose a task by number. The first choice guides Red/Blue to FireRed/LeafGreen
+conversion; the other menus cover checks, JSON, editing, comparisons, proof,
+and a searchable browser of all 124 current commands. Answer one question at a
+time. Type `?` for an explanation, `B` to return to the previous step, or `Q`
+to leave. Paste a full save path, including spaces, as one answer. Before a
+task creates files, review the proposed command and destinations and confirm.
+Proposed future commands are not runnable from this menu.
+For screen-by-screen guidance, see the
+[Version 3.0 interactive guide](INTERACTIVE_V3_GUIDE.md) and
+[examples for every current command](INTERACTIVE_COMMAND_EXAMPLES.md).
+
 Direct Red → FireRed conversion remains:
 
 ```sh

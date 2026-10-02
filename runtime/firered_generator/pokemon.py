@@ -42,10 +42,13 @@ def encode_box_pokemon(mon):
     ot_id = int(mon["otId"])
     put_u32(result, 0, pid)
     put_u32(result, 4, ot_id)
-    result[8:18] = encode_name(mon["nickname"], 10, allow_full=True)
-    result[18] = 2  # English
+    language = mon.get("language", "English")
+    result[8:18] = encode_name(mon["nickname"], 10, allow_full=True,
+                               language=language)
+    result[18] = {"English": 2, "Japanese": 1}[language]
     result[19] = 0x02  # hasSpecies
-    result[20:27] = encode_name(mon["otName"], 7, allow_full=True)
+    result[20:27] = encode_name(mon["otName"], 7, allow_full=True,
+                                language=language)
     result[27] = 0
 
     logical = [bytearray(12) for _ in range(4)]

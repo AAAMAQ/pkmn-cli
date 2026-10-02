@@ -9,6 +9,7 @@
 namespace firered {
 
 std::string DecodeFireRedText(std::span<const std::uint8_t> bytes);
+std::string DecodeFireRedJapaneseText(std::span<const std::uint8_t> bytes);
 std::vector<std::uint8_t> EncodeFireRedEnglishName(
     const std::string& text,
     std::size_t fieldLength);

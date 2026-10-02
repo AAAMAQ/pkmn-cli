@@ -8,6 +8,7 @@
 
 #include "app/Version.hpp"
 #include "red/codec/Gen1Codec.hpp"
+#include "red/codec/JapaneseGen1Codec.hpp"
 #include "red/events/EventCatalog.hpp"
 #include "red/data/Gen1Names.hpp"
 #include "red/validation/SaveValidator.hpp"
@@ -18,6 +19,31 @@ namespace {
 
 namespace c = pkmn::cli::red::codec;
 using pkmn::cli::red::save::RedSave;
+
+struct Layout {
+  std::size_t nameLength, party, boxCache, boxSize, boxCount;
+  std::size_t hofCount, rivalName, money, coins, options, badges, badgeMirror;
+  std::size_t trainerId, map, x, y, xBlock, yBlock, previousMap, contrast;
+  std::size_t dexOwned, dexSeen, bagCount, bagPairs, pcItemCount, pcItemPairs;
+  std::size_t selectedBox, missable, hiddenItems, hiddenCoins, visitedTowns;
+  std::size_t scripts, events, rivalStarter, playerStarter;
+  std::size_t playtime, daycareInUse, daycareNickname, daycareOt, daycareRecord;
+};
+
+constexpr Layout kEnglish{11, 0x2F2C, 0x30C0, 0x462, 12,
+    0x284E, 0x25F6, 0x25F3, 0x2850, 0x2601, 0x2602, 0x29D6,
+    0x2605, 0x260A, 0x260E, 0x260D, 0x2610, 0x260F, 0x2611, 0x2609,
+    0x25A3, 0x25B6, 0x25C9, 0x25CA, 0x27E6, 0x27E7,
+    0x284C, 0x2852, 0x299C, 0x29AA, 0x29B7,
+    0x289C, 0x29F3, 0x29C1, 0x29C3,
+    0x2CED, 0x2CF4, 0x2CF5, 0x2D00, 0x2D0B};
+constexpr Layout kJapanese{6, 0x2ED5, 0x302D, 0x566, 8,
+    0x2844, 0x25F1, 0x25EE, 0x2846, 0x25F7, 0x25F8, 0x29CC,
+    0x25FB, 0x2600, 0x2604, 0x2603, 0x2606, 0x2605, 0x2607, 0x25FF,
+    0x259E, 0x25B1, 0x25C4, 0x25C5, 0x27DC, 0x27DD,
+    0x2842, 0x2848, 0x2992, 0x29A0, 0x29AD,
+    0x2892, 0x29E9, 0x29B7, 0x29B9,
+    0x2CA0, 0x2CA7, 0x2CA8, 0x2CAE, 0x2CB4};
 
 std::string StarterName(std::uint8_t species) {
   // Pinned pret/pokered internal species constants used by wPlayerStarter and
@@ -34,7 +60,16 @@ std::string StarterName(std::uint8_t species) {
   }
 }
 
-OrderedJson Text(const RedSave &save, std::size_t offset, std::size_t length) {
+OrderedJson Text(const RedSave &save, std::size_t offset, std::size_t length,
+                 bool japanese) {
+  if (japanese) {
+    const auto text = c::DecodeJapaneseText(save, offset, length);
+    return {{"value", text.value}, {"losslessValue", text.value},
+            {"rawHex", c::Hex(save.Slice(offset, length))},
+            {"terminated", text.terminated},
+            {"ambiguousGlyph", text.ambiguousGlyph},
+            {"unsupportedByte", text.unsupportedByte}};
+  }
   return {{"value", c::DecodeText(save, offset, length)},
           {"losslessValue", c::DecodeText(save, offset, length, true)},
           {"rawHex", c::Hex(save.Slice(offset, length))}};
@@ -63,7 +98,8 @@ OrderedJson Items(const RedSave &save, std::size_t countOffset,
 
 OrderedJson Pokemon(const RedSave &save, std::size_t record,
                     std::size_t recordSize, std::size_t otName,
-                    std::size_t nickname, std::size_t position, bool party) {
+                    std::size_t nickname, std::size_t position, bool party,
+                    const Layout& layout, bool japanese) {
   const auto dv1 = save.At(record + 0x1B);
   const auto dv2 = save.At(record + 0x1C);
   OrderedJson moves = OrderedJson::array();
@@ -86,8 +122,8 @@ OrderedJson Pokemon(const RedSave &save, std::size_t record,
                             ? OrderedJson(nullptr)
                             : OrderedJson(data::PokedexNumber(speciesId))},
       {"level", save.At(record + (party ? 0x21 : 0x03))},
-      {"nickname", Text(save, nickname, 11)},
-      {"otName", Text(save, otName, 11)},
+      {"nickname", Text(save, nickname, layout.nameLength, japanese)},
+      {"otName", Text(save, otName, layout.nameLength, japanese)},
       {"currentHp", c::ReadU16BE(save, record + 0x01)},
       {"status", save.At(record + 0x04)},
       {"types",
@@ -120,37 +156,41 @@ OrderedJson Pokemon(const RedSave &save, std::size_t record,
   return result;
 }
 
-OrderedJson Box(const RedSave &save, std::size_t base, int number) {
+OrderedJson Box(const RedSave &save, std::size_t base, int number,
+                const Layout& layout, bool japanese) {
   const auto rawCount = save.At(base);
   // Unused external PC-box banks in otherwise valid saves may still contain
   // erased SRAM (0xFF). Treat that erased count byte as an empty box instead
   // of clamping it to 20 and decoding twenty 0xFF records as Pokemon.
   const auto declaredCount = rawCount == 0xFF ? 0U : rawCount;
-  const auto count = std::min<std::size_t>(declaredCount, 20);
+  const auto capacity = japanese ? 30U : 20U;
+  const auto count = std::min<std::size_t>(declaredCount, capacity);
   OrderedJson pokemon = OrderedJson::array();
   for (std::size_t index = 0; index < count; ++index) {
-    pokemon.push_back(Pokemon(save, base + 0x16 + index * 0x21, 0x21,
-                              base + 0x2AA + index * 11,
-                              base + 0x386 + index * 11, index + 1, false));
+    pokemon.push_back(Pokemon(save, base + (japanese ? 0x20 : 0x16) + index * 0x21, 0x21,
+                              base + (japanese ? 0x3FE : 0x2AA) + index * layout.nameLength,
+                              base + (japanese ? 0x4B2 : 0x386) + index * layout.nameLength,
+                              index + 1, false, layout, japanese));
   }
   return {{"boxNumber", number},
           {"declaredCount", declaredCount},
           {"count", pokemon.size()},
-          {"speciesListHex", c::Hex(save.Slice(base + 1, 20))},
+          {"speciesListHex", c::Hex(save.Slice(base + 1, capacity))},
           {"pokemon", pokemon},
-          {"rawBlockHex", c::Hex(save.Slice(base, 0x462))}};
+          {"rawBlockHex", c::Hex(save.Slice(base, layout.boxSize))}};
 }
 
-OrderedJson Party(const RedSave &save) {
-  constexpr std::size_t base = 0x2F2C;
+OrderedJson Party(const RedSave &save, const Layout& layout, bool japanese) {
+  const std::size_t base = layout.party;
   const auto storedCount = save.At(base);
   const auto rawCount = storedCount == 0xFF ? 0U : storedCount;
   const auto count = std::min<std::size_t>(rawCount, 6);
   OrderedJson pokemon = OrderedJson::array();
   for (std::size_t index = 0; index < count; ++index) {
     pokemon.push_back(Pokemon(save, base + 0x08 + index * 0x2C, 0x2C,
-                              base + 0x110 + index * 11,
-                              base + 0x152 + index * 11, index + 1, true));
+                              base + 0x110 + index * layout.nameLength,
+                              base + (japanese ? 0x134 : 0x152) + index * layout.nameLength,
+                              index + 1, true, layout, japanese));
   }
   return {{"declaredCount", rawCount},
           {"count", pokemon.size()},
@@ -158,8 +198,8 @@ OrderedJson Party(const RedSave &save) {
           {"pokemon", pokemon}};
 }
 
-OrderedJson HallOfFame(const RedSave &save) {
-  const auto storedCount = save.At(0x284E);
+OrderedJson HallOfFame(const RedSave &save, const Layout& layout, bool japanese) {
+  const auto storedCount = save.At(layout.hofCount);
   const auto count = storedCount == 0xFF
                          ? 0U
                          : std::min<std::size_t>(storedCount, 50);
@@ -176,7 +216,7 @@ OrderedJson HallOfFame(const RedSave &save) {
                          {"speciesName", data::SpeciesName(species)},
                          {"pokedexNumber", data::PokedexNumber(species)},
                          {"level", save.At(offset + 1)},
-                         {"nickname", Text(save, offset + 2, 11)},
+                         {"nickname", Text(save, offset + 2, layout.nameLength, japanese)},
                          {"rawSlotHex", c::Hex(save.Slice(offset, 0x10))}});
     }
     entries.push_back({{"entryNumber", entry + 1}, {"pokemon", pokemon}});
@@ -186,9 +226,11 @@ OrderedJson HallOfFame(const RedSave &save) {
 
 } // namespace
 
-OrderedJson Decode(const RedSave &input, const std::string &logicalName,
-                   const validation::ValidationReport &report,
-                   const DecodeOptions &options) {
+OrderedJson DecodeImpl(const RedSave &input, const std::string &logicalName,
+                       const OrderedJson& integrity, bool japanese,
+                       const std::string& sourceProfile,
+                       const DecodeOptions &options) {
+  const auto& layout = japanese ? kJapanese : kEnglish;
   const auto &all = input.BytesView();
   const auto standard = input.Slice(0, RedSave::ExpectedSize);
   const RedSave::Bytes trailing(
@@ -197,88 +239,86 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
   const auto wholeHash = util::Sha256Hex(all);
   const auto standardHash = util::Sha256Hex(standard);
   OrderedJson boxes = OrderedJson::array();
-  for (std::size_t index = 0; index < 12; ++index)
-    boxes.push_back(Box(input, validation::SaveValidator::BoxOffset(index),
-                        static_cast<int>(index + 1)));
-  const auto currentRaw = input.At(0x284C);
-  const auto daycareMarker = input.At(0x2CF4);
+  for (std::size_t index = 0; index < layout.boxCount; ++index)
+    boxes.push_back(Box(input, japanese
+                         ? validation::JapaneseSaveValidator::BoxOffset(index)
+                         : validation::SaveValidator::BoxOffset(index),
+                        static_cast<int>(index + 1), layout, japanese));
+  const auto currentRaw = input.At(layout.selectedBox);
+  const auto daycareMarker = input.At(layout.daycareInUse);
   const bool daycareInUse = daycareMarker != 0 && daycareMarker != 0xFF;
   const RedSave emptySave(
       RedSave::Bytes(RedSave::ExpectedSize, static_cast<std::uint8_t>(0)));
   const auto daycarePokemon =
       daycareInUse
-          ? Pokemon(input, 0x2D0B, 0x21, 0x2D00, 0x2CF5, 1, false)
-          : Pokemon(emptySave, 0x2D0B, 0x21, 0x2D00, 0x2CF5, 1, false);
-
-  OrderedJson boxChecksums = OrderedJson::array();
-  for (std::size_t index = 0; index < report.boxes.size(); ++index)
-    boxChecksums.push_back({{"box", index + 1},
-                            {"valid", report.boxes[index].Valid()},
-                            {"stored", report.boxes[index].stored},
-                            {"calculated", report.boxes[index].expected}});
+          ? Pokemon(input, layout.daycareRecord, 0x21, layout.daycareOt,
+                    layout.daycareNickname, 1, false, layout, japanese)
+          : Pokemon(emptySave, layout.daycareRecord, 0x21, layout.daycareOt,
+                    layout.daycareNickname, 1, false, layout, japanese);
 
   OrderedJson badges = OrderedJson::array();
   for (std::size_t bit = 0; bit < 8; ++bit)
     badges.push_back(
-        {{"index", bit + 1}, {"owned", (input.At(0x2602) & (1U << bit)) != 0}});
+        {{"index", bit + 1}, {"owned", (input.At(layout.badges) & (1U << bit)) != 0}});
 
   OrderedJson decoded = {
       {"trainer",
-       {{"name", Text(input, 0x2598, 11)},
-        {"trainerId", c::ReadU16BE(input, 0x2605)}}},
-      {"rival", {{"name", Text(input, 0x25F6, 11)}}},
+       {{"name", Text(input, 0x2598, layout.nameLength, japanese)},
+        {"trainerId", c::ReadU16BE(input, layout.trainerId)}}},
+      {"rival", {{"name", Text(input, layout.rivalName, layout.nameLength, japanese)}}},
       {"moneyAndCoins",
-       {{"money", c::ReadBcd(input, 0x25F3, 3)},
-        {"coins", c::ReadBcd(input, 0x2850, 2)}}},
+       {{"money", c::ReadBcd(input, layout.money, 3)},
+        {"coins", c::ReadBcd(input, layout.coins, 2)}}},
       {"badges",
-       {{"raw", input.At(0x2602)},
-        {"mirrorRaw", input.At(0x29D6)},
+       {{"raw", input.At(layout.badges)},
+        {"mirrorRaw", input.At(layout.badgeMirror)},
         {"entries", badges}}},
       {"playtime",
-       {{"hours", input.At(0x2CED)},
-        {"maxed", input.At(0x2CEE) != 0},
-        {"minutes", input.At(0x2CEF)},
-        {"seconds", input.At(0x2CF0)},
-        {"frames", input.At(0x2CF1)}}},
+       {{"hours", input.At(layout.playtime)},
+        {"maxed", input.At(layout.playtime + 1) != 0},
+        {"minutes", input.At(layout.playtime + 2)},
+        {"seconds", input.At(layout.playtime + 3)},
+        {"frames", input.At(layout.playtime + 4)}}},
       {"location",
-       {{"mapId", input.At(0x260A)},
-        {"mapName", data::MapName(input.At(0x260A))},
-        {"x", input.At(0x260E)},
-        {"y", input.At(0x260D)},
-        {"xBlock", input.At(0x2610)},
-        {"yBlock", input.At(0x260F)},
-        {"previousMapId", input.At(0x2611)},
-        {"previousMapName", data::MapName(input.At(0x2611))}}},
+       {{"mapId", input.At(layout.map)},
+        {"mapName", data::MapName(input.At(layout.map))},
+        {"x", input.At(layout.x)},
+        {"y", input.At(layout.y)},
+        {"xBlock", input.At(layout.xBlock)},
+        {"yBlock", input.At(layout.yBlock)},
+        {"previousMapId", input.At(layout.previousMap)},
+        {"previousMapName", data::MapName(input.At(layout.previousMap))}}},
       {"options",
-       {{"raw", input.At(0x2601)},
-        {"textSpeed", input.At(0x2601) & 0x07},
-        {"battleAnimationsDisabled", (input.At(0x2601) & 0x80) != 0},
-        {"battleStyleSet", (input.At(0x2601) & 0x40) != 0},
-        {"contrast", input.At(0x2609)}}},
+       {{"raw", input.At(layout.options)},
+        {"textSpeed", input.At(layout.options) & 0x07},
+        {"battleAnimationsDisabled", (input.At(layout.options) & 0x80) != 0},
+        {"battleStyleSet", (input.At(layout.options) & 0x40) != 0},
+        {"contrast", input.At(layout.contrast)}}},
       {"pokedex",
-       {{"ownedCount", c::CountSetBits(input, 0x25A3, 19, 151)},
-        {"seenCount", c::CountSetBits(input, 0x25B6, 19, 151)},
-        {"ownedBitfieldHex", c::Hex(input.Slice(0x25A3, 19))},
-        {"seenBitfieldHex", c::Hex(input.Slice(0x25B6, 19))}}},
+       {{"ownedCount", c::CountSetBits(input, layout.dexOwned, 19, 151)},
+        {"seenCount", c::CountSetBits(input, layout.dexSeen, 19, 151)},
+        {"ownedBitfieldHex", c::Hex(input.Slice(layout.dexOwned, 19))},
+        {"seenBitfieldHex", c::Hex(input.Slice(layout.dexSeen, 19))}}},
       {"inventory",
-       {{"bag", Items(input, 0x25C9, 0x25CA, 20)},
-        {"pcItems", Items(input, 0x27E6, 0x27E7, 50)}}},
-      {"party", Party(input)},
+       {{"bag", Items(input, layout.bagCount, layout.bagPairs, 20)},
+        {"pcItems", Items(input, layout.pcItemCount, layout.pcItemPairs, 50)}}},
+      {"party", Party(input, layout, japanese)},
       {"pcStorage", {{"boxes", boxes}}},
       {"currentBoxCache",
        {{"rawSelectedBoxValue", currentRaw},
         {"selectedBoxNumber", (currentRaw & 0x7F) + 1},
         {"hasChangedBoxesBefore", (currentRaw & 0x80) != 0},
-        {"cache", Box(input, 0x30C0, (currentRaw & 0x7F) + 1)}}},
+        {"cache", Box(input, layout.boxCache, (currentRaw & 0x7F) + 1,
+                       layout, japanese)}}},
       {"daycare",
        {{"inUse", daycareInUse}, {"pokemon", daycarePokemon}}},
-      {"hallOfFame", HallOfFame(input)},
+      {"hallOfFame", HallOfFame(input, layout, japanese)},
       {"summaryCounts",
-       {{"eventFlagsSet", c::CountSetBits(input, 0x29F3, 0x140, 0xA00)},
-        {"missableObjectsSet", c::CountSetBits(input, 0x2852, 29, 228)},
-        {"hiddenItemsSet", c::CountSetBits(input, 0x299C, 7, 54)},
-        {"hiddenCoinsSet", c::CountSetBits(input, 0x29AA, 2, 12)},
-        {"visitedTownsSet", c::CountSetBits(input, 0x29B7, 2, 11)},
+       {{"eventFlagsSet", c::CountSetBits(input, layout.events, 0x140, 0xA00)},
+        {"missableObjectsSet", c::CountSetBits(input, layout.missable, 29, 228)},
+        {"hiddenItemsSet", c::CountSetBits(input, layout.hiddenItems, 7, 54)},
+        {"hiddenCoinsSet", c::CountSetBits(input, layout.hiddenCoins, 2, 12)},
+        {"visitedTownsSet", c::CountSetBits(input, layout.visitedTowns, 2, 11)},
         {"nonzeroScriptBytes", 0},
         {"trainerFlagsSet", 0},
         {"staticEncounterFlagsSet", 0},
@@ -286,13 +326,13 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
         {"classification",
          "aggregate counts; named classification deferred"}}}};
   decoded["worldStateRaw"] = {
-      {"eventFlagsHex", c::Hex(input.Slice(0x29F3, 0x140))},
-      {"scriptsHex", c::Hex(input.Slice(0x289C, 0x100))},
-      {"missableObjectsHex", c::Hex(input.Slice(0x2852, 29))},
-      {"hiddenItemsHex", c::Hex(input.Slice(0x299C, 7))},
-      {"hiddenCoinsHex", c::Hex(input.Slice(0x29AA, 2))},
-      {"visitedTownsHex", c::Hex(input.Slice(0x29B7, 2))}};
-  const auto namedState = events::DecodeNamedState(input.Slice(0x29F3, 0x140));
+      {"eventFlagsHex", c::Hex(input.Slice(layout.events, 0x140))},
+      {"scriptsHex", c::Hex(input.Slice(layout.scripts, 0x100))},
+      {"missableObjectsHex", c::Hex(input.Slice(layout.missable, 29))},
+      {"hiddenItemsHex", c::Hex(input.Slice(layout.hiddenItems, 7))},
+      {"hiddenCoinsHex", c::Hex(input.Slice(layout.hiddenCoins, 2))},
+      {"visitedTownsHex", c::Hex(input.Slice(layout.visitedTowns, 2))}};
+  const auto namedState = events::DecodeNamedState(input.Slice(layout.events, 0x140));
   for (const auto &[key, value] : namedState.items())
     decoded[key] = value;
   bool gotStarter = false;
@@ -308,12 +348,12 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
   decoded["worldState"] = {
       {"storyEvidence",
        {{"gotStarter", gotStarter},
-        {"starterChoice", StarterName(input.At(0x29C3))},
-        {"rivalStarterChoice", StarterName(input.At(0x29C1))},
-        {"starterSpeciesId", input.At(0x29C3)},
-        {"rivalStarterSpeciesId", input.At(0x29C1)}}}};
+        {"starterChoice", StarterName(input.At(layout.playerStarter))},
+        {"rivalStarterChoice", StarterName(input.At(layout.rivalStarter))},
+        {"starterSpeciesId", input.At(layout.playerStarter)},
+        {"rivalStarterSpeciesId", input.At(layout.rivalStarter)}}}};
   std::size_t scripts = 0;
-  for (const auto byte : input.Slice(0x289C, 97))
+  for (const auto byte : input.Slice(layout.scripts, 97))
     if (byte != 0)
       ++scripts;
   decoded["summaryCounts"]["nonzeroScriptBytes"] = scripts;
@@ -328,17 +368,18 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
 
   OrderedJson document = {
       {"schema",
-       {{"format", "pkmn-red-master-save"},
+       {{"format", japanese ? "pkmn-red-jp-master-save" : "pkmn-red-master-save"},
         {"schemaVersion", "0.1.0"},
-        {"game", "Pokemon Red"},
+        {"game", japanese ? "Pocket Monsters Red (Japan)" : "Pokemon Red"},
         {"generation", 1},
-        {"regionAssumption", "USA-Europe"},
-        {"canonicalExtension", ".red.json"},
+        {"regionAssumption", japanese ? "Japan" : "USA-Europe"},
+        {"canonicalExtension", japanese ? ".red.jp.json" : ".red.json"},
         {"lossless", options.includePhysicalImage},
         {"stability", "draft"}}},
       {"tool", {{"name", "pkmn"}, {"version", std::string(kVersion)}}},
       {"source",
        {{"fileName", logicalName},
+        {"profile", sourceProfile},
         {"fileSize", {{"decimal", input.Size()}}},
         {"standardSramSize", {{"decimal", RedSave::ExpectedSize}}},
         {"trailingByteCount", trailing.size()},
@@ -348,15 +389,7 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
           {"trailingDataSha256",
            trailing.empty() ? OrderedJson(nullptr)
                             : OrderedJson(util::Sha256Hex(trailing))}}}}},
-      {"integrity",
-       {{"allValid", report.Valid()},
-        {"mainChecksum",
-         {{"valid", report.main.Valid()},
-          {"storedValue", report.main.stored},
-          {"calculatedValue", report.main.expected}}},
-        {"bank2AllChecksumValid", report.banks[0].Valid()},
-        {"bank3AllChecksumValid", report.banks[1].Valid()},
-        {"boxChecksums", boxChecksums}}},
+      {"integrity", integrity},
       {"decoded", decoded},
       {"reconstruction",
        {{"available", options.includePhysicalImage},
@@ -373,6 +406,58 @@ OrderedJson Decode(const RedSave &input, const std::string &logicalName,
                                  {"standardSramLength", RedSave::ExpectedSize},
                                  {"trailingLength", trailing.size()}};
   }
+  return document;
+}
+
+OrderedJson Decode(const RedSave &input, const std::string &logicalName,
+                   const validation::ValidationReport &report,
+                   const DecodeOptions &options) {
+  OrderedJson boxChecksums = OrderedJson::array();
+  for (std::size_t index = 0; index < report.boxes.size(); ++index)
+    boxChecksums.push_back({{"box", index + 1},
+                            {"valid", report.boxes[index].Valid()},
+                            {"stored", report.boxes[index].stored},
+                            {"calculated", report.boxes[index].expected}});
+  OrderedJson integrity = {
+      {"allValid", report.Valid()},
+      {"mainChecksum", {{"valid", report.main.Valid()},
+                        {"storedValue", report.main.stored},
+                        {"calculatedValue", report.main.expected}}},
+      {"bank2AllChecksumValid", report.banks[0].Valid()},
+      {"bank3AllChecksumValid", report.banks[1].Valid()},
+      {"boxChecksums", boxChecksums}};
+  auto document = DecodeImpl(input, logicalName, integrity, false,
+                             "GEN1_RED_INTL", options);
+  document["source"].erase("profile");
+  return document;
+}
+
+OrderedJson DecodeJapanese(const RedSave &input, const std::string &logicalName,
+                           const validation::JapaneseValidationReport &report,
+                           const std::string& sourceProfile,
+                           const DecodeOptions &options) {
+  OrderedJson banks = OrderedJson::array();
+  for (std::size_t index = 0; index < report.bankDiagnostics.size(); ++index)
+    banks.push_back({{"bank", index + 2},
+                     {"stored", report.bankDiagnostics[index].stored},
+                     {"simpleCalculated", report.bankDiagnostics[index].expected},
+                     {"acceptanceRole", "diagnostic-only"}});
+  const OrderedJson integrity = {
+      {"allValid", report.Valid()},
+      {"mainChecksum", {{"valid", report.main.Valid()},
+                        {"storedValue", report.main.stored},
+                        {"calculatedValue", report.main.expected}}},
+      {"externalBankChecksums", banks},
+      {"errors", report.errors}};
+  auto document = DecodeImpl(input, logicalName, integrity, true,
+                             sourceProfile, options);
+  if (sourceProfile == "JP_GREEN_REV0") {
+    document["schema"]["format"] = "pkmn-green-jp-master-save";
+    document["schema"]["game"] = "Pocket Monsters Green (Japan)";
+    document["schema"]["canonicalExtension"] = ".green.jp.json";
+  }
+  document["diagnostics"]["japaneseLayoutSource"] =
+      "Narishma-gb/pokegreen@953f41b34108621b2bf13c3b1e53abfc9c3e5aec";
   return document;
 }
 

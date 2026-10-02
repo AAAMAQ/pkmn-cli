@@ -84,7 +84,7 @@ def scaled_evs(stat_exp):
 
 class PokemonConverter:
     def __init__(self, metadata, policy, source_fingerprint, player_name, player_tid, player_sid,
-                 target_game="firered"):
+                 target_game="firered", source_japanese_player_name=None):
         self.metadata = metadata
         self.policy = policy
         self.source_fingerprint = source_fingerprint
@@ -92,6 +92,7 @@ class PokemonConverter:
         self.player_tid = int(player_tid)
         self.player_sid = int(player_sid)
         self.target_game = target_game
+        self.source_japanese_player_name = source_japanese_player_name
         self.target_display_name = "LeafGreen" if target_game == "leafgreen" else "FireRed"
         self.species = metadata["species"]
         self.moves_by_id = {row["redId"]: row for row in metadata["moves"]}
@@ -186,6 +187,39 @@ class PokemonConverter:
         ot_name = str(canonical_ot_name or ot.get("name") or self.player_name)
         raw_tid = mon.get("trainerId", ot.get("idNo", self.player_tid))
         tid = self.player_tid if raw_tid is None else int(raw_tid)
+        japanese = mon.get("sourceJapanese")
+        nickname_value = mon.get("nickname", {})
+        if isinstance(nickname_value, dict):
+            nickname_value = nickname_value.get("value")
+        nickname = str(nickname_value or species["speciesName"])[:10]
+        language = "English"
+        ot_policy = "existing-English-bridge"
+        japanese_nickname_bytes = None
+        japanese_ot_bytes = None
+        if japanese:
+            from firered_generator.text import encode_name
+            if japanese.get("provenanceVersion") != "1.0.0":
+                raise ConversionInvariantError(f"{locator}: unsupported Japanese name provenance")
+            nickname = str(japanese["nickname"]["value"])
+            original_japanese_ot = str(japanese["otName"]["value"])
+            if not nickname or not original_japanese_ot:
+                raise ConversionInvariantError(f"{locator}: Japanese nickname or OT is empty")
+            language = "Japanese"
+            if (original_japanese_ot == self.source_japanese_player_name
+                    and tid == self.player_tid):
+                # FireRed compares both OT ID and OT name to determine whether
+                # a Pokémon is traded. The target player name has no language
+                # flag, so own Pokémon must use its target English spelling.
+                ot_name = self.player_name
+                ot_policy = "target-player-name-for-self-ownership"
+            else:
+                ot_name = original_japanese_ot
+                ot_policy = "preserve-Japanese-traded-OT"
+            try:
+                japanese_nickname_bytes = encode_name(nickname, 10, language="Japanese")
+                japanese_ot_bytes = encode_name(ot_name, 7, language="Japanese")
+            except ValueError as exc:
+                raise ConversionInvariantError(f"{locator}: {exc}") from exc
         sid = self.ot_sid(ot_name, tid)
         shiny, shiny_source = source_is_shiny(mon)
         nature = experience % 25
@@ -204,10 +238,6 @@ class PokemonConverter:
             ivs[target_name] = int(dvs[source_name]) * 2 + bit
         evs, ev_scaled, raw_evs = scaled_evs(stat_exp)
         moves, move_changes, warnings = self.convert_moves(mon)
-        nickname_value = mon.get("nickname", {})
-        if isinstance(nickname_value, dict):
-            nickname_value = nickname_value.get("value")
-        nickname = str(nickname_value or species["speciesName"])[:10]
         status = mon.get("status", {})
         ability = species["abilities"][ability_slot]
         target = {
@@ -233,7 +263,7 @@ class PokemonConverter:
             "moves": moves,
             "friendship": 70,
             "heldItem": {"id": 0, "name": "NONE"},
-            "language": "English",
+            "language": language,
             "pokerus": {"raw": 0, "strain": 0, "daysRemaining": 0},
             "origins": {
                 "metLocation": 255,
@@ -255,6 +285,11 @@ class PokemonConverter:
             warnings.append("Mew was preserved with a legality warning; ORIGINAL_V1 does not silently sanitize event identity.")
         if ev_scaled:
             warnings.append("Gen I stat-experience-derived EVs exceeded 510 and were proportionally scaled.")
+        if japanese and ot_policy == "target-player-name-for-self-ownership":
+            warnings.append("Japanese original OT retained in provenance; target OT uses the target player name so this Pokémon remains self-owned.")
+        if japanese and (japanese["nickname"].get("ambiguousGlyph") or
+                         japanese["otName"].get("ambiguousGlyph")):
+            warnings.append("Japanese Gen I shared-tile alias has no recoverable original spelling; exact source bytes remain in provenance.")
 
         field_changes = [
             {"field": "species", "source": dex, "target": dex, "action": "preserve-national-dex-species"},
@@ -267,6 +302,17 @@ class PokemonConverter:
             {"field": "evs", "source": stat_exp, "intermediate": raw_evs, "target": evs, "action": "ORIGINAL_V1-override-stat-experience-conversion"},
             {"field": "secretTrainerId", "source": None, "target": sid, "action": "deterministically-generate-per-ot"},
         ] + move_changes
+        if japanese:
+            field_changes.extend([
+                {"field": "nickname", "source": japanese["nickname"],
+                 "target": nickname, "targetBytesHex": japanese_nickname_bytes.hex().upper(),
+                 "action": "preserve-Japanese-glyphs"},
+                {"field": "otName", "source": japanese["otName"],
+                 "target": ot_name, "targetBytesHex": japanese_ot_bytes.hex().upper(),
+                 "action": ot_policy},
+                {"field": "language", "source": "Japanese Gen I",
+                 "target": "Japanese", "action": "set-Gen-III-language-byte-1"},
+            ])
         audit = {
             "sourceLocator": locator,
             "targetLocator": target_locator,

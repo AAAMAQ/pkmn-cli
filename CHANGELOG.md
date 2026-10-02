@@ -1,5 +1,42 @@
 # Changelog
 
+## 3.1.0 — Guided Journeys (2026-10-02)
+
+- Added experimental Japanese Green 1.0 validation, archive decode, projection,
+  exact reconstruction, FireRed conversion, eight catalog endpoints, and simple
+  interactive selection. Green identity is retained in archives and manifests.
+  Real-save/emulator acceptance and Green 1.1 remain pending.
+
+- Made the leading interactive conversion flow save-only and beginner-friendly:
+  choose the source game, file, destination game, and confirm. Added Japanese
+  Red to that flow with an explicit revision choice and experimental notice.
+- Automatically choose new output names, number English conversion collisions,
+  and enable in-memory checksum repair for English conversion. Advanced JSON
+  and conversion settings remain available through the command browser.
+
+- Added Japanese Red save validation, `.red.jp.json` archival decode,
+  reconstruction, English-shaped `.red.json` projection, and an auditable
+  `red-jp convert` route to international FireRed.
+- Preserved Japanese Pokémon nickname/OT provenance; the FireRed writer and
+  native reader now handle supported Japanese glyphs and language value `1`.
+- Added selected-box cache reconciliation, 8×30 to 12×20 slot mapping,
+  `rjpjson compare`, and synthetic byte-to-byte and end-to-end tests.
+- Added opt-in `--retain-playername` for experimental Japanese player-name
+  bytes in international FireRed. Default `RED`/`BLUE` behavior is unchanged;
+  in-game identity-name rendering remains unverified.
+- Kept the route `EXPERIMENTAL`: real Japanese saves and emulator acceptance
+  are still required before a verified-support claim.
+
+- Completed `pkmn interactive` with a searchable, paginated browser and a
+  guided workflow for every current catalog endpoint, including advanced
+  options, path recovery, review, collision checks, and in-process dispatch.
+- Added guided conversion planning, Japanese Red provenance prompts, edit
+  sessions, comparison, proof, and post-emulator flows with honest evidence
+  labels and separate planned-command listings.
+- Added interactive parity and safety regression tests, including output
+  families for conversion, repair, editing, generation, and proof artifacts.
+- Added the complete beginner interactive manual and all 124 command entries.
+
 ## 3.0.0 — Phase 3 and public release
 
 - Added a private PyInstaller one-directory conversion runtime so downloaded

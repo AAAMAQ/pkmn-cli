@@ -69,15 +69,19 @@ PokemonRecord DecodeBoxPokemon(std::span<const std::uint8_t> bytes) {
     record.shinyValue = static_cast<std::uint16_t>(
         record.publicTrainerId ^ record.secretTrainerId ^ personalityLow ^ personalityHigh);
     record.isShiny = record.shinyValue < 8;
-    record.nickname = DecodeFireRedText(bytes.subspan(8, 10));
     record.language = bytes[18];
+    record.nickname = record.language == 1
+        ? DecodeFireRedJapaneseText(bytes.subspan(8, 10))
+        : DecodeFireRedText(bytes.subspan(8, 10));
     record.headerFlags = bytes[19];
     record.badEgg = (record.headerFlags & 0x01U) != 0;
     record.hasSpecies = (record.headerFlags & 0x02U) != 0;
     record.egg = (record.headerFlags & 0x04U) != 0;
     record.blockBoxRs = (record.headerFlags & 0x08U) != 0;
     record.unusedHeaderFlags = static_cast<std::uint8_t>(record.headerFlags >> 4);
-    record.otName = DecodeFireRedText(bytes.subspan(20, 7));
+    record.otName = record.language == 1
+        ? DecodeFireRedJapaneseText(bytes.subspan(20, 7))
+        : DecodeFireRedText(bytes.subspan(20, 7));
     record.markings = bytes[27];
     record.storedChecksum = ReadLe16(bytes, 28);
     record.headerUnknown = ReadLe16(bytes, 30);

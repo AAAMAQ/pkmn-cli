@@ -18,6 +18,30 @@ pkmn convert validate-manifest conversion-manifest.json
 pkmn proof convert blue-leafgreen game.blue.json
 ```
 
+## Experimental Japanese Red bridge
+
+```sh
+pkmn red-jp validate game-jp.sav --profile JP_RED_REV0
+pkmn red-jp decode game-jp.sav --profile JP_RED_REV0
+pkmn rjpjson validate game-jp.red.jp.json
+pkmn rjpjson reconstruct game-jp.red.jp.json
+pkmn rjpjson project game-jp.red.jp.json
+pkmn rjpjson compare game-jp.red.jp.json game-jp.red.json
+pkmn rjson generate game-jp.red.json english-compatibility.sav
+pkmn red-jp convert game-jp.sav --profile JP_RED_REV0 --output game-jp_fr.sav
+```
+
+Add `--retain-playername` to a Japanese Red conversion only when testing
+experimental Japanese player-name bytes in international FireRed; use a fresh
+input copy or output directory because conversion refuses existing archive
+and projection files.
+
+Use `JP_RED_REV1` for a known v1.1 source. The version is an explicit
+declaration, not auto-detected. The optional English Red save cannot carry
+Japanese names; the archive/projection retains them for FireRed. The FireRed
+route is synthetically validated but still needs real-save and emulator
+acceptance. See [Japanese archive and projection schema](JAPANESE_RED_JSON_SCHEMA.md).
+
 The clean FireRed template is bundled; `--template` is an optional override for
 a strictly validated equivalent user dump.
 
@@ -42,9 +66,11 @@ mode; ordinary source builds retain a developer Python fallback.
 
 - `pkmn --help` prints the supported and reserved command domains.
 - `pkmn --version` prints the stable tool version.
-- `pkmn interactive` opens the beginner workflow for all four routes. It shows
-  `EMULATOR_VERIFIED` for Red → FireRed and
-  `STATICALLY_VALIDATED_COMMUNITY_TESTING` for the three new routes.
+- `pkmn interactive` opens guided tasks for all 124 current catalog endpoints.
+  Its first task covers the four Red/Blue → FireRed/LeafGreen routes, and its
+  searchable browser reaches save, JSON, edit, compare, proof, Japanese Red,
+  and general commands. It shows route evidence before conversion and the
+  exact direct command and output paths before execution.
 - `pkmn doctor` checks internal readiness; `doctor --deep` runs an internal deterministic generation round trip.
 - `pkmn completion <bash|zsh|fish>` prints shell completion source.
 - `pkmn config show [--format text|json]` prints immutable compiled safety and default policy; no external engine paths are configured.
@@ -137,7 +163,12 @@ Proof output is evidence, not source material. Do not commit it. Automated check
 
 See `docs/PROOF_WORKFLOW.md` for artifact, privacy, ZIP, and emulator-gate details.
 
-New users can follow `docs/BEGINNERS_GUIDE.md`; exact examples and expected outputs for every endpoint are in `docs/COMPLETE_USAGE_GUIDE.md`; the exhaustive endpoint table is `docs/ALL_COMMANDS.md`.
+New users can follow `docs/BEGINNERS_GUIDE.md`; the detailed direct-command guide is `docs/COMPLETE_USAGE_GUIDE.md`; guided examples for every current endpoint are in `docs/INTERACTIVE_COMMAND_EXAMPLES.md`; the exhaustive endpoint table is `docs/ALL_COMMANDS.md`.
+
+Proposed, not-yet-implemented command work is tracked separately in
+[`FUTURE_COMMANDS.md`](FUTURE_COMMANDS.md); it is not part of the executable
+catalog. The implemented conversational front end and command-by-command
+guided coverage are described in [`INTERACTIVE_V3_GUIDE.md`](INTERACTIVE_V3_GUIDE.md).
 
 ## Exit codes
 

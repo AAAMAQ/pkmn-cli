@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "red/codec/Gen1Codec.hpp"
+#include "red/codec/JapaneseGen1Codec.hpp"
 #include "red/data/Gen1PokemonData.hpp"
 #include "red/data/Gen1PokemonMath.hpp"
 #include "red/events/EventCatalog.hpp"
@@ -52,6 +53,43 @@ void ValidateText(const OrderedJson& text, const std::string& path,
             validation.errors.push_back(path + " exceeds the ten-character Gen I limit");
     } catch (const std::exception& exception) {
         validation.errors.push_back(path + " is not valid Gen I text: " + exception.what());
+    }
+}
+
+void ValidateJapaneseProvenanceText(const OrderedJson& text,
+                                    const std::string& path,
+                                    DocumentValidation& validation,
+                                    bool requireConvertible = true) {
+    try {
+        const auto raw = codec::DecodeHex(text.at("rawHex").get<std::string>());
+        if (raw.size() != 6)
+            throw std::runtime_error("Japanese name field is not six bytes");
+        const save::RedSave field(raw);
+        const auto decoded = codec::DecodeJapaneseText(field, 0, 6);
+        if (text.at("value") != decoded.value ||
+            text.at("terminated") != decoded.terminated ||
+            text.at("ambiguousGlyph") != decoded.ambiguousGlyph ||
+            text.at("unsupportedByte") != decoded.unsupportedByte ||
+            !decoded.terminated || (requireConvertible && decoded.unsupportedByte))
+            throw std::runtime_error("Japanese glyphs, flags, or terminator disagree with raw bytes");
+    } catch (const std::exception& exception) {
+        validation.errors.push_back(path + ": " + exception.what());
+    }
+}
+
+void ValidateJapaneseMon(const OrderedJson& mon, const std::string& locator,
+                         DocumentValidation& validation) {
+    try {
+        const auto& provenance = mon.at("sourceJapanese");
+        if (provenance.at("provenanceVersion") != "1.0.0" ||
+            provenance.at("sourceLocator") != locator)
+            throw std::runtime_error("Japanese provenance version or locator mismatch");
+        ValidateJapaneseProvenanceText(provenance.at("nickname"),
+                                       locator + ".nickname", validation);
+        ValidateJapaneseProvenanceText(provenance.at("otName"),
+                                       locator + ".otName", validation);
+    } catch (const std::exception& exception) {
+        validation.errors.push_back(locator + ": missing or malformed Japanese provenance: " + exception.what());
     }
 }
 
@@ -301,6 +339,63 @@ DocumentValidation ValidateDocument(const OrderedJson& root) {
         if (daycare.at("inUse").get<bool>())
             ValidatePokemon(daycare.at("pokemon"), false,
                             "$.decoded.daycare.pokemon", validation);
+        if (root.contains("sourceJapanese")) {
+            try {
+                const auto& japanese = root.at("sourceJapanese");
+                const auto profile = japanese.at("profile").get<std::string>();
+                if (japanese.at("provenanceVersion") != "1.0.0" ||
+                    (profile != "JP_RED_REV0" && profile != "JP_RED_REV1" && profile != "JP_GREEN_REV0"))
+                    throw std::runtime_error("unsupported provenance version or Japanese source profile");
+                const auto hash = japanese.at("sourceSha256").get<std::string>();
+                if (hash.size() != 64 ||
+                    hash != root.at("source").at("hashes")
+                                .at("wholeFileSha256").get<std::string>() ||
+                    profile != root.at("source").at("profile").get<std::string>())
+                    throw std::runtime_error("Japanese source hash or profile disagrees with source metadata");
+                ValidateJapaneseProvenanceText(japanese.at("trainerName"),
+                                               "sourceJapanese.trainerName", validation, false);
+                ValidateJapaneseProvenanceText(japanese.at("rivalName"),
+                                               "sourceJapanese.rivalName", validation, false);
+                const auto playerNamePolicy = japanese.value(
+                    "targetPlayerNamePolicy", std::string("english-fallback"));
+                if (playerNamePolicy != "english-fallback" &&
+                    playerNamePolicy != "retain-japanese-raw-experimental")
+                    throw std::runtime_error("unknown Japanese target player-name policy");
+                if (playerNamePolicy == "retain-japanese-raw-experimental") {
+                    const auto& trainerName = japanese.at("trainerName");
+                    if (trainerName.at("unsupportedByte").get<bool>() ||
+                        !trainerName.at("terminated").get<bool>() ||
+                        trainerName.at("value").get<std::string>().empty())
+                        throw std::runtime_error("retained Japanese player name is not encodable");
+                }
+                for (std::size_t index = 0; index < party.at("pokemon").size(); ++index)
+                    ValidateJapaneseMon(party.at("pokemon").at(index),
+                                        "party/" + std::to_string(index), validation);
+                const auto& mapping = japanese.at("slotMapping");
+                std::size_t mapped = 0;
+                std::set<std::string> sourceLocators;
+                for (std::size_t boxIndex = 0; boxIndex < boxes.size(); ++boxIndex)
+                    for (std::size_t index = 0; index < boxes.at(boxIndex).at("pokemon").size(); ++index) {
+                        const auto& entry = mapping.at(mapped);
+                        const auto source = entry.at("source").get<std::string>();
+                        const auto target = "pcStorage/boxes/" + std::to_string(boxIndex) +
+                                            "/pokemon/" + std::to_string(index);
+                        if (entry.at("target") != target || !sourceLocators.insert(source).second)
+                            throw std::runtime_error("Japanese slot mapping is duplicated or out of order");
+                        ValidateJapaneseMon(boxes.at(boxIndex).at("pokemon").at(index),
+                                            source, validation);
+                        ++mapped;
+                    }
+                if (mapping.size() != mapped ||
+                    japanese.at("pcPokemonCount").get<std::size_t>() != mapped)
+                    throw std::runtime_error("Japanese slot mapping count disagrees with projected boxes");
+                if (daycare.at("inUse").get<bool>())
+                    ValidateJapaneseMon(daycare.at("pokemon"), "daycare/pokemon", validation);
+            } catch (const std::exception& exception) {
+                validation.errors.push_back(std::string("invalid sourceJapanese extension: ") +
+                                            exception.what());
+            }
+        }
         const auto& hall = decoded.at("hallOfFame").at("entries");
         if (hall.size() > 50)
             validation.errors.push_back("Hall of Fame exceeds 50 entries");

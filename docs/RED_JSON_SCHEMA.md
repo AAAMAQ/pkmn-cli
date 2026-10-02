@@ -12,6 +12,9 @@ The canonical extension is `.red.json`, format identity is `pkmn-red-master-save
 - `reconstruction`: archival availability and policy.
 - `diagnostics`: deferred classification and location-policy notes.
 - `physicalImage`: optional archival byte image encoded as uppercase continuous hexadecimal.
+- `sourceJapanese`: optional version `1.0.0` provenance extension for an
+  English-shaped projection of Japanese Red; see
+  [Japanese archive and bridge schema](JAPANESE_RED_JSON_SCHEMA.md).
 
 ## Decoded state
 
@@ -35,6 +38,13 @@ The canonical extension is `.red.json`, format identity is `pkmn-red-master-save
   static-encounter, and story-progress views.
 
 Pokémon records include species, level, names, HP/status/types, moves/PP/PP Ups, trainer ID, experience, stat experience, DVs, and party stats when applicable. Raw record fields are diagnostic/derived and are not semantic-generation authority.
+
+When root `sourceJapanese` is present, every active party/PC/Daycare Pokémon
+also carries `sourceJapanese` raw Japanese nickname and OT fields. Validation
+checks the six-byte text against its decoded Unicode and the source slot map.
+The ordinary English name fields are compatibility fallbacks only. The
+FireRed bridge gives the Japanese provenance priority; an English Red save
+generated from this projection does not preserve Japanese display text.
 
 ## Physical-image policy
 

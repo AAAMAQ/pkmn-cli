@@ -21,6 +21,7 @@
 #include "commands/conversion/ConversionCommand.hpp"
 #include "commands/proof/ProofCommand.hpp"
 #include "commands/red/RedCommand.hpp"
+#include "commands/red/JapaneseRedCommand.hpp"
 #include "commands/rjson/RjsonCommand.hpp"
 
 namespace pkmn::cli {
@@ -79,6 +80,11 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
         }
         const std::vector<std::string> stripped(arguments.begin() + begin,
                                                 arguments.end());
+        if (quiet && !stripped.empty() && stripped.front() == "interactive") {
+            // The guided session must keep its questions and safety review
+            // visible even when a global quiet preference is requested.
+            return Run(stripped, output, error);
+        }
         if (quiet) {
             std::ostringstream discarded;
             return Run(stripped, discarded, error);
@@ -132,6 +138,14 @@ int CommandRouter::Run(const std::vector<std::string>& arguments,
     if (arguments.front() == "red") {
         return commands::red::Run({arguments.begin() + 1, arguments.end()}, output, error);
     }
+    if (arguments.front() == "red-jp" || arguments.front() == "green-jp") {
+        return commands::red::RunJapaneseRed(
+            {arguments.begin() + 1, arguments.end()}, output, error, arguments.front()=="green-jp");
+    }
+    if (arguments.front() == "rjpjson" || arguments.front() == "gjpjson") {
+        return commands::red::RunJapaneseJson(
+            {arguments.begin() + 1, arguments.end()}, output, error, arguments.front()=="gjpjson");
+    }
     if (arguments.front() == "blue") {
         return commands::paired::RunBlue(
             {arguments.begin() + 1, arguments.end()}, output, error);
@@ -171,13 +185,13 @@ void CommandRouter::PrintVersion(std::ostream& output) {
 
 void CommandRouter::PrintHelp(std::ostream& output) {
     output
-        << "pkmn 3.0 - translate Red/Blue journeys into FireRed/LeafGreen\n\n"
+        << "pkmn 3.1 - translate Red/Blue journeys into FireRed/LeafGreen\n\n"
         << "Conversion:\n"
         << "  pkmn convert red-firered game.sav\n"
         << "  pkmn convert red-leafgreen game.sav\n"
         << "  pkmn convert blue-firered game.sav\n"
         << "  pkmn convert blue-leafgreen game.sav\n\n"
-        << "Game domains: red, blue, fred, leafgreen, rjson, bjson, frjson, lgjson\n\n"
+        << "Game domains: red, red-jp, green-jp, blue, fred, leafgreen, rjson, rjpjson, gjpjson, bjson, frjson, lgjson\n\n"
         << "Beginner mode:\n"
         << "  pkmn interactive\n\n"
         << "Usage:\n"
@@ -218,7 +232,7 @@ void CommandRouter::PrintHelp(std::ostream& output) {
         << "  pkmn compare progress older.sav newer.sav\n"
         << "  pkmn get-all-cmds\n"
         << "  pkmn doctor\n";
-    output << "\nReport pkmn 3.0 issues: "
+    output << "\nReport pkmn 3.1 issues: "
               "https://github.com/AAAMAQ/pkmn-cli/issues\n";
 }
 

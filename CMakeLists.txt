@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(pkmn-cli VERSION 3.0.0 LANGUAGES CXX)
+project(pkmn-cli VERSION 3.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -23,14 +23,20 @@ add_library(pkmn_cli_core
     src/commands/doctor/DoctorCommand.cpp
     src/commands/fred/FredCommand.cpp
     src/commands/interactive/InteractiveCommand.cpp
+    src/commands/interactive/options/WorkflowRegistry.cpp
+    src/commands/interactive/options/SaveAndJsonWorkflows.cpp
+    src/commands/interactive/options/EditAndJapaneseWorkflows.cpp
+    src/commands/interactive/options/ConversionCompareProofWorkflows.cpp
     src/commands/paired/PairedCommand.cpp
     src/commands/compare/CompareCommand.cpp
     src/commands/conversion/ConversionCommand.cpp
     src/commands/proof/ProofCommand.cpp
     src/commands/red/EditCommand.cpp
+    src/commands/red/JapaneseRedCommand.cpp
     src/commands/red/RedCommand.cpp
     src/commands/rjson/RjsonCommand.cpp
     src/red/codec/Gen1Codec.cpp
+    src/red/codec/JapaneseGen1Codec.cpp
     src/red/comparison/Comparison.cpp
     src/red/comparison/ProgressComparison.cpp
     src/red/data/Gen1Names.cpp
@@ -39,11 +45,13 @@ add_library(pkmn_cli_core
     src/red/events/EventCatalog.cpp
     src/red/generation/SemanticGenerator.cpp
     src/red/json/RedDecoder.cpp
+    src/red/json/JapaneseRedDocument.cpp
     src/red/json/RedJsonDocument.cpp
     src/red/proof/PostEmulator.cpp
     src/red/reporting/SaveSummary.cpp
     src/red/save/RedSave.cpp
     src/red/validation/SaveValidator.cpp
+    src/red/validation/JapaneseSaveValidator.cpp
     src/conversion/RouteRegistry.cpp
     src/util/Sha256.cpp
     src/util/AtomicOutput.cpp
@@ -69,6 +77,11 @@ configure_file(
 )
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/runtime/"
      DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/runtime")
+add_custom_target(sync_runtime ALL
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/runtime"
+            "${CMAKE_CURRENT_BINARY_DIR}/runtime"
+    COMMENT "Syncing Python conversion runtime")
 
 target_include_directories(pkmn_cli_core PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -139,7 +152,7 @@ endif()
 
 set(CPACK_PACKAGE_NAME "pkmn-cli")
 set(CPACK_PACKAGE_VENDOR "MAQ / BiG MAQ Studios")
-set(CPACK_PACKAGE_VERSION "3.0.0")
+set(CPACK_PACKAGE_VERSION "3.1.0")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Pokemon Red and Blue to FireRed and LeafGreen save conversion CLI")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
                "${CMAKE_CURRENT_BINARY_DIR}/LICENSE.txt" COPYONLY)
@@ -148,8 +161,8 @@ set(CPACK_GENERATOR "TGZ")
 if(WIN32)
     set(CPACK_PACKAGE_FILE_NAME "pkmn-cli-${CPACK_PACKAGE_VERSION}-windows-x86_64")
     set(CPACK_GENERATOR "ZIP;NSIS")
-    set(CPACK_NSIS_DISPLAY_NAME "pkmn 3.0")
-    set(CPACK_NSIS_PACKAGE_NAME "pkmn 3.0")
+    set(CPACK_NSIS_DISPLAY_NAME "pkmn 3.1")
+    set(CPACK_NSIS_PACKAGE_NAME "pkmn 3.1")
     set(CPACK_NSIS_MODIFY_PATH ON)
     set(CPACK_NSIS_MENU_LINKS "bin/pkmn-interactive.cmd" "pkmn interactive")
 elseif(APPLE)
@@ -188,4 +201,12 @@ if(BUILD_TESTING)
              COMMAND "${Python3_EXECUTABLE}"
                      "${CMAKE_CURRENT_SOURCE_DIR}/tests/paired_origin_profile_test.py"
                      "${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME pkmn-japanese-red-synthetic
+             COMMAND "${Python3_EXECUTABLE}"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/tests/japanese_red_synthetic_test.py"
+                     "$<TARGET_FILE:pkmn>")
+    add_test(NAME pkmn-japanese-green-synthetic
+             COMMAND "${Python3_EXECUTABLE}"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/tests/japanese_green_synthetic_test.py"
+                     "$<TARGET_FILE:pkmn>")
 endif()

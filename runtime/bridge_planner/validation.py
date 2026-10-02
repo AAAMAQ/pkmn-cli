@@ -17,7 +17,15 @@ def iter_source_pokemon(document):
         yield f"party/{index}", f"party/{index}", mon
     target_box = 0
     target_slot = 0
-    for box_index, box in enumerate(decoded.get("pcStorage", {}).get("boxes", [])):
+    boxes = decoded.get("pcStorage", {}).get("boxes", [])
+    cache = decoded.get("currentBoxCache", {})
+    selected = cache.get("selectedBoxNumber")
+    if isinstance(selected, int) and 1 <= selected <= len(boxes) and isinstance(cache.get("cache"), dict):
+        # Gen I saves the current box in main SRAM. Its permanent-bank copy
+        # can be stale until a box change, in either language layout.
+        boxes = list(boxes)
+        boxes[selected - 1] = cache["cache"]
+    for box_index, box in enumerate(boxes):
         for slot_index, mon in enumerate(box.get("pokemon", [])):
             yield f"pcStorage/boxes/{box_index}/pokemon/{slot_index}", f"storage/boxes/{target_box}/slots/{target_slot}", mon
             target_slot += 1

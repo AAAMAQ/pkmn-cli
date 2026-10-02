@@ -19,6 +19,15 @@ namespace {
 constexpr std::size_t kSectorSize = 0x1000;
 constexpr std::size_t kSectorDataSize = 0xF80;
 
+std::string HallOfFameNickname(std::span<const std::uint8_t> bytes) {
+    if (bytes.size() == 10 && bytes[0] == 0xFC && bytes[1] == 0x15) {
+        for (std::size_t end = 2; end + 1 < bytes.size(); ++end)
+            if (bytes[end] == 0xFC && bytes[end + 1] == 0x16)
+                return DecodeFireRedJapaneseText(bytes.subspan(2, end - 2));
+    }
+    return DecodeFireRedText(bytes);
+}
+
 std::uint16_t SpecialChecksum(std::span<const std::uint8_t> bytes) {
     std::uint32_t sum = 0;
     for (std::size_t offset = 0; offset + 4 <= bytes.size(); offset += 4) {
@@ -88,7 +97,7 @@ ordered_json SpecialSectorsJson(std::span<const std::uint8_t> image) {
                     {"species", species}, {"speciesName", SpeciesName(species)},
                     {"nationalDex", SpeciesNationalDex(species)},
                     {"level", speciesLevel >> 9},
-                    {"nickname", DecodeFireRedText(std::span<const std::uint8_t>(data).subspan(offset + 10, 10))},
+                    {"nickname", HallOfFameNickname(std::span<const std::uint8_t>(data).subspan(offset + 10, 10))},
                     {"rawHex", EncodeHex(std::span<const std::uint8_t>(data).subspan(offset, 20))}
                 });
             }

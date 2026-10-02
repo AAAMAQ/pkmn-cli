@@ -63,18 +63,28 @@ class BridgePlanner:
 
     def plan(self, source, source_sha256=None, source_name=None):
         input_warnings = validate_red_document(source)
+        japanese_source = source.get("sourceJapanese")
+        if japanese_source:
+            self.source_profile = japanese_source["profile"]
+            green = self.source_profile == "JP_GREEN_REV0"
+            self.source_display = "Pocket Monsters Green (Japan)" if green else "Pocket Monsters Red (Japan)"
+            self.route_id = f"{'green' if green else 'red'}-jp-{self.target_game}"
         source_fingerprint = sha256_json(source)
         source_sha256 = source_sha256 or source_fingerprint
         decoded = source["decoded"]
         source_schema = source["schema"]
         player_name = str(value_at(decoded, "trainer", "name"))
         rival_name = str(value_at(decoded, "rival", "name", default="BLUE"))
+        retain_player_name = (japanese_source or {}).get("targetPlayerNamePolicy") == "retain-japanese-raw-experimental"
+        if retain_player_name:
+            player_name = str(japanese_source["trainerName"]["value"])
         public_tid = int(value_at(decoded, "trainer", "trainerId"))
         player_sid = deterministic_u16(self.policy.salt, source_fingerprint, "player-sid", player_name.upper(), public_tid)
 
         pokemon_converter = PokemonConverter(
             self.metadata, self.policy, source_fingerprint, player_name, public_tid, player_sid,
-            target_game=self.target_game
+            target_game=self.target_game,
+            source_japanese_player_name=(japanese_source or {}).get("trainerName", {}).get("value")
         )
         converted = []
         pokemon_audits = []
@@ -97,6 +107,11 @@ class BridgePlanner:
         source_location = decoded.get("location", {})
 
         warnings = list(input_warnings) + item_warnings
+        if retain_player_name:
+            warnings.append(
+                "Experimental Japanese player-name bytes were written to an international "
+                "FireRed identity field; in-game display and dialogue font behavior are unverified."
+            )
         if fly_warning:
             warnings.append(fly_warning)
         warnings.extend(warning for audit in pokemon_audits for warning in audit["warnings"])
@@ -116,6 +131,7 @@ class BridgePlanner:
 
         identity = {
             "playerName": player_name[:7],
+            "playerNameLanguage": "Japanese" if retain_player_name else "English",
             "rivalName": rival_name[:7],
             "gender": "male",
             "publicTrainerId": public_tid,
@@ -202,7 +218,7 @@ class BridgePlanner:
         decisions = event_decisions + trainer_decisions + item_decisions + [fly_decision]
         manifest = {
             "schemaVersion": MANIFEST_VERSION,
-            "manifestType": f"pkmn-{self.source_game}-to-{self.target_game}-conversion-plan",
+            "manifestType": f"pkmn-{self.route_id}-conversion-plan",
             "planningStatus": planning_status,
             "versions": {
                 "bridgeSpecification": BRIDGE_VERSION,

@@ -50,7 +50,10 @@ std::string MarkdownCatalog() {
   }
   result += "## Global controls\n\n`--quiet`, `--verbose`, and `--no-color` "
             "must appear before the command. FireRed physical generation passed "
-            "Phase 5; Red-to-FireRed conversion passed Phase 6.\n";
+            "Phase 5; Red-to-FireRed conversion passed Phase 6.\n\n"
+            "Future, not-yet-implemented command proposals are tracked in "
+            "[`FUTURE_COMMANDS.md`](FUTURE_COMMANDS.md); they are not part of "
+            "this executable catalog.\n";
   return result;
 }
 

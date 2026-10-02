@@ -19,6 +19,9 @@ Convert canonical Red JSON directly to a FireRed save.
 .B pkmn rjson convert_to_frjson game.red.json [--output game.fred.json]
 Translate Red semantics into FireRed JSON without writing a physical save.
 .TP
+.B pkmn red-jp convert game-jp.sav --profile JP_RED_REV0|JP_RED_REV1 [--output game-jp_fr.sav] [--retain-playername]
+Experimental Japanese Red route: archive, English-shaped projection with Japanese name provenance, and international FireRed output. Real-save and emulator acceptance remain pending.
+.TP
 .B pkmn convert red-firered RED [--preview|--plan-only] [--output-json FILE|--output-save SAVE]
 Use the unified converter with preview, plan-only, policy, manifest, and output controls.
 .TP
@@ -36,7 +39,10 @@ Use --template or PKMN_FIRERED_TEMPLATE to select a strictly validated custom cl
 .SH GENERAL COMMANDS
 .TP
 .B pkmn interactive
-Open the beginner guided workflow for all four Red/Blue to FireRed/LeafGreen routes.
+Open the guided task menu and searchable browser for all current command endpoints.
+The first task covers Red/Blue to FireRed/LeafGreen conversion. Guided tasks
+ask for inputs and options, preview the direct command and proposed outputs,
+and require confirmation before execution.
 .TP
 .B pkmn --help
 Show available and reserved commands.
@@ -65,6 +71,12 @@ Inspect or validate Red SRAM and all known checksums.
 .TP
 .B pkmn red decode SAVE [--output FILE] [--include-physical-image|--no-physical-image]
 Write deterministic canonical Red JSON without overwriting existing output.
+.TP
+.B pkmn red-jp validate|decode SAVE --profile JP_RED_REV0|JP_RED_REV1
+Validate or archive Japanese Red SRAM; decode writes .red.jp.json by default.
+.TP
+.B pkmn rjpjson inspect|validate|reconstruct|project FILE
+Inspect the Japanese archive, reconstruct its original bytes, or make an English-shaped .red.json bridge projection.
 .TP
 .B pkmn red edit SAVE
 Run the interactive copy-first editor.

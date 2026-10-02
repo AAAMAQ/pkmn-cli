@@ -180,7 +180,7 @@ int Run(const std::vector<std::string>& arguments,
         << "[ok] shared FireRed/LeafGreen remake engine and explicit LeafGreen profile\n"
         << "[ok] all four pkmn 3.0 conversion routes and static proof packages\n"
         << "[ok] source-preserving conversion checksum recovery\n"
-        << "[ok] beginner interactive four-route workflow with evidence labels\n"
+        << "[ok] simple conversion and guided command browser with evidence labels\n"
         << (util::UsesBundledRuntime()
                 ? "[ok] private self-contained conversion runtime (no separate Python)\n"
                 : "[dev] Python runtime fallback (source/developer installation)\n")

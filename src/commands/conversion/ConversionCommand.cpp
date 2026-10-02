@@ -149,23 +149,27 @@ std::filesystem::path ResolveTemplate(const std::filesystem::path &explicitPath)
   return util::FireRedTemplatePath();
 }
 
-bool OutputFamilyExists(const std::filesystem::path &output) {
+bool OutputFamilyExists(const std::filesystem::path &output,
+                        bool keepIntermediate, bool leafGreen) {
   auto stem = output;
   stem.replace_extension();
   return std::filesystem::exists(output) ||
          std::filesystem::exists(stem.string() + ".conversion-manifest.json") ||
-         std::filesystem::exists(stem.string() + ".conversion-report.md");
+         std::filesystem::exists(stem.string() + ".conversion-report.md") ||
+         (keepIntermediate && std::filesystem::exists(
+             stem.string() + (leafGreen ? ".lg.json" : ".fred.json")));
 }
 
 std::filesystem::path SelectOutput(std::filesystem::path output,
-                                   bool autoSuffix) {
-  if (!OutputFamilyExists(output)) return output;
+                                   bool autoSuffix, bool keepIntermediate,
+                                   bool leafGreen) {
+  if (!OutputFamilyExists(output, keepIntermediate, leafGreen)) return output;
   if (!autoSuffix)
     throw std::runtime_error("refusing to overwrite an existing output family");
   const auto preferred = output;
   for (std::size_t number = 2;; ++number) {
     output = util::NumberedOutputPath(preferred, number);
-    if (!OutputFamilyExists(output)) return output;
+    if (!OutputFamilyExists(output, keepIntermediate, leafGreen)) return output;
   }
 }
 
@@ -235,7 +239,9 @@ ConversionOptions ParseConversion(const std::vector<std::string> &arguments,
   }
   if (!options.repairedSourcePath.empty())
     options.autoRepairChecksum = true;
-  options.output = SelectOutput(options.output, options.autoSuffix);
+  options.output = SelectOutput(
+      options.output, options.autoSuffix, options.keepIntermediate,
+      options.targetGame == pkmn::cli::conversion::GameId::LeafGreen);
   return options;
 }
 

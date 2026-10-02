@@ -1,4 +1,9 @@
-# Install pkmn 3.0
+# Install pkmn 3.1
+
+For step-by-step file preparation, interactive conversion, editing, comparison,
+and all other menu options, read the [player's interactive manual](INTERACTIVE_USER_MANUAL.md).
+Use release 3.1.0 or newer for the expanded menu and experimental Japanese Green
+support. Older 3.0.0 installations show a different menu.
 
 This guide starts from zero. Release users do not need Python, CMake, Git, a
 compiler, or any earlier pkmn project.
@@ -110,14 +115,23 @@ pkmn interactive
 It will ask:
 
 1. what you want to do;
-2. whether the source is Red or Blue;
-3. whether the target is FireRed or LeafGreen;
-4. where your source `.sav` is;
-5. whether a checksum-only problem may be repaired in memory;
-6. where the new save should be written;
-7. whether the summary is correct.
+2. which source game made the save;
+3. where your source `.sav` is;
+4. whether the target is FireRed or LeafGreen for English Red/Blue, or which
+   supported revision made a Japanese save (Japanese routes target FireRed);
+5. whether to create the automatically named new save.
 
-Paths containing spaces should be quoted:
+Simple conversion enables in-memory checksum repair for English saves and
+leaves the original unchanged. Choose menu 2 or 8 for JSON conversion plans,
+custom output paths, templates, and other advanced choices.
+
+The other main-menu tasks cover inspection, JSON, editing, comparison, and
+proof. Choose **Browse every current command and option** to search all 124
+current endpoints. Type `?` for help, `B` to go back, or `Q` to quit.
+See the [interactive guide](INTERACTIVE_V3_GUIDE.md) for the full menu and
+[interactive examples](INTERACTIVE_COMMAND_EXAMPLES.md) for every command.
+
+Paths containing spaces may be pasted with or without surrounding quotes:
 
 ```text
 "C:\Users\MAQ\Desktop\Pokemon Red.sav"

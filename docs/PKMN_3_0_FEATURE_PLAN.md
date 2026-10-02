@@ -6,6 +6,10 @@ This document defines and records the staged scope of `pkmn 3.0`. All three
 implementation phases are complete in the final `3.0.0` source tree. Tagged
 release CI provides the native Windows, macOS, and Linux artifact gate.
 
+The interactive menu design later in this file is the original phase plan.
+The implemented 116-command task menu and browser are documented in
+[INTERACTIVE_V3_GUIDE.md](INTERACTIVE_V3_GUIDE.md).
+
 `pkmn 2.0` proved complete-save Pokémon Red → Pokémon FireRed conversion.
 Version 3.0 will turn that single proven route into a reusable Kanto remake
 conversion system supporting Pokémon Red, Blue, FireRed, and LeafGreen.

@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
-TOOL_VERSION = "3.0.0"
+TOOL_VERSION = "3.1.0"
 sys.path.insert(0, str(ROOT))
 
 from bridge_planner import BridgePlanner  # noqa: E402
@@ -48,7 +48,9 @@ def source_hash(path):
 def plan_red(path, salt=None, source_name=None, source_sha256=None,
              source_game="red", target_game="firered"):
     source = without_physical_image(load_json(path))
-    expected_profile = "GEN1_BLUE" if source_game == "blue" else "GEN1_RED"
+    japanese_source = source.get("sourceJapanese")
+    expected_profile = ((japanese_source or {}).get("profile") or
+                        ("GEN1_BLUE" if source_game == "blue" else "GEN1_RED"))
     declared_profile = source.get("schema", {}).get("gameProfile")
     if declared_profile is not None and declared_profile != expected_profile:
         raise ValueError(
@@ -59,7 +61,8 @@ def plan_red(path, salt=None, source_name=None, source_sha256=None,
     source["sourceDeclaration"] = {
         "profile": expected_profile,
         "basis": "explicit-conversion-route",
-        "binaryLayout": "shared-generation-I-save-layout",
+        "binaryLayout": "Japanese-Gen1-projected-semantics" if japanese_source else
+                        "shared-generation-I-save-layout",
     }
     result = BridgePlanner(root=ROOT, salt=salt, source_game=source_game,
                            target_game=target_game).plan(
@@ -84,7 +87,7 @@ def conversion_sidecars(output):
     )
 
 
-def manifest_v3(manifest, args, template=None):
+def manifest_v3(manifest, args, template=None, source_document=None):
     """Add the stable 3.0 audit envelope without changing bridge decisions."""
     manifest = copy.deepcopy(manifest)
     repair_applied = str(getattr(args, "source_repair_applied", "false")).lower() == "true"
@@ -94,16 +97,22 @@ def manifest_v3(manifest, args, template=None):
     manifest["manifestSchemaVersion"] = "3.0.0"
     source_game = getattr(args, "source_game", "red")
     target_game = getattr(args, "target_game", "firered")
-    source_profile = "GEN1_BLUE" if source_game == "blue" else "GEN1_RED"
+    japanese_source = (source_document or {}).get("sourceJapanese")
+    source_profile = (japanese_source or {}).get("profile") or (
+        "GEN1_BLUE" if source_game == "blue" else "GEN1_RED")
     target_profile = "GEN3_LEAFGREEN" if target_game == "leafgreen" else "GEN3_FIRERED"
-    route_id = f"{source_game}-{target_game}"
-    evidence = "EMULATOR_VERIFIED" if route_id == "red-firered" else "STATICALLY_VALIDATED_COMMUNITY_TESTING"
+    route_id = f"{source_game}-jp-{target_game}" if japanese_source else f"{source_game}-{target_game}"
+    if source_profile == "JP_GREEN_REV0":
+        route_id = f"green-jp-{target_game}"
+    evidence = ("SYNTHETICALLY_VALIDATED_REAL_SAVE_PENDING" if japanese_source else
+                "EMULATOR_VERIFIED" if route_id == "red-firered" else
+                "STATICALLY_VALIDATED_COMMUNITY_TESTING")
     manifest["tool"] = {"name": "pkmn", "version": TOOL_VERSION}
     manifest["route"] = {
         "id": route_id,
         "sourceProfile": source_profile,
         "targetProfile": target_profile,
-        "capability": "AVAILABLE",
+        "capability": "EXPERIMENTAL" if japanese_source else "AVAILABLE",
         "evidence": evidence,
     }
     manifest["sourceIntegrity"] = {
@@ -137,6 +146,27 @@ def manifest_v3(manifest, args, template=None):
         "pokefireredCommit": "df4449a27cd78dd747ce269e47d3ab4a0149d8f4",
         "ambiguousStatePolicy": "DEFAULT_AND_MANIFEST_NEVER_GUESS",
     }
+    if japanese_source:
+        retain_player_name = japanese_source.get("targetPlayerNamePolicy") == "retain-japanese-raw-experimental"
+        target_player_name_hex = None
+        if retain_player_name:
+            from firered_generator.text import encode_name
+            target_player_name_hex = encode_name(
+                japanese_source["trainerName"]["value"], 8,
+                language="Japanese"
+            ).hex().upper()
+        manifest["japaneseSource"] = {
+            "profile": source_profile,
+            "sourceSha256": japanese_source.get("sourceSha256"),
+            "selectedBox": japanese_source.get("selectedBox"),
+            "pcPokemonCount": japanese_source.get("pcPokemonCount"),
+            "slotMapping": japanese_source.get("slotMapping"),
+            "playerNamePolicy": japanese_source.get("targetPlayerNamePolicy", "english-fallback"),
+            "originalPlayerName": japanese_source.get("trainerName", {}).get("value"),
+            "targetPlayerNameFieldHex": target_player_name_hex,
+            "playerNameDisplayStatus": "UNVERIFIED_IN_ENGLISH_FIRERED" if retain_player_name else "ENGLISH_FALLBACK",
+            "ownPokemonOtPolicy": "target player name preserves self-ownership; original OT retained in provenance",
+        }
     return manifest
 
 
@@ -156,7 +186,7 @@ def convert_to_frjson(args):
     manifest_path = args.manifest or default_manifest
     report_path = args.report or default_report
     write_new(args.output, json.dumps(proposed, indent=2) + "\n")
-    manifest = manifest_v3(planned.manifest, args)
+    manifest = manifest_v3(planned.manifest, args, source_document=source)
     write_new(manifest_path, json.dumps(manifest, indent=2) + "\n")
     write_new(report_path, planned.preview_markdown + "\n")
     print(json.dumps({
@@ -186,7 +216,7 @@ def convert_to_save(args):
     manifest_path = args.manifest or default_manifest
     report_path = args.report or default_report
     write_new(args.output, result.generation.image, binary=True)
-    manifest = manifest_v3(result.manifest, args, template)
+    manifest = manifest_v3(result.manifest, args, template, source_document=source)
     write_new(manifest_path, json.dumps(manifest, indent=2) + "\n")
     write_new(report_path, result.preview_markdown + "\n")
     if args.keep_intermediate:
@@ -315,8 +345,15 @@ def validate_manifest(args):
             if not isinstance(manifest.get(key), dict):
                 errors.append(f"{key} object is required by Manifest 3.0")
         route = manifest.get("route", {})
-        if route.get("id") not in ("red-firered", "red-leafgreen", "blue-firered", "blue-leafgreen"):
+        if route.get("id") not in ("red-firered", "red-leafgreen", "blue-firered", "blue-leafgreen",
+                                    "red-jp-firered", "green-jp-firered"):
             errors.append("Manifest 3.0 route.id must identify a supported conversion route")
+        if route.get("id") in ("red-jp-firered", "green-jp-firered"):
+            profiles = ("JP_GREEN_REV0",) if route["id"] == "green-jp-firered" else ("JP_RED_REV0", "JP_RED_REV1")
+            if (route.get("sourceProfile") not in profiles or
+                    route.get("targetProfile") != "GEN3_FIRERED" or
+                    route.get("capability") != "EXPERIMENTAL"):
+                errors.append("Japanese route profile, destination, or experimental status is inconsistent")
         integrity = manifest.get("sourceIntegrity", {})
         if integrity.get("originalSourceModified") is not False:
             errors.append("Manifest 3.0 must record source preservation")

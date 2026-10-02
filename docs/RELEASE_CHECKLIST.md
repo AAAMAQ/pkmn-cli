@@ -28,6 +28,8 @@
       to the installed executable.
 - [ ] Moving only the executable fails clearly rather than silently guessing.
 - [ ] Interactive launcher opens the same `pkmn interactive` engine.
+- [ ] The interactive catalog coverage test includes every current command,
+      and guided navigation, output review, and cancellation tests pass.
 
 ## Package formats
 

@@ -4,6 +4,7 @@
 
 ```text
 pkmn command router
+  -> interactive task menu and typed workflow registry (when requested)
   -> domain command (red, rjson, fred, frjson)
   -> internal game engine module
   -> validation and safety policy
@@ -14,6 +15,10 @@ pkmn command router
 
 - `src/app`: process entry, version, exit codes, and command routing.
 - `src/commands`: stable public command contracts.
+- `src/commands/interactive/options`: typed questions and argument builders
+  for all current catalog endpoints; startup validation catches missing or
+  duplicate guided workflows. The interactive engine handles navigation,
+  paths, review, collision checks, and in-process command-router dispatch.
 - `src/red/save`: bounded Gen I SRAM representation and file I/O.
 - `src/red/json`: deterministic canonical JSON decode model, import validation, physical-image verification, and archival reconstruction source handling.
 - `src/red/generation`: physical-image-isolated semantic generation, safe-location policy, subsystem serializers, checksum repair, and write-range validation.

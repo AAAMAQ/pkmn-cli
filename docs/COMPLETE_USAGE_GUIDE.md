@@ -8,6 +8,18 @@ Downloaded 3.0 packages are self-contained. Beginners can start with:
 pkmn interactive
 ```
 
+The guided main menu starts with Red/Blue conversion and also opens save,
+JSON, edit, compare, proof, and general command groups. Choose **Browse every
+command** to search or page through the 124 current catalog endpoints. Each
+runnable endpoint collects its inputs and relevant options through prompts;
+advanced flags appear when requested. At a prompt, `?` explains it, `B` goes
+back, and `Q` quits. Paths are entered as complete lines, including spaces.
+File-writing workflows show a review and require confirmation. Future roadmap
+commands remain disabled.
+For the interactive questions behind each command, see the
+[Version 3.0 interactive guide](INTERACTIVE_V3_GUIDE.md) and
+[examples for every current endpoint](INTERACTIVE_COMMAND_EXAMPLES.md).
+
 The explicit routes are:
 
 ```sh

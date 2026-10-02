@@ -49,6 +49,42 @@ std::string DecodeByte(std::uint8_t value) {
     }
 }
 
+std::string Kana(const char* glyphs, std::uint8_t byte, std::uint8_t first) {
+    return std::string(glyphs + (byte - first) * 3, 3);
+}
+
+std::string DecodeJapaneseByte(std::uint8_t value) {
+    // pret/pokefirered@df4449a charmap.txt, Japanese font selection.
+    if (value >= 0x01 && value <= 0x2E)
+        return Kana("あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん", value, 0x01);
+    if (value >= 0x2F && value <= 0x36)
+        return Kana("ぁぃぅぇぉゃゅょ", value, 0x2F);
+    if (value >= 0x37 && value <= 0x45)
+        return Kana("がぎぐげござじずぜぞだぢづでど", value, 0x37);
+    if (value >= 0x46 && value <= 0x4A)
+        return Kana("ばびぶべぼ", value, 0x46);
+    if (value >= 0x4B && value <= 0x4F)
+        return Kana("ぱぴぷぺぽ", value, 0x4B);
+    if (value == 0x50) return "っ";
+    if (value >= 0x51 && value <= 0x7E)
+        return Kana("アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン", value, 0x51);
+    if (value >= 0x7F && value <= 0x86)
+        return Kana("ァィゥェォャュョ", value, 0x7F);
+    if (value >= 0x87 && value <= 0x95)
+        return Kana("ガギグゲゴザジズゼゾダヂヅデド", value, 0x87);
+    if (value >= 0x96 && value <= 0x9A)
+        return Kana("バビブベボ", value, 0x96);
+    if (value >= 0x9B && value <= 0x9F)
+        return Kana("パピプペポ", value, 0x9B);
+    if (value == 0xA0) return "ッ";
+    if (value == 0xAB) return "！";
+    if (value == 0xAC) return "？";
+    if (value == 0xAD) return "。";
+    if (value == 0xAE) return "ー";
+    if (value == 0xEF) return "▶";
+    return DecodeByte(value);
+}
+
 std::uint8_t EncodeAscii(char value) {
     if (value == ' ') return 0x00;
     if (value >= '0' && value <= '9') return static_cast<std::uint8_t>(0xA1 + value - '0');
@@ -80,6 +116,15 @@ std::string DecodeFireRedText(std::span<const std::uint8_t> bytes) {
     for (const auto value : bytes) {
         if (value == 0xFF) break;
         result += DecodeByte(value);
+    }
+    return result;
+}
+
+std::string DecodeFireRedJapaneseText(std::span<const std::uint8_t> bytes) {
+    std::string result;
+    for (const auto value : bytes) {
+        if (value == 0xFF) break;
+        result += DecodeJapaneseByte(value);
     }
     return result;
 }

@@ -17,11 +17,13 @@ int Run(const std::vector<std::string> &arguments, std::ostream &output,
   if (arguments[0] == "bash") {
     output << R"(_pkmn_completion() {
   local cur="${COMP_WORDS[COMP_CWORD]}"
-  local words="doctor config get-all-cmds interactive red blue rjson bjson compare proof completion fred leafgreen frjson lgjson convert"
+  local words="doctor config get-all-cmds interactive red red-jp green-jp blue rjson rjpjson gjpjson bjson compare proof completion fred leafgreen frjson lgjson convert"
   case "${COMP_WORDS[1]}" in
     red) words="summary decode inspect validate repair-checksums events validate-batch decode-batch validate-post-emulator edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit" ;;
+    red-jp|green-jp) words="validate decode convert" ;;
     blue) words="summary decode inspect validate repair-checksums events validate-batch decode-batch edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit convert" ;;
     rjson) words="inspect validate generate reconstruct migrate schema update_schema generate-batch convert convert_to_frjson convert_to_lgjson" ;;
+    rjpjson|gjpjson) words="inspect validate reconstruct project compare" ;;
     bjson) words="inspect validate generate reconstruct migrate schema update_schema generate-batch convert convert_to_lgjson convert_to_frjson" ;;
     fred) words="summary inspect validate repair-checksums decode events validate-batch decode-batch validate-post-emulator edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit" ;;
     leafgreen) words="summary inspect validate repair-checksums decode events validate-batch decode-batch edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit" ;;
@@ -40,15 +42,17 @@ complete -F _pkmn_completion pkmn
     output << R"(#compdef pkmn
 _pkmn() {
   local -a domains
-  domains=(doctor config get-all-cmds interactive red blue rjson bjson compare proof completion fred leafgreen frjson lgjson convert)
+  domains=(doctor config get-all-cmds interactive red red-jp green-jp blue rjson rjpjson gjpjson bjson compare proof completion fred leafgreen frjson lgjson convert)
   if (( CURRENT == 2 )); then
     _describe 'command' domains
     return
   fi
   case "$words[2]" in
     red) _values 'Red command' summary decode inspect validate repair-checksums events validate-batch decode-batch validate-post-emulator edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit ;;
+    red-jp|green-jp) _values 'Japanese Red command' validate decode convert ;;
     blue) _values 'Blue command' summary decode inspect validate repair-checksums events validate-batch decode-batch edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit convert ;;
     rjson) _values 'Red JSON command' inspect validate generate reconstruct migrate schema update_schema generate-batch convert convert_to_frjson convert_to_lgjson ;;
+    rjpjson|gjpjson) _values 'Japanese Red JSON command' inspect validate reconstruct project compare ;;
     bjson) _values 'Blue JSON command' inspect validate generate reconstruct migrate schema update_schema generate-batch convert convert_to_lgjson convert_to_frjson ;;
     fred) _values 'FireRed command' summary inspect validate repair-checksums decode events validate-batch decode-batch validate-post-emulator edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit ;;
     leafgreen) _values 'LeafGreen command' summary inspect validate repair-checksums decode events validate-batch decode-batch edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit ;;
@@ -64,10 +68,12 @@ compdef _pkmn pkmn
 )";
   } else {
     output << R"(complete -c pkmn -f
-complete -c pkmn -n '__fish_use_subcommand' -a 'doctor config get-all-cmds interactive red blue rjson bjson compare proof completion fred leafgreen frjson lgjson convert'
+complete -c pkmn -n '__fish_use_subcommand' -a 'doctor config get-all-cmds interactive red red-jp green-jp blue rjson rjpjson gjpjson bjson compare proof completion fred leafgreen frjson lgjson convert'
 complete -c pkmn -n '__fish_seen_subcommand_from red' -a 'summary decode inspect validate repair-checksums events validate-batch decode-batch validate-post-emulator edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit'
+complete -c pkmn -n '__fish_seen_subcommand_from red-jp green-jp' -a 'validate decode convert'
 complete -c pkmn -n '__fish_seen_subcommand_from blue' -a 'summary decode inspect validate repair-checksums events validate-batch decode-batch edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit convert'
 complete -c pkmn -n '__fish_seen_subcommand_from rjson' -a 'inspect validate generate reconstruct migrate schema update_schema generate-batch convert convert_to_frjson convert_to_lgjson'
+complete -c pkmn -n '__fish_seen_subcommand_from rjpjson gjpjson' -a 'inspect validate reconstruct project compare'
 complete -c pkmn -n '__fish_seen_subcommand_from bjson' -a 'inspect validate generate reconstruct migrate schema update_schema generate-batch convert convert_to_lgjson convert_to_frjson'
 complete -c pkmn -n '__fish_seen_subcommand_from fred' -a 'summary inspect validate repair-checksums decode events validate-batch decode-batch validate-post-emulator edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit'
 complete -c pkmn -n '__fish_seen_subcommand_from leafgreen' -a 'summary inspect validate repair-checksums decode events validate-batch decode-batch edit begin-edit edit-session pokemon bag progress pending-edits undo-edit edit-history annotate-edit validate-edit end-edit'

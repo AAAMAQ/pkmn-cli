@@ -64,6 +64,24 @@ pkmn convert blue-leafgreen game.sav
 
 The route declaration is recorded in the manifest.
 
+## Experimental Japanese Red route
+
+Use `red-jp`, not the English `red` reader, for a Japanese Red save. Declare
+the source ROM revision as `--profile JP_RED_REV0` or `JP_RED_REV1`; the SRAM
+layout cannot prove that revision by itself. Preserve the original save and
+start with `pkmn red-jp validate game.sav --profile JP_RED_REV0`.
+
+This route does not auto-repair Japanese checksums. A bad main checksum or
+malformed/unsupported Japanese nickname blocks conversion rather than
+guessing. `rjpjson inspect` and `rjpjson compare` can help locate archive or
+projection problems. An optional English Red compatibility save uses English
+name fallbacks and cannot be used as the Japanese-name source for a later
+FireRed transfer; use the `.red.jp.json` archive and `.red.json` projection.
+
+The Japanese route's `EXPERIMENTAL` manifest label means synthetic round-trip
+tests pass, but real-save and emulator acceptance have not been recorded.
+See the [Japanese bridge schema](JAPANESE_RED_JSON_SCHEMA.md).
+
 ## Evidence warning
 
 Red → FireRed is MAQ emulator-verified. The other three routes are statically

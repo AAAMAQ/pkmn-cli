@@ -1,4 +1,4 @@
-name: pkmn 3.0 release packages
+name: pkmn 3.1 release packages
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ on:
         default: false
   push:
     tags:
-      - "v3.0.0*"
+      - "v3.1.0*"
 
 permissions:
   contents: read
@@ -86,13 +86,13 @@ jobs:
         run: >-
           pkgbuild --root build/install
           --identifier studios.bigmaq.pkmn-cli
-          --version 3.0.0
+          --version 3.1.0
           --install-location /usr/local
-          build/packages/pkmn-cli-3.0.0-${{ matrix.name }}.pkg
+          build/packages/pkmn-cli-3.1.0-${{ matrix.name }}.pkg
       - name: Verify macOS installer payload
         if: runner.os == 'macOS'
         run: |
-          package="build/packages/pkmn-cli-3.0.0-${{ matrix.name }}.pkg"
+          package="build/packages/pkmn-cli-3.1.0-${{ matrix.name }}.pkg"
           test "$(stat -f%z "$package")" -gt 1000000
           pkgutil --payload-files "$package" | grep -Eq '(^|/)bin/pkmn$'
       - name: Install AppImage tool
@@ -105,7 +105,7 @@ jobs:
         env:
           APPIMAGETOOL: ${{ github.workspace }}/build/appimagetool.AppImage
           APPIMAGE_EXTRACT_AND_RUN: "1"
-        run: scripts/build-appimage.sh build/install build/packages/pkmn-cli-3.0.0-linux-x86_64.AppImage
+        run: scripts/build-appimage.sh build/install build/packages/pkmn-cli-3.1.0-linux-x86_64.AppImage
       - name: Privacy scan source
         if: runner.os != 'Windows'
         run: scripts/privacy-scan.sh
@@ -124,7 +124,7 @@ jobs:
 
   publish:
     if: >-
-      startsWith(github.ref, 'refs/tags/v3.0.0') ||
+      startsWith(github.ref, 'refs/tags/v3.1.0') ||
       (github.event_name == 'workflow_dispatch' && inputs.publish_release)
     needs: package
     runs-on: ubuntu-22.04
@@ -153,5 +153,6 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ inputs.release_ref || github.ref_name }}
-          generate_release_notes: true
+          generate_release_notes: false
+          body_path: docs/RELEASE_NOTES_3_1_0.md
           files: release-files/*

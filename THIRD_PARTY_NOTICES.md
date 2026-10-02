@@ -33,6 +33,14 @@ The pinned research authorities remain:
 
 - `pret/pokered@d70d99ffbd329473d96eaaf19fd97c86d2220b7f`;
 - `pret/pokefirered@df4449a27cd78dd747ce269e47d3ab4a0149d8f4`.
+- `Narishma-gb/pokegreen@953f41b34108621b2bf13c3b1e53abfc9c3e5aec`
+  for the Japanese Red/Green SRAM layout, text map, and save routines. Its
+  README credits pret/pokered as the origin of much of the disassembly's
+  structure. The Japanese bridge implements its own reader and text mapping
+  from these source facts; no ROM, game graphics, or source file from that
+  repository is copied into this project. No standalone license file was
+  present in the pinned checkout, so this is source attribution, not an
+  assertion that its code is incorporated under this repository's license.
 
 The Pokémon conversion policy uses the **Pokémon Community Conversion
 Standard** `ORIGINAL` profile as a research/specification foundation at commit
