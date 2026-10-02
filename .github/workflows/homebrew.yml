@@ -23,7 +23,10 @@ jobs:
       - name: Formula style
         run: brew style packaging/homebrew/pkmn-cli.rb
       - name: Install development formula
-        run: brew install --HEAD --build-from-source ./packaging/homebrew/pkmn-cli.rb
+        run: |
+          brew tap-new pkmn-ci/local
+          cp packaging/homebrew/pkmn-cli.rb "$(brew --repository pkmn-ci/local)/Formula/pkmn-cli.rb"
+          brew install --HEAD --build-from-source pkmn-ci/local/pkmn-cli
       - name: Formula test
         run: brew test pkmn-cli
       - name: Installed deep smoke test
