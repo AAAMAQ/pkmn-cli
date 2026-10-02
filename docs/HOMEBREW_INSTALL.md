@@ -29,8 +29,11 @@ brew upgrade AAAMAQ/pkmn/pkmn-cli
 pkmn --version
 ```
 
-For a previous development `--HEAD` installation, use
-`brew reinstall AAAMAQ/pkmn/pkmn-cli` to switch to stable. If the executable is
+For a previous development `--HEAD` installation, run
+`brew uninstall AAAMAQ/pkmn/pkmn-cli` followed by
+`brew install AAAMAQ/pkmn/pkmn-cli` to switch to stable. This removes only the
+installed CLI package, not your save files. `brew reinstall` preserves `--HEAD`.
+If the executable is
 not linked, run `brew link pkmn-cli`. Inspect any reported conflicts before
 replacing files; do not use blanket overwrite flags.
 

@@ -134,8 +134,9 @@ brew update
 brew upgrade AAAMAQ/pkmn/pkmn-cli
 ```
 
-For a previous `--HEAD` installation, use
-`brew reinstall AAAMAQ/pkmn/pkmn-cli` to switch to stable.
+For a previous `--HEAD` installation, run `brew uninstall AAAMAQ/pkmn/pkmn-cli`
+and then `brew install AAAMAQ/pkmn/pkmn-cli` to switch to stable. This removes
+the installed CLI package, not your save files. Reinstalling preserves `--HEAD`.
 These commands build published source and install Homebrew Python automatically.
 Check `pkmn --version` after an update. See
 [Homebrew status and instructions](HOMEBREW_INSTALL.md).
