@@ -114,7 +114,7 @@ def daycare_fixture():
 
 def run(pkmn, *args):
     result = subprocess.run([str(pkmn), *map(str, args)],
-                            capture_output=True, text=True)
+                            capture_output=True, text=True, encoding="utf-8")
     if result.returncode:
         raise AssertionError(f"{args}: {result.stdout}\n{result.stderr}")
     return result.stdout
@@ -122,7 +122,7 @@ def run(pkmn, *args):
 
 def run_failure(pkmn, *args):
     result = subprocess.run([str(pkmn), *map(str, args)],
-                            capture_output=True, text=True)
+                            capture_output=True, text=True, encoding="utf-8")
     assert result.returncode != 0, (args, result.stdout, result.stderr)
     return result.stderr
 
@@ -145,7 +145,7 @@ def main():
         assert comparison["exactProjectionMatch"]
         assert comparison["pcPokemonCount"] == comparison["slotMappings"] == 2
         run(pkmn, "rjson", "validate", projection)
-        document = json.loads(projection.read_text())
+        document = json.loads(projection.read_text(encoding="utf-8"))
         assert document["sourceJapanese"]["pcPokemonCount"] == 2
         assert document["sourceJapanese"]["selectedBoxPermanentDiffers"]
         assert document["decoded"]["pcStorage"]["boxes"][0]["count"] == 2
@@ -155,22 +155,22 @@ def main():
         run(pkmn, "rjson", "generate", projection, english_bridge)
         run(pkmn, "red", "validate", english_bridge)
         run(pkmn, "red", "decode", english_bridge)
-        english = json.loads((root / "english-bridge.red.json").read_text())
+        english = json.loads((root / "english-bridge.red.json").read_text(encoding="utf-8"))
         assert english["decoded"]["party"]["pokemon"][0]["pokedexNumber"] == 1
         assert english["decoded"]["party"]["pokemon"][0]["nickname"]["value"] == "BULBASAUR"
         nidoran_path = root / "nidoran.sav"
         nidoran_path.write_bytes(nidoran_fixture())
         run(pkmn, "red-jp", "decode", nidoran_path, "--profile", "JP_RED_REV0")
         run(pkmn, "rjpjson", "project", root / "nidoran.red.jp.json")
-        nidoran = json.loads((root / "nidoran.red.json").read_text())
+        nidoran = json.loads((root / "nidoran.red.json").read_text(encoding="utf-8"))
         assert nidoran["decoded"]["party"]["pokemon"][0]["nickname"]["value"] == "NIDORAN♂"
         assert nidoran["decoded"]["party"]["pokemon"][0]["sourceJapanese"]["nickname"]["value"] == "カキ"
         target = root / "synthetic-fr.sav"
         run(pkmn, "rjson", "convert_to_frjson", projection)
-        planned = json.loads((root / "synthetic-jp-red.fred.json").read_text())
+        planned = json.loads((root / "synthetic-jp-red.fred.json").read_text(encoding="utf-8"))
         assert planned["semantic"]["party"][0]["nickname"] == "カキ", planned["semantic"]["party"][0]
         run(pkmn, "rjson", "convert", projection, "--output", target)
-        manifest = json.loads((root / "synthetic-fr.conversion-manifest.json").read_text())
+        manifest = json.loads((root / "synthetic-fr.conversion-manifest.json").read_text(encoding="utf-8"))
         assert manifest["route"]["capability"] == "EXPERIMENTAL"
         assert manifest["route"]["evidence"] == "SYNTHETICALLY_VALIDATED_REAL_SAVE_PENDING"
         assert manifest["japaneseSource"]["pcPokemonCount"] == 2
@@ -179,7 +179,7 @@ def main():
                    for change in manifest["pokemonConversions"][0]["fieldChanges"])
         run(pkmn, "fred", "validate", target)
         run(pkmn, "fred", "decode", target)
-        decoded = json.loads((root / "synthetic-fr.fred.json").read_text())
+        decoded = json.loads((root / "synthetic-fr.fred.json").read_text(encoding="utf-8"))
         names = [(mon["nickname"], mon["otName"], mon["language"])
                  for mon in decoded["decoded"]["semantic"]["party"]["pokemon"]]
         assert ("カキ", "RED", 1) in names, names
@@ -192,7 +192,7 @@ def main():
         tampered = copy.deepcopy(document)
         tampered["decoded"]["party"]["pokemon"][0]["sourceJapanese"]["nickname"]["value"] = "アイ"
         tampered_path = root / "tampered.red.json"
-        tampered_path.write_text(json.dumps(tampered, ensure_ascii=False))
+        tampered_path.write_text(json.dumps(tampered, ensure_ascii=False), encoding="utf-8")
         run_failure(pkmn, "rjson", "validate", tampered_path)
         run_failure(pkmn, "rjpjson", "compare", archive, tampered_path)
 
@@ -219,12 +219,12 @@ def main():
         alias_target = root / "alias-fr.sav"
         run(pkmn, "red-jp", "convert", alias_path, "--profile", "JP_RED_REV1",
             "--output", alias_target)
-        alias_projection = json.loads((root / "alias.red.json").read_text())
+        alias_projection = json.loads((root / "alias.red.json").read_text(encoding="utf-8"))
         assert alias_projection["decoded"]["party"]["pokemon"][0]["sourceJapanese"]["nickname"]["ambiguousGlyph"]
         run(pkmn, "fred", "decode", alias_target)
-        alias_decoded = json.loads((root / "alias-fr.fred.json").read_text())
+        alias_decoded = json.loads((root / "alias-fr.fred.json").read_text(encoding="utf-8"))
         assert alias_decoded["decoded"]["semantic"]["party"]["pokemon"][0]["nickname"] == "へ"
-        alias_manifest = json.loads((root / "alias-fr.conversion-manifest.json").read_text())
+        alias_manifest = json.loads((root / "alias-fr.conversion-manifest.json").read_text(encoding="utf-8"))
         assert any("shared-tile alias" in warning for warning in
                    alias_manifest["pokemonConversions"][0]["warnings"])
 
@@ -235,7 +235,7 @@ def main():
             "--output", hof_target)
         run(pkmn, "fred", "validate", hof_target)
         run(pkmn, "fred", "decode", hof_target)
-        hof_decoded = json.loads((root / "hof-fr.fred.json").read_text())
+        hof_decoded = json.loads((root / "hof-fr.fred.json").read_text(encoding="utf-8"))
         hof_teams = hof_decoded["decoded"]["specialSectors"]["hallOfFame"]["teams"]
         assert hof_teams[0]["pokemon"][0]["nickname"] == "カキ", hof_teams
 
@@ -245,7 +245,7 @@ def main():
         run(pkmn, "red-jp", "convert", daycare_path, "--profile", "JP_RED_REV0",
             "--output", daycare_target)
         run(pkmn, "fred", "decode", daycare_target)
-        daycare_decoded = json.loads((root / "daycare-fr.fred.json").read_text())
+        daycare_decoded = json.loads((root / "daycare-fr.fred.json").read_text(encoding="utf-8"))
         records = daycare_decoded["decoded"]["semantic"]["daycare"]["records"]
         assert any(entry["pokemon"]["nickname"] == "カキ" for entry in records), records
 
@@ -253,7 +253,7 @@ def main():
         full_path.write_bytes(full_box_fixture())
         run(pkmn, "red-jp", "decode", full_path, "--profile", "JP_RED_REV0")
         run(pkmn, "rjpjson", "project", root / "full.red.jp.json")
-        full = json.loads((root / "full.red.json").read_text())
+        full = json.loads((root / "full.red.json").read_text(encoding="utf-8"))
         assert full["sourceJapanese"]["pcPokemonCount"] == 240
         assert sum(box["count"] for box in full["decoded"]["pcStorage"]["boxes"]) == 240
         run(pkmn, "rjson", "validate", root / "full.red.json")
@@ -271,9 +271,9 @@ def main():
         english_cache["decoded"]["pcStorage"]["boxes"][0]["count"] = 0
         english_cache["decoded"]["pcStorage"]["boxes"][0]["declaredCount"] = 0
         english_cache_path = root / "english-cache.red.json"
-        english_cache_path.write_text(json.dumps(english_cache, ensure_ascii=False))
+        english_cache_path.write_text(json.dumps(english_cache, ensure_ascii=False), encoding="utf-8")
         run(pkmn, "rjson", "convert_to_frjson", english_cache_path)
-        english_cache_plan = json.loads((root / "english-cache.fred.json").read_text())
+        english_cache_plan = json.loads((root / "english-cache.fred.json").read_text(encoding="utf-8"))
         assert len(english_cache_plan["semantic"]["storage"]["boxes"][0]["slots"]) == 2
 
         direct_path = root / "direct-jp.sav"
@@ -289,7 +289,7 @@ def main():
         guided = subprocess.run(
             [str(pkmn), "interactive"],
             input=f'1\n3\n"{guided_source}"\n1\nYES\nQ\n',
-            text=True, capture_output=True, check=True)
+            text=True, encoding="utf-8", capture_output=True, check=True)
         guided_target = root / "Pkmn Red JP_fr.sav"
         assert "Converted save ready" in guided.stdout, guided.stderr
         comparison_dir = root / "guided-parity"
@@ -314,7 +314,7 @@ def main():
             "--profile", "JP_RED_REV0", "--retain-playername",
             "--output", retained_target))
         retained_projection_path = root / "retained-jp.red.json"
-        retained_projection = json.loads(retained_projection_path.read_text())
+        retained_projection = json.loads(retained_projection_path.read_text(encoding="utf-8"))
         assert retained_projection["sourceJapanese"]["targetPlayerNamePolicy"] == "retain-japanese-raw-experimental"
         run(pkmn, "rjpjson", "validate", root / "retained-jp.red.jp.json")
         retained_comparison = json.loads(run(
@@ -322,7 +322,7 @@ def main():
             retained_projection_path))
         assert retained_comparison["exactProjectionMatch"]
         run(pkmn, "rjson", "validate", retained_projection_path)
-        retained_manifest = json.loads((root / "retained-fr.conversion-manifest.json").read_text())
+        retained_manifest = json.loads((root / "retained-fr.conversion-manifest.json").read_text(encoding="utf-8"))
         assert retained_manifest["japaneseSource"]["playerNamePolicy"] == "retain-japanese-raw-experimental"
         assert retained_manifest["japaneseSource"]["originalPlayerName"] == "アイ"
         assert retained_manifest["japaneseSource"]["targetPlayerNameFieldHex"].startswith("5152FF")
@@ -332,13 +332,13 @@ def main():
         assert bytes([0x51, 0x52, 0xFF]) in retained_target.read_bytes()
         run(pkmn, "fred", "validate", retained_target)
         run(pkmn, "fred", "decode", retained_target)
-        retained_decoded = json.loads((root / "retained-fr.fred.json").read_text())
+        retained_decoded = json.loads((root / "retained-fr.fred.json").read_text(encoding="utf-8"))
         assert retained_decoded["decoded"]["semantic"]["party"]["pokemon"][0]["otName"] == "アイ"
 
         bad_policy = copy.deepcopy(retained_projection)
         bad_policy["sourceJapanese"]["targetPlayerNamePolicy"] = "unexpected"
         bad_policy_path = root / "bad-policy.red.json"
-        bad_policy_path.write_text(json.dumps(bad_policy, ensure_ascii=False))
+        bad_policy_path.write_text(json.dumps(bad_policy, ensure_ascii=False), encoding="utf-8")
         run_failure(pkmn, "rjson", "validate", bad_policy_path)
         print("Synthetic Japanese Red archive and projection passed")
 

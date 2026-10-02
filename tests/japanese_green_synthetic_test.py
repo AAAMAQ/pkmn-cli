@@ -24,7 +24,7 @@ def main():
         run_failure(pkmn, "red-jp", "validate", source, "--profile", "JP_GREEN_REV0")
         run(pkmn, "green-jp", "decode", source, "--profile", "JP_GREEN_REV0")
         archive = root / "Pkmn Green JP.green.jp.json"
-        data = json.loads(archive.read_text())
+        data = json.loads(archive.read_text(encoding="utf-8"))
         assert data["schema"]["format"] == "pkmn-green-jp-master-save"
         assert data["source"]["profile"] == "JP_GREEN_REV0"
         for action in ("inspect", "validate"):
@@ -36,10 +36,10 @@ def main():
         projection = root / "Pkmn Green JP.red.json"
         run(pkmn, "rjson", "validate", projection)
         run(pkmn, "gjpjson", "compare", archive, projection)
-        assert json.loads(projection.read_text())["sourceJapanese"]["profile"] == "JP_GREEN_REV0"
+        assert json.loads(projection.read_text(encoding="utf-8"))["sourceJapanese"]["profile"] == "JP_GREEN_REV0"
         data["schema"]["format"] = "pkmn-red-jp-master-save"
         invalid = root / "mismatched.json"
-        invalid.write_text(json.dumps(data))
+        invalid.write_text(json.dumps(data), encoding="utf-8")
         run_failure(pkmn, "gjpjson", "validate", invalid)
         no_image = root / "no-image.green.jp.json"
         run(pkmn, "green-jp", "decode", source, "--profile", "JP_GREEN_REV0",
@@ -52,20 +52,20 @@ def main():
             "--profile", "JP_GREEN_REV0", "--output", target)
         run(pkmn, "fred", "validate", target)
         run(pkmn, "fred", "decode", target)
-        decoded = json.loads((root / "green-fr.fred.json").read_text())
+        decoded = json.loads((root / "green-fr.fred.json").read_text(encoding="utf-8"))
         assert any(mon["nickname"] == "カキ" and mon["language"] == 1
                    for mon in decoded["decoded"]["semantic"]["party"]["pokemon"])
         repeated = root / "green-fr-repeat.sav"
         run(pkmn, "rjson", "convert", root / "convert-green.red.json", "--output", repeated)
         assert target.read_bytes() == repeated.read_bytes()
-        manifest = json.loads((root / "green-fr.conversion-manifest.json").read_text())
+        manifest = json.loads((root / "green-fr.conversion-manifest.json").read_text(encoding="utf-8"))
         assert manifest["route"]["id"] == "green-jp-firered"
         assert manifest["route"]["sourceProfile"] == "JP_GREEN_REV0"
         assert manifest["route"]["capability"] == "EXPERIMENTAL"
         run(pkmn, "convert", "validate-manifest", root / "green-fr.conversion-manifest.json")
         manifest["route"]["sourceProfile"] = "JP_RED_REV0"
         bad_manifest = root / "bad-manifest.json"
-        bad_manifest.write_text(json.dumps(manifest))
+        bad_manifest.write_text(json.dumps(manifest), encoding="utf-8")
         run_failure(pkmn, "convert", "validate-manifest", bad_manifest)
         before = target.read_bytes()
         run_failure(pkmn, "green-jp", "convert", converted_source,
@@ -75,7 +75,7 @@ def main():
         guided_source.write_bytes(original)
         guided = subprocess.run([str(pkmn), "interactive"],
             input=f'1\n4\n"{guided_source}"\n1\nYES\nQ\n',
-            capture_output=True, text=True, check=True)
+            capture_output=True, text=True, encoding="utf-8", check=True)
         assert "Converted save ready" in guided.stdout, guided.stderr
         run(pkmn, "fred", "validate", root / "simple-green_fr.sav")
         assert source.read_bytes() == original == guided_source.read_bytes()
