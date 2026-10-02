@@ -20,6 +20,19 @@ runtime, and resources together and use the included interactive launcher.
 Packages include the conversion runtime; no separate Python is needed for
 these downloads. The Homebrew source formula uses Homebrew Python.
 
+### Homebrew
+
+```sh
+brew tap AAAMAQ/pkmn
+brew install AAAMAQ/pkmn/pkmn-cli
+```
+
+For an existing stable installation, run `brew update` followed by
+`brew upgrade AAAMAQ/pkmn/pkmn-cli`. To switch from an old `--HEAD` development
+installation, run `brew uninstall AAAMAQ/pkmn/pkmn-cli` and then
+`brew install AAAMAQ/pkmn/pkmn-cli`. This removes only the installed CLI package,
+not your save files. `brew reinstall` preserves the original `--HEAD` option.
+
 Read the [interactive player's manual](https://github.com/AAAMAQ/pkmn-cli/blob/v3.1.0/docs/INTERACTIVE_USER_MANUAL.md)
 for installation, sample files, every menu, and the full command index.
 
