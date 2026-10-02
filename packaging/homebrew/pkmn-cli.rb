@@ -1,11 +1,12 @@
 # typed: strict
 # frozen_string_literal: true
 
-# Development source formula. Stable 3.0 bottles are added only after the
-# immutable release archive and real bottle checksums exist.
+# Versioned source formula; prebuilt bottles are not published yet.
 class PkmnCli < Formula
   desc "Translate Pokemon Red or Blue saves into FireRed or LeafGreen"
   homepage "https://github.com/AAAMAQ/pkmn-cli"
+  url "https://github.com/AAAMAQ/pkmn-cli/archive/refs/tags/v3.1.0.tar.gz"
+  sha256 "94c28140c1d49c9b08542deb43b7b5c19dc914e93c7e142a9d21074a9dbb6bfe"
   license "MIT"
   head "https://github.com/AAAMAQ/pkmn-cli.git", branch: "main"
 
