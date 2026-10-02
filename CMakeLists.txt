@@ -91,6 +91,9 @@ target_include_directories(pkmn_cli_core PUBLIC
 target_compile_features(pkmn_cli_core PUBLIC cxx_std_20)
 
 if(MSVC)
+    # Text codecs index UTF-8 literals by byte; never use the host ANSI code page.
+    # PUBLIC also keeps linked test/executable translation units consistent.
+    target_compile_options(pkmn_cli_core PUBLIC /utf-8)
     target_compile_options(pkmn_cli_core PRIVATE /W4 /permissive-)
 else()
     target_compile_options(pkmn_cli_core PRIVATE -Wall -Wextra -Wpedantic)
